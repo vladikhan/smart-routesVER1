@@ -28,6 +28,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 6.1.3'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'devise'
+  gem 'faker'
   
 
 end
@@ -68,5 +69,6 @@ gem 'debug'
 
 
 # gem 'jquery-rails'
+gem 'acts_as_list'
 
 gem 'aws-sdk-s3', '~> 1.0'

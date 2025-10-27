@@ -12,7 +12,8 @@ class Notification < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   # メソッド
-  def mark_as read!
+  def mark_as_read!
     update(is_read: true)
+
   end
 end
