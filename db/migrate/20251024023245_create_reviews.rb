@@ -16,7 +16,6 @@ class CreateReviews < ActiveRecord::Migration[6.1]
     end
 
     add_index :reviews, [:reviewable_type, :reviewable_id]
-    add_index :reviews, :user_id
     add_index :reviews, :total_score
     add_index :reviews, :is_flagged
   end

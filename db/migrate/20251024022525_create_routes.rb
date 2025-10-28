@@ -22,7 +22,6 @@ class CreateRoutes < ActiveRecord::Migration[6.1]
       t.timestamps
     end
 
-    add_index :routes, :user_id
     add_index :routes, :is_public
     add_index :routes, :is_featured
     add_index :routes, :popularity_score

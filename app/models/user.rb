@@ -1,6 +1,7 @@
 class User < ApplicationRecord
-	has_secure_password
-
+	devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable, 
+         :confirmable 
 	# リレーション
  has_many :routes, dependent: :destroy
  has_many :reviews, dependent: :destroy

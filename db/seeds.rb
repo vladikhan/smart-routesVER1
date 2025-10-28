@@ -1,3 +1,5 @@
+require 'faker'
+
 if Rails.env.development?
 	puts "既存データをクリア中..."
 
@@ -20,33 +22,41 @@ puts "シードデータの作成中..."
 #=========================== 1. Users ==============================
 puts "ユーザーを作成中。。。"
 
-admin = User.create!(
-	username: 'admin',
-	email: 'admin@smartroutes.com',
-	password: 'password',
-	password_confirmation: 'password',
-	is_admin: true,
-	bio: "SmartRoutesの管理者です。",
-	location: 'Kyoto, Japan',
-	email_verified: true
+# Создание Администратора: используем new, чтобы избежать колбэка
+admin = User.new(
+  username: 'admin',
+  email: 'admin@smartroutes.com',
+  password: 'password',
+  password_confirmation: 'password',
+  is_admin: true,
+  bio: "SmartRoutesの管理者です。",
+  location: 'Kyoto, Japan',
+  email_verified: true
 )
+admin.skip_confirmation! # <-- Пропускаем отправку письма
+admin.save!              # <-- Сохраняем без ошибок
 
-users = []
+# Создание 30 обычных пользователей: то же исправление
 30.times do |i|
-	users << User.create!(
-		username: "user#{i + 1}",
-		email: "user#{i + 1}@example.com",
-		password: 'password',
-		password_confirmation: 'password',
-		bio: Faker::Lorem.sentence,
-		location: ['Nara', 'Osaka', 'Kyoto'].sample,
-		budget_min: [1000, 2000, 3000, 5000].sample,
-		budget_max: [5000, 10000, 15000, 20000].sample,
-		email_verified: true
-	)
+  user = User.new(
+    username: "user#{i + 1}",
+    email: "user#{i + 1}@example.com",
+    password: 'password123',
+    password_confirmation: 'password123',
+    bio: Faker::Lorem.sentence,
+    location: ['Nara', 'Osaka', 'Kyoto'].sample,
+    budget_min: [1000, 2000, 3000, 5000].sample,
+    budget_max: [5000, 10000, 15000, 20000].sample,
+    email_verified: true
+  )
+  user.skip_confirmation! # <-- Пропускаем отправку письма
+  user.save!              # <-- Сохраняем без ошибок
 end
 
 puts "#{User.count}人のユーザーを作成しました。"
+
+users = User.all
+nil
 
 #================== 2. Cities & Districts =====================
 puts  "都市とエリアを作成中..."

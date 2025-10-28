@@ -13,7 +13,6 @@ class CreateComments < ActiveRecord::Migration[6.1]
     end
 
     add_index :comments, [:commentable_type, :commentable_id]
-    add_index :comments, :user_id
     add_index :comments, :parent_id
   end
 end
