@@ -72,3 +72,4 @@ gem 'debug'
 gem 'acts_as_list'
 
 gem 'aws-sdk-s3', '~> 1.0'
+gem "bootstrap", "~> 5.3"
