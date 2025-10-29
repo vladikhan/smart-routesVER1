@@ -7,6 +7,9 @@ WORKDIR /app
 COPY Gemfile* ./
 RUN bundle install
 
+RUN apt-get update -qq && apt-get install -y nodejs npm
+RUN npm install -g yarn
+
 COPY . .
 
 EXPOSE 3000

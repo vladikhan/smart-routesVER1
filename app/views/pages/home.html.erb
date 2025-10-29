@@ -1,7 +1,7 @@
+docker compose exec web bash -c 'cat > app/views/pages/home.html.erb << "ENDOFFILE"
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -10,6 +10,7 @@
       color: #3d2755;
     }
     
+    /* Header */
     .header {
       background: #007edf;
       padding: 15px 0;
@@ -38,8 +39,19 @@
       color: white;
       text-decoration: none;
       font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    .nav-links a:hover { opacity: 0.8; }
+    .login-btn {
+      background: white;
+      color: #007edf;
+      padding: 8px 20px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
     }
     
+    /* Hero Section */
     .hero {
       background: linear-gradient(135deg, #007edf 0%, #0056b3 100%);
       padding: 80px 20px 100px;
@@ -51,11 +63,18 @@
       margin-bottom: 15px;
       font-weight: 700;
     }
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 40px;
+      opacity: 0.95;
+    }
     
+    /* Search Box */
     .search-container {
       max-width: 900px;
       margin: -50px auto 60px;
       position: relative;
+      z-index: 10;
     }
     .search-box {
       background: #e0e0e0;
@@ -67,6 +86,7 @@
     .search-form {
       display: flex;
       gap: 15px;
+      align-items: center;
     }
     .search-input {
       flex: 1;
@@ -75,6 +95,11 @@
       border-radius: 6px;
       font-size: 16px;
       background: white;
+      color: #3d2755;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #007edf;
     }
     .search-btn {
       background: #007edf;
@@ -85,14 +110,20 @@
       font-size: 18px;
       font-weight: 600;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+    .search-btn:hover {
+      background: #0056b3;
     }
     
+    /* Container */
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
     
+    /* Stats */
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -105,19 +136,37 @@
       background: white;
       border-radius: 8px;
       border: 1px solid #e0e0e0;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
     }
     .stat-number {
       font-size: 36px;
       font-weight: 700;
       color: #007edf;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      color: #666;
+      font-size: 16px;
     }
     
+    /* Section Title */
     .section-title {
       text-align: center;
       font-size: 32px;
+      font-weight: 700;
       margin: 60px 0 40px;
+      color: #3d2755;
     }
     
+    /* Cards Grid */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -128,9 +177,10 @@
     .card {
       background: white;
       border-radius: 12px;
-      border: 1px solid #e0e0e0;
       overflow: hidden;
-      transition: transform 0.3s;
+      border: 1px solid #e0e0e0;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
     }
     .card:hover {
       transform: translateY(-8px);
@@ -143,6 +193,7 @@
       align-items: center;
       justify-content: center;
       font-size: 64px;
+      color: white;
     }
     .card-body {
       padding: 20px;
@@ -151,6 +202,42 @@
       font-size: 20px;
       font-weight: 700;
       margin-bottom: 10px;
+      color: #3d2755;
+    }
+    .card-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .badge {
+      background: #007edf;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .duration {
+      color: #666;
+      font-size: 14px;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .rating {
+      color: #f59e0b;
+      font-size: 14px;
     }
     .view-btn {
       background: #007edf;
@@ -158,87 +245,253 @@
       padding: 8px 20px;
       border-radius: 6px;
       text-decoration: none;
-      display: inline-block;
-      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .view-btn:hover {
+      background: #0056b3;
     }
     
+    /* Features */
+    .features {
+      background: #f8f9fa;
+      padding: 60px 0;
+      margin: 60px 0;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+    .feature {
+      text-align: center;
+      padding: 30px;
+    }
+    .feature-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    .feature h3 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #3d2755;
+    }
+    .feature p {
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    /* Footer */
     .footer {
       background: #3d2755;
       color: white;
       padding: 40px 0 20px;
       margin-top: 60px;
+    }
+    .footer-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+    .footer h5 {
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    .footer p {
+      color: rgba(255,255,255,0.7);
+      line-height: 1.6;
+    }
+    .footer-links {
+      list-style: none;
+    }
+    .footer-links li {
+      margin-bottom: 10px;
+    }
+    .footer-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover {
+      color: white;
+    }
+    .footer-bottom {
       text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+    }
+    
+    /* Alert */
+    .alert {
+      background: #e3f2fd;
+      border: 1px solid #64b5f7;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      color: #3d2755;
+      margin: 40px 0;
+    }
+    
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 32px; }
+      .stats, .features-grid { grid-template-columns: 1fr; }
+      .search-form { flex-direction: column; }
+      .search-btn { width: 100%; }
+      .footer-content { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+  <!-- Header -->
   <header class="header">
     <div class="container">
       <a href="/" class="logo">📍 Smart Routes</a>
       <ul class="nav-links">
         <li><a href="/routes">ルート一覧</a></li>
-        <li><a href="/venues">場所</a></li>
+        <li><a href="/venues">場所を探す</a></li>
         <li><a href="/cities">都市</a></li>
       </ul>
+      <a href="/login" class="login-btn">ログイン</a>
     </div>
   </header>
 
+  <!-- Hero Section -->
   <section class="hero">
     <h1>京都・大阪の旅を最適化</h1>
-    <p>AIが最適なルートを提案</p>
+    <p>AIが最適なルートを提案。時間とお金を節約しながら、最高の旅行体験を。</p>
   </section>
 
+  <!-- Search Box -->
   <div class="search-container">
     <div class="search-box">
-      <form class="search-form" action="/routes">
-        <input type="text" class="search-input" placeholder="場所、料理、アクティビティを検索...">
+      <form class="search-form" action="/routes" method="get">
+        <input 
+          type="text" 
+          name="q"
+          class="search-input" 
+          placeholder="場所、料理、アクティビティを検索..."
+        >
         <button type="submit" class="search-btn">🔍 検索</button>
       </form>
     </div>
   </div>
 
+  <!-- Stats -->
   <div class="container">
     <div class="stats">
       <div class="stat-card">
+        <div class="stat-icon">🗺️</div>
         <div class="stat-number"><%= @routes_count %></div>
-        <div>ルート</div>
+        <div class="stat-label">ルート</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">📍</div>
         <div class="stat-number"><%= @venues_count %></div>
-        <div>場所</div>
+        <div class="stat-label">場所</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">👥</div>
         <div class="stat-number"><%= @users_count %></div>
-        <div>ユーザー</div>
+        <div class="stat-label">ユーザー</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">⭐</div>
         <div class="stat-number"><%= @reviews_count %></div>
-        <div>レビュー</div>
+        <div class="stat-label">レビュー</div>
       </div>
     </div>
 
+    <!-- Popular Routes -->
     <h2 class="section-title">人気のルート</h2>
     
     <% if @featured_routes.any? %>
       <div class="cards-grid">
         <% @featured_routes.each do |route| %>
           <div class="card">
-            <div class="card-image">��</div>
+            <div class="card-image">🗾</div>
             <div class="card-body">
               <h3 class="card-title"><%= route.name %></h3>
-              <p><%= truncate(route.description, length: 80) %></p>
-              <a href="/routes/<%= route.id %>" class="view-btn">詳細を見る</a>
+              <p class="card-description"><%= truncate(route.description, length: 80) %></p>
+              
+              <div class="card-meta">
+                <span class="badge"><%= route.difficulty_level || "easy" %></span>
+                <span class="duration">⏱️ <%= route.estimated_duration %>分</span>
+              </div>
+              
+              <div class="card-footer">
+                <span class="rating">⭐ 4.8 (120)</span>
+                <a href="/routes/<%= route.id %>" class="view-btn">詳細を見る</a>
+              </div>
             </div>
           </div>
         <% end %>
       </div>
     <% else %>
-      <p style="text-align: center; padding: 40px;">まだルートがありません</p>
+      <div class="alert">
+        📝 まだルートがありません。最初のルートを作成しましょう！
+      </div>
     <% end %>
   </div>
 
+  <!-- Features -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Smart Routesの特徴</h2>
+      <div class="features-grid">
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <h3>AIによる最適化</h3>
+          <p>遺伝的アルゴリズムで最短ルートを自動計算。時間とコストを最小化します。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🌍</div>
+          <h3>リアルタイム位置情報</h3>
+          <p>GPS座標で正確なナビゲーション。迷うことなく目的地に到着できます。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">💬</div>
+          <h3>コミュニティレビュー</h3>
+          <p>実際の旅行者からの評価と写真。信頼できる情報で旅行を計画。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
   <footer class="footer">
-    <p>© 2025 Smart Routes. All rights reserved.</p>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <h5>Smart Routes</h5>
+          <p>京都・大阪の旅行ルート最適化プラットフォーム。AIと遺伝的アルゴリズムで、あなたの旅を最高のものにします。</p>
+        </div>
+        <div>
+          <h5>リンク</h5>
+          <ul class="footer-links">
+            <li><a href="/routes">ルート一覧</a></li>
+            <li><a href="/venues">場所を探す</a></li>
+            <li><a href="/cities">都市</a></li>
+            <li><a href="/about">About Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>サポート</h5>
+          <ul class="footer-links">
+            <li><a href="/help">ヘルプ</a></li>
+            <li><a href="/contact">お問い合わせ</a></li>
+            <li><a href="/terms">利用規約</a></li>
+            <li><a href="/privacy">プライバシー</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2024 Smart Routes. All rights reserved.
+      </div>
+    </div>
   </footer>
 </body>
 </html>
+ENDOFFILE'

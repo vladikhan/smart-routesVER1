@@ -59,9 +59,9 @@ gem "kaminari", "~> 1.2.2"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-gem "dartsass-rails", "~> 0.5.1"
-# gem 'sass-rails', '~> 6.0.0'
-# gem 'sassc-rails', '~> 2.1.0'
+# Используем Dart Sass вместо sassc
+gem "sass-embedded", "~> 1.79" 
+gem "cssbundling-rails"   
 
 gem 'sprockets-rails'
 
