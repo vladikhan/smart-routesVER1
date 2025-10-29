@@ -20,7 +20,7 @@ $card-border: #e0e0e0;
 
 /* === Body === */
 body {
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+	font-family: 'Osaka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
 		'Helvetica Neue', Arial, sans-serif;
 	background: $bg-color;
 	color: $text-color;
@@ -47,8 +47,8 @@ body {
 
 	.logo {
 		color: white;
-		font-size: 24px;
-		font-weight: bold;
+		font-size: 34px;
+		font-weight: bolder;
 		text-decoration: none;
 		transition: opacity 0.3s;
 
@@ -161,7 +161,7 @@ body {
 	background: #64b5f7;
 	color: #fefefe;
 	padding: 15px 40px;
-	border: 1px solid #fefefe;
+	border: 2px solid $primary-color;
 	border-radius: 6px;
 	font-size: 18px;
 	font-weight: 600;

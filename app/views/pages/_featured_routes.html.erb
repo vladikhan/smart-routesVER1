@@ -1,0 +1,31 @@
+<!-- Popular Routes -->
+    <h2 class="section-title">人気のルート</h2>
+    
+    <% if @featured_routes.any? %>
+      <div class="cards-grid">
+        <% @featured_routes.each do |route| %>
+          <div class="card">
+            <div class="card-image">🗾</div>
+            <div class="card-body">
+              <h3 class="card-title"><%= route.name %></h3>
+              <p class="card-description"><%= truncate(route.description, length: 80) %></p>
+              
+              <div class="card-meta">
+                <span class="badge"><%= route.difficulty_level || "easy" %></span>
+                <span class="duration">⏱️ <%= route.estimated_duration %>分</span>
+              </div>
+              
+              <div class="card-footer">
+                <span class="rating">⭐ 4.8 (120)</span>
+                <a href="/routes/<%= route.id %>" class="view-btn">詳細を見る</a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="alert">
+        📝 まだルートがありません。最初のルートを作成しましょう！
+      </div>
+    <% end %>
+  </div>

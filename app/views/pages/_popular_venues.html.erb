@@ -1,0 +1,16 @@
+<h2 class="section-title">人気のレストラン</h2>
+<div class="cards-grid">
+  <% @popular_venues.each do |venue| %>
+    <div class="card">
+      <div class="card-image">🍽️</div>
+      <div class="card-body">
+        <h3 class="card-title"><%= venue.name %></h3>
+        <p class="card-description"><%= truncate(venue.description, length: 60) %></p>
+        <div class="card-footer">
+          <span class="rating">⭐ <%= venue.average_rating || "4.5" %></span>
+          <a href="/venues/<%= venue.id %>" class="view-btn">詳細を見る</a>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

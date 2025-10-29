@@ -5,152 +5,36 @@
   
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <a href="/" class="logo">Smart Routes</a>
-      <ul class="nav-links">
-        <li><a href="/routes">ルート一覧</a></li>
-        <li><a href="/venues">場所を探す</a></li>
-        <li><a href="/cities">都市</a></li>
-      </ul>
-      <a href="/login" class="login-btn">ログイン</a>
-    </div>
-  </header>
+ 
+<!-- Header -->
+<%= render "pages/header" %>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h1>京都・大阪の旅を最適化</h1>
-    <p>AIが最適なルートを提案。時間とお金を節約しながら、最高の旅行体験を。</p>
-  </section>
+<!-- Hero -->
+<%= render "pages/hero" %>
 
-  <!-- Search Box -->
-  <div class="search-container">
-    <div class="search-box">
-      <form class="search-form" action="/routes" method="get">
-        <input 
-          type="text" 
-          name="q"
-          class="search-input" 
-          placeholder="場所、料理、アクティビティを検索..."
-        >
-        <button type="submit" class="search-btn">🔍 検索</button>
-      </form>
-    </div>
-  </div>
+<!-- Stats -->
+<%= render "pages/stats" %>
 
-  <!-- Stats -->
-  <div class="container">
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-icon">🗺️</div>
-        <div class="stat-number"><%= @routes_count %></div>
-        <div class="stat-label">ルート</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📍</div>
-        <div class="stat-number"><%= @venues_count %></div>
-        <div class="stat-label">場所</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-number"><%= @users_count %></div>
-        <div class="stat-label">ユーザー</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-number"><%= @reviews_count %></div>
-        <div class="stat-label">レビュー</div>
-      </div>
-    </div>
+<!-- Popular Routes -->
+<%= render "pages/featured_routes" %>
 
-    <!-- Popular Routes -->
-    <h2 class="section-title">人気のルート</h2>
+<!-- Popular Venues -->
+<%= render "pages/popular_venues" %>
+
+<!-- Features -->
+<%= render "pages/features" %>
+
+<!-- Footer -->
+<%= render "pages/footer" %>
+ 
+
+  
+  
+
     
-    <% if @featured_routes.any? %>
-      <div class="cards-grid">
-        <% @featured_routes.each do |route| %>
-          <div class="card">
-            <div class="card-image">🗾</div>
-            <div class="card-body">
-              <h3 class="card-title"><%= route.name %></h3>
-              <p class="card-description"><%= truncate(route.description, length: 80) %></p>
-              
-              <div class="card-meta">
-                <span class="badge"><%= route.difficulty_level || "easy" %></span>
-                <span class="duration">⏱️ <%= route.estimated_duration %>分</span>
-              </div>
-              
-              <div class="card-footer">
-                <span class="rating">⭐ 4.8 (120)</span>
-                <a href="/routes/<%= route.id %>" class="view-btn">詳細を見る</a>
-              </div>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="alert">
-        📝 まだルートがありません。最初のルートを作成しましょう！
-      </div>
-    <% end %>
-  </div>
 
-  <!-- Features -->
-  <section class="features">
-    <div class="container">
-      <h2 class="section-title">Smart Routesの特徴</h2>
-      <div class="features-grid">
-        <div class="feature">
-          <div class="feature-icon">⚡</div>
-          <h3>AIによる最適化</h3>
-          <p>遺伝的アルゴリズムで最短ルートを自動計算。時間とコストを最小化します。</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">🌍</div>
-          <h3>リアルタイム位置情報</h3>
-          <p>GPS座標で正確なナビゲーション。迷うことなく目的地に到着できます。</p>
-        </div>
-        <div class="feature">
-          <div class="feature-icon">💬</div>
-          <h3>コミュニティレビュー</h3>
-          <p>実際の旅行者からの評価と写真。信頼できる情報で旅行を計画。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div>
-          <h5>Smart Routes</h5>
-          <p>京都・大阪の旅行ルート最適化プラットフォーム。AIと遺伝的アルゴリズムで、あなたの旅を最高のものにします。</p>
-        </div>
-        <div>
-          <h5>リンク</h5>
-          <ul class="footer-links">
-            <li><a href="/routes">ルート一覧</a></li>
-            <li><a href="/venues">場所を探す</a></li>
-            <li><a href="/cities">都市</a></li>
-            <li><a href="/about">About Us</a></li>
-          </ul>
-        </div>
-        <div>
-          <h5>サポート</h5>
-          <ul class="footer-links">
-            <li><a href="/help">ヘルプ</a></li>
-            <li><a href="/contact">お問い合わせ</a></li>
-            <li><a href="/terms">利用規約</a></li>
-            <li><a href="/privacy">プライバシー</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        © 2025 Smart Routes. All rights reserved.
-      </div>
-    </div>
-  </footer>
+  
 </body>
 </html>
