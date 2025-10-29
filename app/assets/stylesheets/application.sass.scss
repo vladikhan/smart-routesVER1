@@ -91,7 +91,7 @@ body {
 
 /* === Hero Section === */
 .hero {
-	background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+	background: linear-gradient(135deg, #f1e9dd 0%, #64b5f7 100%);
 	padding: 80px 20px 100px;
 	text-align: center;
 	color: white;
@@ -140,7 +140,7 @@ body {
 .search-input {
 	flex: 1;
 	padding: 15px 20px;
-	border: 2px solid $secondary-color;
+	border: 2px solid white;
 	border-radius: 6px;
 	font-size: 16px;
 	background: white;
@@ -158,10 +158,10 @@ body {
 }
 
 .search-btn {
-	background: $primary-color;
-	color: white;
+	background: #64b5f7;
+	color: #fefefe;
 	padding: 15px 40px;
-	border: none;
+	border: 1px solid #fefefe;
 	border-radius: 6px;
 	font-size: 18px;
 	font-weight: 600;
@@ -169,7 +169,8 @@ body {
 	transition: background 0.3s;
 
 	&:hover {
-		background: $primary-dark;
+		color: #fefefe;
+		background: #9ec8ea;
 	}
 
 	@media (max-width: 768px) {
