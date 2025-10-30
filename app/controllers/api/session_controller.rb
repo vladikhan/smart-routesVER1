@@ -13,7 +13,7 @@ class Api::SessionsController < Devise::SessionsController
 			render json: (
 				status: {
 					code: 200,
-					message: 'Signed in successfully.'
+					message: 'サインインに成功しました。'
 				},
 				data: {
 					user: resource.as_json(only: [:id, :username, :email]),
@@ -27,7 +27,7 @@ rescue ActionController::ParameterMissing => each
 	render json: {
 		status: {
 			code: 400,
-			message: 'Missing user parameters in request body.'
+			message: 'リクエスト本文にユーザーパラメータが不足しています。'
 		}
 	}, status: :bad_request
 	rescue => e
@@ -35,7 +35,8 @@ rescue ActionController::ParameterMissing => each
 		render json: {
 			status: {
 				code: 401,
-				message: 'Invalid email or password.'
+				message: 'メールアドレスまたはパスワードが無効です。
+.'
 			}
 		}, status: :unauthorized
 end
@@ -47,7 +48,8 @@ def destroy
 	render json: {
 		status: {
 		code: 200,
-		message: 'Signed out successfully'
+		message: 'サインアウトに成功しました
+'
 		}
 	}, status: :ok
 end

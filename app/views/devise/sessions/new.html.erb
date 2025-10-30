@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ログイン - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'login', media: 'all' %>
+</head>
+<body>
+  <header class="login-header">
+    <%= link_to root_path, class: "login-logo" do %>
+      <span class="login-logo-icon">🗺️</span>
+      <span>Smart<strong>Routes</strong></span>
+    <% end %>
+    <%= link_to "ログイン →", new_user_session_path, class: "login-link" %>
+  </header>
+
+  <div class="login-container">
+    <div class="login-box">
+      <% if alert %>
+        <div class="alert">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="form-group">
+          <%= f.label :email, "メールアドレス", class: "form-label" %>
+          <%= f.email_field :email, 
+              autofocus: true, 
+              autocomplete: "email",
+              class: "form-input",
+              placeholder: "example@email.com" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password, "パスワード", class: "form-label" %>
+          <%= f.password_field :password, 
+              autocomplete: "current-password",
+              class: "form-input",
+              placeholder: "••••••••" %>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+          <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+            <%= f.check_box :remember_me %>
+            <%= f.label :remember_me, "ログイン状態を保持" %>
+          </div>
+        <% end %>
+
+        <%= f.submit "ログイン", class: "btn-primary" %>
+      <% end %>
+
+      <%= link_to "パスワードを忘れた場合", new_password_path(resource_name), class: "text-link" %>
+
+      <a href="<%= new_registration_path(resource_name) %>" class="btn-secondary">新しいアカウント作成</a>
+    </div>
+  </div>
+</body>
+</html>

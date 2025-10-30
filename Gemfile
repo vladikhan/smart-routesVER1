@@ -28,6 +28,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 6.1.3'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'devise'
+  gem 'devise-i18n'
   gem 'faker'
   
 
@@ -73,3 +74,4 @@ gem 'acts_as_list'
 
 gem 'aws-sdk-s3', '~> 1.0'
 gem "bootstrap", "~> 5.3"
+gem 'sass-rails'
