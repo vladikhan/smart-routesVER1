@@ -1,16 +1,35 @@
-<h2>Resend confirmation instructions</h2>
+<div class="login-container">
+    <div class="login-box">
+      <h2 class="form-title">Resend confirmation 
+instructions 再送確認の手順</h2>
+      <p class="form-subtitle">確認メールが届いていない場合は、こちらから再送信できます。</p>
 
-<%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+      <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) %>
+        <div class="form-group">
+          <%= f.label :email, class: "form-label" %>
+          <%= f.email_field :email, 
+              autofocus: true, 
+              autocomplete: "email", 
+              value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email),
+              class: "form-input",
+              placeholder: "example@email.com" %>
+        </div>
+
+        <%= f.submit "再送確認の手順
+", class: "btn-primary" %>
+      <% end %>
+
+      <div class="auth-links">
+        <%= link_to "ログイン", new_session_path(resource_name), class: "auth-link" %>
+        <span class="auth-separator">|</span>
+        <%= link_to "登録", new_registration_path(resource_name), class: "auth-link" %>
+        <% if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
+          <span class="auth-separator">|</span>
+          <%= link_to "パスワードをお忘れですか？
+", new_password_path(resource_name), class: "auth-link" %>
+        <% end %>
+      </div>
+    </div>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Resend confirmation instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
