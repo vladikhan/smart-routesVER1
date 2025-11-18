@@ -1,4 +1,21 @@
-<div class="login-container">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>確認メールを再送信 - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'login', media: 'all' %>
+</head>
+<body>
+  <header class="login-header">
+    <%= link_to root_path, class: "login-logo" do %>
+      <span class="login-logo-icon">🗺️</span>
+      <span>Smart<strong>Routes</strong></span>
+    <% end %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-link" %>
+  </header>
+  <div class="login-container">
     <div class="login-box">
       <h2 class="form-title">パスワードをお忘れですか？
 </h2>

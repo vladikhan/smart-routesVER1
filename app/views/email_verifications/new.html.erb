@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>メールアドレス確認 - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'login', media: 'all' %>
+  
+</head>
+<body>
+  <header class="login-header">
+    <%= link_to root_path, class: "login-logo" do %>
+      <span class="login-logo-icon">🗺️</span>
+      <span>Smart<strong>Routes</strong></span>
+    <% end %>
+  </header>
+
+  <div class="login-container">
+    <div class="login-box verification-box">
+      <h2 class="form-title">📧 メールアドレスを確認</h2>
+      <p class="form-subtitle">以下のメールアドレスに送信された6桁のコードを入力してください</p>
+      
+      <div class="email-display">
+        <div>確認コードを送信しました：</div>
+        <div class="email-address"><%= @user&.email %></div>
+      </div>
+
+      <% if flash[:alert] %>
+        <div class="alert">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <% if flash[:notice] %>
+        <div class="alert" style="background: #e8f5e9; border-color: #4caf50; color: #2e7d32;">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+
+      <%= form_with url: email_verification_path, method: :post, local: true do |f| %>
+        <div class="code-input-group">
+          <input type="text" maxlength="1" class="code-digit" id="digit-1" name="code[]" pattern="\d" required>
+          <input type="text" maxlength="1" class="code-digit" id="digit-2" name="code[]" pattern="\d" required>
+          <input type="text" maxlength="1" class="code-digit" id="digit-3" name="code[]" pattern="\d" required>
+          <input type="text" maxlength="1" class="code-digit" id="digit-4" name="code[]" pattern="\d" required>
+          <input type="text" maxlength="1" class="code-digit" id="digit-5" name="code[]" pattern="\d" required>
+          <input type="text" maxlength="1" class="code-digit" id="digit-6" name="code[]" pattern="\d" required>
+        </div>
+
+        <input type="hidden" name="verification_code" id="full-code">
+
+        <div class="timer" id="timer">コードは15分後に期限切れになります</div>
+
+        <%= f.submit "確認", class: "btn-primary" %>
+      <% end %>
+
+      <%= form_with url: email_verification_resend_path, method: :post, local: true do |f| %>
+        <button type="submit" class="resend-link" style="background: none; border: none; cursor: pointer;">
+          コードを再送信
+        </button>
+      <% end %>
+    </div>
+  </div>
+
+  <script>
+    // Auto-focus and auto-advance code inputs
+    const inputs = document.querySelectorAll('.code-digit');
+    const fullCodeInput = document.getElementById('full-code');
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        
+        if (value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+        
+        // Update hidden field
+        const code = Array.from(inputs).map(i => i.value).join('');
+        fullCodeInput.value = code;
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = e.clipboardData.getData('text');
+        const digits = paste.replace(/\D/g, '').split('');
+        
+        digits.forEach((digit, i) => {
+          if (inputs[index + i]) {
+            inputs[index + i].value = digit;
+          }
+        });
+        
+        const lastIndex = Math.min(index + digits.length, inputs.length - 1);
+        inputs[lastIndex].focus();
+        
+        // Update hidden field
+        const code = Array.from(inputs).map(i => i.value).join('');
+        fullCodeInput.value = code;
+      });
+    });
+
+    // Focus first input on load
+    inputs[0].focus();
+
+    // Timer countdown (15 minutes)
+    let timeLeft = 15 * 60; // 15 minutes in seconds
+    const timerElement = document.getElementById('timer');
+
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerElement.textContent = `コードは ${minutes}:${seconds.toString().padStart(2, '0')} 後に期限切れになります`;
+      
+      if (timeLeft > 0) {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+      } else {
+        timerElement.textContent = 'コードの有効期限が切れました。再送信してください。';
+        timerElement.style.color = '#f44336';
+      }
+    }
+
+    updateTimer();
+  </script>
+</body>
+</html>
