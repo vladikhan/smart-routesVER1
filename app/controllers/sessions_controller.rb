@@ -1,8 +1,11 @@
-class SessionsController < ApplicationController
+class Users::SessionsController < Devise::SessionsController
   def new
+    self.resource = resource_class.new(sign_in_params)
+    super
   end
 
   def create
+    self.resource = warden.authenticate!(auth_options)
     user = User.find_by(email: params[:email])
 
     if user && user.authenticate(params[:password])

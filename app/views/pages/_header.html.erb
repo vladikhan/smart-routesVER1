@@ -10,10 +10,25 @@
 
       <div class="auth-links">
       <% if user_signed_in? %>
-        <%= link_to "ログアウト", destroy_user_session_path, method: :delete, class: "login-btn" %>
-        <% else %>
-        <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
-        <% end %>
+        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
+      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
+    <% end %>
+  <% else %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
+  <% end %>
+  <style>
+.inline-logout-form {
+  display: inline;
+}
+.login-btn {
+  /* Убедитесь, что стили кнопки соответствуют вашим стилям для ссылок */
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  /* Добавьте сюда другие стили из вашего .login-btn */
+}
+</style>
       </div>
     </div>
   </header>
