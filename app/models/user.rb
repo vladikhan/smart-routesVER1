@@ -10,6 +10,44 @@ class User < ApplicationRecord
  has_many :bookmarks, dependent: :destroy
  has_many :notifications, dependent: :destroy
 
+ #Verification code constants
+ VERIFICATION_CODE_LENGTH = 6
+ VERIFICATION_CODE_EXPIRY = 15.minutes
+
+ #Generate 6-digit verification code
+ def generate_verification_code
+	self.verification_code = SecureRandom.random_number(10**VERIFICATION_CODE_LENGTH).to_s.rjust(VERIFICATION_CODE_LENGTH, '0')
+	self.verification_code_sent_at = Time.current
+	save(validate: false)
+ end
+
+ #Check if verfication code is valid
+ def verification_code_valid?(code)
+	return false if verification_code.blank?
+	return false if verification_code_sent_at.nil?
+	return false if Time.current > verification_code_sent_at + VERIFICATION_CODE_EXPIRY
+
+	verification_code == code
+ end
+
+ #Chdeck if code is expired 
+ def verification_code_expired?
+	return true if verification_code_sent_at.nil?
+	Time.current > verification_code_sent_at + VERIFICATION_CODE_EXPIRY
+ end
+
+ #Send verification code email
+ def send_verification_code
+	generate_verification_code
+	UserMailer.verification_code_email(self).deliver_now
+ end
+
+ #Override Devise confirmable to use code instead of link
+ def senf_confirmation_instructions
+	generate_verification_code
+	UserMailer.verification_code_email(self).deliver_now
+ end
+
  #DM
 	has_many :sent_dm_rooms, class_name: 'DmRoom', foreign_key: 'sender_id', dependent: :destroy
 	has_many :received_dm_rooms, class_name: 'DmRoom', foreign_key: 'receiver_id', dependent: :destroy

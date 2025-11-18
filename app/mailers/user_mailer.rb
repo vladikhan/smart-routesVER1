@@ -3,7 +3,7 @@ class UserMailer < ApplicationMailer
 
   def verification_code_email(user)
     @user = user
-    @code = user.veification_code
+    @code = user.verification_code
     @expiry_minutes = User::VERIFICATION_CODE_EXPIRY / 1.minute
 
     mail(

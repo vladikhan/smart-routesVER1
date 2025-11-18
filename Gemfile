@@ -23,6 +23,7 @@ gem 'jbuilder', '~> 2.7'
 gem 'valid_email2'
 
 
+
 group :development, :test do
   gem 'factory_bot_rails', '~> 6.2'
   gem 'rspec-rails', '~> 6.1.3'
@@ -43,6 +44,8 @@ group :development do
   gem 'web-console', '>= 4.1.0'
   gem 'rack-mini-profiler', '~> 2.0'
   gem 'listen', '~> 3.3'
+  gem 'letter_opener_web'
+
 
 end
 
