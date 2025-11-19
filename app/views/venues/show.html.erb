@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @venue.name %> - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'application', media: 'all' %>
+  <%= stylesheet_pack_tag 'pages', media: 'all' %>
+  <style>
+    .venue-detail-header {
+      position: relative;
+      height: 400px;
+      background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)),
+                  url('https://source.unsplash.com/1200x400/?<%= @venue.cuisine_type %>,restaurant') center/cover;
+      color: white;
+      display: flex;
+      align-items: flex-end;
+      padding: 40px;
+    }
+    
+    .venue-detail-content {
+      max-width: 1200px;
+      margin: -50px auto 0;
+      padding: 0 20px;
+      position: relative;
+    }
+    
+    .venue-info-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    
+    .venue-detail-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+    
+    .info-row {
+      display: flex;
+      padding: 15px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      color: #666;
+      width: 120px;
+    }
+    
+    .info-value {
+      color: #333;
+      flex: 1;
+    }
+    
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .photo-item {
+      aspect-ratio: 1;
+      background: #e0e0e0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .sidebar {
+      position: sticky;
+      top: 100px;
+    }
+    
+    .map-preview {
+      width: 100%;
+      height: 300px;
+      background: #e0e0e0;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <%= link_to root_path, class: "page-logo" do %>
+        <span>🗺️</span>
+        <span>Smart<strong>Routes</strong></span>
+      <% end %>
+      
+      <nav class="page-nav">
+        <%= link_to "戻る", venues_path %>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Venue Header -->
+  <div class="venue-detail-header">
+    <div style="max-width: 1200px; width: 100%;">
+      <h1 style="font-size: 36px; margin-bottom: 10px;"><%= @venue.name %></h1>
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 5px;">
+          ⭐ <%= @venue.average_rating || 4.5 %> (125 レビュー)
+        </div>
+        <div><%= @venue.price_range %></div>
+        <div><%= @venue.cuisine_type %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="venue-detail-content">
+    <div class="venue-detail-grid">
+      <!-- Left Column -->
+      <div>
+        <!-- Photos -->
+        <div class="venue-info-card">
+          <h2 style="margin-bottom: 20px;">写真</h2>
+          <div class="photo-grid">
+            <div class="photo-item">写真</div>
+            <div class="photo-item">写真</div>
+            <div class="photo-item">写真</div>
+            <div class="photo-item">写真</div>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="venue-info-card">
+          <h2 style="margin-bottom: 20px;">概要</h2>
+          
+          <div class="info-row">
+            <div class="info-label">説明</div>
+            <div class="info-value"><%= @venue.description %></div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">住所</div>
+            <div class="info-value"><%= @venue.address %></div>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">営業時間</div>
+            <div class="info-value"><%= @venue.business_hours %></div>
+          </div>
+          
+          <% if @venue.phone %>
+            <div class="info-row">
+              <div class="info-label">電話番号</div>
+              <div class="info-value"><%= @venue.phone %></div>
+            </div>
+          <% end %>
+          
+          <div class="info-row">
+            <div class="info-label">価格帯</div>
+            <div class="info-value"><%= @venue.price_range %></div>
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="venue-info-card">
+          <h2 style="margin-bottom: 20px;">レビュー</h2>
+          
+          <% if @reviews.any? %>
+            <% @reviews.first(4).each do |review| %>
+              <div style="padding: 20px 0; border-bottom: 1px solid #e0e0e0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                  <strong><%= review.user.username %></strong>
+                  <span style="color: #f59e0b;">⭐ <%= review.total_score %></span>
+                </div>
+                <p style="color: #666; line-height: 1.6;"><%= review.text %></p>
+                <small style="color: #999;"><%= review.created_at.strftime('%Y年%m月%d日') %></small>
+              </div>
+            <% end %>
+          <% else %>
+            <p style="color: #999;">まだレビューがありません。</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="sidebar">
+        <!-- Map -->
+        <div class="venue-info-card">
+          <h3 style="margin-bottom: 15px;">地図</h3>
+          <div class="map-preview">
+            <img src="https://via.placeholder.com/400x300/e0e0e0/666?text=Map" 
+                 style="width: 100%; height: 100%; border-radius: 12px;">
+          </div>
+        </div>
+
+        <!-- Routes -->
+        <div class="venue-info-card">
+          <h3 style="margin-bottom: 15px;">ルートに掲載 (<%= @routes.count %>)</h3>
+          
+          <% if @routes.any? %>
+            <% @routes.each do |route| %>
+              <%= link_to route_path(route), style: "text-decoration: none; color: inherit;" do %>
+                <div style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 10px;">
+                  <div style="font-weight: 600; margin-bottom: 5px;"><%= route.name %></div>
+                  <small style="color: #666;">⏱️ <%= route.estimated_duration %>分</small>
+                </div>
+              <% end %>
+            <% end %>
+            
+            <%= link_to "すべて見る →", routes_path(venue_id: @venue.id), 
+                style: "color: #0288d1; text-decoration: none; font-size: 14px;" %>
+          <% else %>
+            <p style="color: #999; font-size: 14px;">まだルートに追加されていません。</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <%= render 'layouts/footer' %>
+</body>
+</html>

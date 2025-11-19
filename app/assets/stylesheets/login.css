@@ -42,7 +42,13 @@ body {
 	justify-content: space-between;
 	align-items: center;
 }
-
+.form-group {
+	color: #666;
+}
+.form-input::placeholder {
+	color: #b0b0b0;
+	opactiy: 1;
+}
 .login-logo {
 	display: flex;
 	align-items: center;

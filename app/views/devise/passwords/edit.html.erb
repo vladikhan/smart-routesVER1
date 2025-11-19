@@ -1,4 +1,20 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ログアウト - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'login', media: 'all' %>
+</head>
+<body>
+  <header class="login-header">
+    <%= link_to root_path, class: "login-logo" do %>
+      <span class="login-logo-icon">🗺️</span>
+      <span>Smart<strong>Routes</strong></span>
+    <% end %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-link" %>
+  </header>
 <div class="login-container">
   <div class="login-box">
 
@@ -9,17 +25,17 @@
       <%= f.hidden_field :reset_password_token %>
 
       <% if @minimum_password_length %>
-        <p class="form-label">(<%= @minimum_password_length %> characters minimum)</p>
+        <p class="form-label">(<%= @minimum_password_length %> 文字数最小)</p>
       <% end %>
 
       <div class="form-group">
         <%= f.label :password, class: "form-label" %>
-        <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "form-input", placeholder: "New password (6 characters minimum)" %>
+        <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "form-input", placeholder: "新しいパスワード（6文字以上）" %>
       </div>
 
       <div class="form-group">
         <%= f.label :password_confirmation, class: "form-label" %>
-        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-input", placeholder: "Confirm new password" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-input", placeholder: "新しいパスワードを確認してください" %>
       </div>
 
       <div class="actions">
@@ -27,8 +43,8 @@
       </div>
     <% end %>
 
-    <div style="text-align: center; margin-top: 15px;">
-      <%= render "devise/shared/links" %>
+    
+
     </div>
   </div>
 </div>

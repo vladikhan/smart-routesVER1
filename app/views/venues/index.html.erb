@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>人気レストラン - Smart Routes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'application', media: 'all' %>
+  <%= stylesheet_pack_tag 'pages', media: 'all' %>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <%= link_to root_path, class: "page-logo" do %>
+        <span>🗺️</span>
+        <span>Smart<strong>Routes</strong></span>
+      <% end %>
+      
+      <nav class="page-nav">
+        <%= link_to "ルート", routes_path %>
+        <%= link_to "場所", venues_path %>
+        <%= link_to "都市", cities_path %>
+        
+        <% if user_signed_in? %>
+          <%= link_to "👤", "#", class: "page-nav-icon" %>
+        <% else %>
+          <%= link_to "ログイン", new_user_session_path %>
+        <% end %>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <h1 class="hero-title">人気レストランを探す</h1>
+    <p class="hero-subtitle">京都・大阪の最高のレストランを発見しよう</p>
+    
+    <div class="search-box-container">
+      <%= form_with url: venues_path, method: :get, local: true, class: "search-form" do |f| %>
+        <%= f.text_field :q, 
+            value: params[:q],
+            placeholder: "レストラン名、料理、エリアで検索...",
+            class: "search-input" %>
+        <button type="submit" class="search-btn">
+          🔍 検索
+        </button>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <%= form_with url: venues_path, method: :get, local: true do |f| %>
+        <%= f.hidden_field :q, value: params[:q] %>
+        
+        <%= f.select :cuisine_type, 
+            options_for_select([
+              ['すべての料理', ''],
+              ['ラーメン', 'ramen'],
+              ['寿司', 'sushi'],
+              ['たこ焼き', 'takoyaki'],
+              ['お好み焼き', 'okonomiyaki'],
+              ['焼肉', 'yakiniku'],
+              ['カフェ', 'cafe']
+            ], params[:cuisine_type]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+        
+        <%= f.select :price_range,
+            options_for_select([
+              ['すべての価格', ''],
+              ['¥ - 安い', '¥'],
+              ['¥¥ - 普通', '¥¥'],
+              ['¥¥¥ - 高い', '¥¥¥']
+            ], params[:price_range]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+      <% end %>
+      
+      <!-- Active Filters -->
+      <% if params[:cuisine_type].present? %>
+        <div class="filter-tag">
+          <%= params[:cuisine_type] %>
+          <%= link_to '×', venues_path(q: params[:q], price_range: params[:price_range]), 
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+      
+      <% if params[:price_range].present? %>
+        <div class="filter-tag">
+          <%= params[:price_range] %>
+          <%= link_to '×', venues_path(q: params[:q], cuisine_type: params[:cuisine_type]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="section-header">
+      <h2 class="section-title">
+        <%= @venues.total_count %>件のレストラン
+      </h2>
+      
+      <%= form_with url: venues_path, method: :get, local: true do |f| %>
+        <%= f.hidden_field :q, value: params[:q] %>
+        <%= f.hidden_field :cuisine_type, value: params[:cuisine_type] %>
+        <%= f.hidden_field :price_range, value: params[:price_range] %>
+        
+        <%= f.select :sort,
+            options_for_select([
+              ['人気順', 'popular'],
+              ['評価順', 'rating'],
+              ['新着順', 'recent']
+            ], params[:sort]),
+            {},
+            class: "sort-dropdown",
+            onchange: "this.form.submit()" %>
+      <% end %>
+    </div>
+
+    <!-- Venues Grid -->
+    <div class="venues-grid">
+      <% @venues.each do |venue| %>
+        <%= link_to venue_path(venue), style: "text-decoration: none;" do %>
+          <div class="venue-card">
+            <img src="<%= venue.cuisine_type %>,food" 
+                 alt="<%= venue.name %>" 
+                 class="venue-image">
+            
+            <div class="venue-content">
+              <h3 class="venue-name"><%= venue.name %></h3>
+              <p class="venue-description">
+                <%= truncate(venue.description, length: 80) %>
+              </p>
+              
+              <div class="venue-meta">
+                <div class="venue-rating">
+                  ⭐ <%= venue.average_rating || 4.5 %> 
+                  <span style="color: #999;">(125)</span>
+                </div>
+                <div class="venue-price"><%= venue.price_range %></div>
+              </div>
+              
+              <div class="venue-tags">
+                <span class="venue-tag"><%= venue.cuisine_type %></span>
+                <% if venue.district %>
+                  <span class="venue-tag"><%= venue.district.name %></span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <%= paginate @venues %>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <%= render 'layouts/footer' %>
+</body>
+</html>

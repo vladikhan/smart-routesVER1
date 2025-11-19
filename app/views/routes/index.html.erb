@@ -1,2 +1,239 @@
-<h1>Routes#index</h1>
-<p>Find me in app/views/routes/index.html.erb</p>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>人気ルート - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_pack_tag 'application', media: 'all' %>
+  <%= stylesheet_pack_tag 'pages', media: 'all' %>
+</head>
+<body>
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <%= link_to root_path, class: "page-logo" do %>
+        <span>🗺️</span>
+        <span>Smart<strong>Routes</strong></span>
+      <% end %>
+      
+      <nav class="page-nav">
+        <%= link_to "ルート", routes_path %>
+        <%= link_to "場所", venues_path %>
+        <%= link_to "都市", cities_path %>
+        
+        <% if user_signed_in? %>
+          <%= link_to "+ 作成", new_route_path, 
+              style: "background: #00bcd4; padding: 8px 20px; border-radius: 6px; color: white; text-decoration: none;" %>
+          <%= link_to "👤", "#", class: "page-nav-icon" %>
+        <% else %>
+          <%= link_to "ログイン", new_user_session_path %>
+        <% end %>
+      </nav>
+    </div>
+  </header>
+  
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <h1 class="hero-title">人気のルートを探す</h1>
+    <p class="hero-subtitle">みんなが作成した最高のルートを発見しよう</p>
+    
+    <div class="search-box-container">
+      <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>
+        <%= f.text_field :q,
+            value: params[:q],
+            placeholder: "ルート名、場所、アクティビティで検索...",
+            class: "search-input" %>
+        <button type="submit" class="search-btn">
+          検索
+        </button>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <%= form_with url: routes_path, method: :get, local: true do |f| %>
+        <%= f.hidden_field :q, value: params[:q] %>
+        
+        <%= f.select :difficulty,
+            options_for_select([
+              ['すべての難易度', ''],
+              ['簡単', 'easy'],
+              ['普通', 'moderate'],
+              ['難しい', 'hard']
+            ], params[:difficulty]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+        
+        <%= f.select :duration,
+            options_for_select([
+              ['すべての時間', ''],
+              ['短い (< 3時間)', 'short'],
+              ['普通 (3-6時間)', 'medium'],
+              ['長い (> 6時間)', 'long']
+            ], params[:duration]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+        
+        <%= f.select :cost,
+            options_for_select([
+              ['すべての予算', ''],
+              ['安い (< ¥3,000)', 'budget'],
+              ['普通 (¥3,000-8,000)', 'moderate'],
+              ['高い (> ¥8,000)', 'expensive']
+            ], params[:cost]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+      <% end %>
+      
+      <!-- Active Filters -->
+      <% if params[:difficulty].present? %>
+        <div class="filter-tag">
+          <%= params[:difficulty] %>
+          <%= link_to '×', routes_path(q: params[:q], duration: params[:duration], cost: params[:cost]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+      
+      <% if params[:duration].present? %>
+        <div class="filter-tag">
+          <%= params[:duration] %>
+          <%= link_to '×', routes_path(q: params[:q], difficulty: params[:difficulty], cost: params[:cost]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+      
+      <% if params[:cost].present? %>
+        <div class="filter-tag">
+          <%= params[:cost] %>
+          <%= link_to '×', routes_path(q: params[:q], difficulty: params[:difficulty], duration: params[:duration]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="section-header">
+      <h2 class="section-title">
+        <%= @routes.total_count %>件のルート
+      </h2>
+      
+      <%= form_with url: routes_path, method: :get, local: true do |f| %>
+        <%= f.hidden_field :q, value: params[:q] %>
+        <%= f.hidden_field :difficulty, value: params[:difficulty] %>
+        <%= f.hidden_field :duration, value: params[:duration] %>
+        <%= f.hidden_field :cost, value: params[:cost] %>
+        
+        <%= f.select :sort,
+            options_for_select([
+              ['人気順', 'popular'],
+              ['新着順', 'recent'],
+              ['評価順', 'rating']
+            ], params[:sort]),
+            {},
+            class: "sort-dropdown",
+            onchange: "this.form.submit()" %>
+      <% end %>
+    </div>
+
+    <!-- Routes List -->
+    <div class="routes-list">
+      <% @routes.each do |route| %>
+        <div class="route-card" onclick="window.location='<%= route_path(route) %>'">
+          <div class="route-header">
+            <div>
+              <h3 class="route-title"><%= route.name %></h3>
+              <div class="route-author">
+                by <%= route.user.username %> • 
+                <%= route.created_at.strftime('%Y年%m月%d日') %>
+              </div>
+            </div>
+            
+            <div class="route-stats">
+              <div class="route-stat">
+                👁️ <%= route.view_count || 0 %>
+              </div>
+              <div class="route-stat">
+                ❤️ <%= route.likes_count || 0 %>
+              </div>
+              <div class="route-stat">
+                ⭐ <%= route.average_rating || 4.5 %>
+              </div>
+            </div>
+          </div>
+
+          <p class="route-description">
+            <%= truncate(route.description, length: 200) %>
+          </p>
+
+          <div class="route-meta">
+            <div class="route-meta-item">
+              <span class="route-badge badge-<%= route.difficulty_level %>">
+                <%= route.difficulty_level %>
+              </span>
+            </div>
+            
+            <div class="route-meta-item">
+              ⏱️ <%= route.estimated_duration %>分
+            </div>
+            
+            <div class="route-meta-item">
+              💰 約¥<%= number_with_delimiter(route.estimated_cost) %>
+            </div>
+            
+            <div class="route-meta-item">
+              📍 <%= route.route_items.count %>箇所
+            </div>
+          </div>
+
+          <div class="route-venues-preview">
+            <% route.route_items.limit(5).each do |item| %>
+              <span class="venue-preview-tag">
+                <%= item.item.name %>
+              </span>
+            <% end %>
+            <% if route.route_items.count > 5 %>
+              <span class="venue-preview-tag">
+                +<%= route.route_items.count - 5 %>
+              </span>
+            <% end %>
+          </div>
+
+          <div class="route-footer">
+            <div class="route-actions">
+              <button class="route-action-btn" onclick="event.stopPropagation()">
+                ❤️ いいね
+              </button>
+              <button class="route-action-btn" onclick="event.stopPropagation()">
+                🔖 保存
+              </button>
+              <button class="route-action-btn" onclick="event.stopPropagation()">
+                📤 共有
+              </button>
+            </div>
+            
+            <%= link_to "詳細を見る", route_path(route), class: "view-route-btn" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <%= paginate @routes %>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <%= render 'layouts/footer' %>
+</body>
+</html>
