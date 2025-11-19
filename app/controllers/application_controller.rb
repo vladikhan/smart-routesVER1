@@ -8,7 +8,9 @@ class ApplicationController < ActionController::Base
 		devise_parameter_sanitizer.permit(:sign_up, keys: [:username, :bio, :location, :budget_min, :budget_max])
 		#アカウント更新
 		devise_parameter_sanitizer.permit(:aaccount_update, keys: [:username, :bio, :location, :budget_min, :budget_max])
-
 	end
-	
+
+	def after_sign_in_path_for(resource)
+		root_path
+	end
 end
