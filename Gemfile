@@ -7,7 +7,6 @@ gem 'rails', '~> 6.1.7', '>= 6.1.7.6'
 gem 'pg'
 # Use Puma as the app server
 gem 'puma', '~> 5.0'
-gem 'webpacker', '~> 5.4'
 
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -77,4 +76,6 @@ gem 'acts_as_list'
 
 gem 'aws-sdk-s3', '~> 1.0'
 gem "bootstrap", "~> 5.3"
-gem 'sass-rails'
+# gem 'sass-rails'
+
+gem "jsbundling-rails", "~> 1.3"

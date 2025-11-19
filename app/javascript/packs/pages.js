@@ -1,6 +1,0 @@
-import '../email_verifications.scss'
-import '../login.css'
-import '../pages.css'
-import '../routes.css'
-import '../sessions.css'
-import '../users.css'
