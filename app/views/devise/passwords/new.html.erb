@@ -8,12 +8,38 @@
   <%= stylesheet_link_tag "login", "data-turbo-track": "reload" %>
 </head>
 <body>
-  <header class="login-header">
-    <%= link_to root_path, class: "login-logo" do %>
-      <span class="login-logo-icon">🗺️</span>
-      <span>Smart<strong>Routes</strong></span>
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo">SmartRoutes</a>
+
+      <ul class="nav-links">
+        <li><%=link_to "ルート一覧", routes_path %></li>
+        <li><%= link_to "場所を探す", venues_path %></li>
+      <li><%= link_to "都市", cities_path %></li>
+      </ul>
+
+      <div class="auth-links">
+      <% if user_signed_in? %>
+        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
+      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
     <% end %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-link" %>
+  <% else %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
+  <% end %>
+  <style>
+.inline-logout-form {
+  display: inline;
+}
+.login-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  
+}
+</style>
+      </div>
+    </div>
   </header>
   <div class="login-container">
     <div class="login-box">

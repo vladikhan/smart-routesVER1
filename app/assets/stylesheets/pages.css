@@ -1,6 +1,5 @@
 /* Main Layout */
 .page-header {
-	background: #0288d1;
 	color: white;
 	padding: 15px 0;
 	position: sticky;
@@ -42,11 +41,7 @@
 
 /* Hero Banner */
 .hero-banner {
-	background: linear-gradient(
-		135deg,
-		rgba(0, 136, 209, 0.9),
-		rgba(0, 94, 179, 0.9)
-	);
+	background: linear-gradient(135deg, #4dc9e6 0%, #fefbf6 100%);
 	padding: 60px 20px;
 	color: white;
 	text-align: center;
@@ -84,13 +79,24 @@
 }
 
 .search-btn {
-	background: white;
-	color: #0288d1;
-	border: none;
-	padding: 15px 30px;
+	background: #64b5f7;
+	color: #fefefe;
+	padding: 15px 40px;
+	border: 2px solid #64b5f7;
 	border-radius: 6px;
-	font-weight: bold;
+	font-size: 18px;
+	font-weight: 600;
 	cursor: pointer;
+	transition: background 0.3s;
+
+	&:hover {
+		color: #fefefe;
+		background: #9ec8ea;
+	}
+
+	@media (max-width: 768px) {
+		width: 100%;
+	}
 }
 
 /* Filters */

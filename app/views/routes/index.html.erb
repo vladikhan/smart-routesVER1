@@ -11,26 +11,38 @@
 </head>
 <body>
   <!-- Header -->
-  <header class="page-header">
+  <header class="header">
     <div class="container">
-      <%= link_to root_path, class: "page-logo" do %>
-        <span>🗺️</span>
-        <span>Smart<strong>Routes</strong></span>
-      <% end %>
-      
-      <nav class="page-nav">
-        <%= link_to "ルート", routes_path %>
-        <%= link_to "場所", venues_path %>
-        <%= link_to "都市", cities_path %>
-        
-        <% if user_signed_in? %>
-          <%= link_to "+ 作成", new_route_path, 
-              style: "background: #00bcd4; padding: 8px 20px; border-radius: 6px; color: white; text-decoration: none;" %>
-          <%= link_to "👤", "#", class: "page-nav-icon" %>
-        <% else %>
-          <%= link_to "ログイン", new_user_session_path %>
-        <% end %>
-      </nav>
+      <a href="/" class="logo">SmartRoutes</a>
+
+      <ul class="nav-links">
+        <li><%=link_to "ルート一覧", routes_path %></li>
+        <li><%= link_to "場所を探す", venues_path %></li>
+      <li><%= link_to "都市", cities_path %></li>
+      </ul>
+
+      <div class="auth-links">
+      <% if user_signed_in? %>
+        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
+      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
+    <% end %>
+  <% else %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
+  <% end %>
+  <style>
+  
+.inline-logout-form {
+  display: inline;
+}
+.login-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  
+}
+</style>
+      </div>
     </div>
   </header>
   

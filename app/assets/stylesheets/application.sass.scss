@@ -12,13 +12,13 @@
 }
 
 /* === Variables === */
-$primary-color: #007edf;
+$primary-color: #2296f3;
 $primary-dark: #0056b3;
 $secondary-color: #64b5f7;
 $text-color: #3d2755;
 $bg-color: #fefefe;
 $search-bg: #e0e0e0;
-$footer-bg: #007edf;
+$footer-bg: #2296f3;
 $card-border: #e0e0e0;
 
 /* === Body === */
@@ -101,7 +101,7 @@ body {
 
 /* === Hero Section === */
 .hero {
-	background: linear-gradient(135deg, #f1e9dd 0%, #64b5f7 100%);
+	background: linear-gradient(135deg, #4dc9e6 0%, #fefbf6 100%);
 	padding: 80px 20px 100px;
 	text-align: center;
 	color: white;
