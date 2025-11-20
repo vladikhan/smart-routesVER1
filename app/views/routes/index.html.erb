@@ -177,14 +177,14 @@
           </div>
 
           <div class="route-venues-preview">
-            <% route.route_items.limit(5).each do |item| %>
+            <% route.route_items.limit(4).each do |item| %>
               <span class="venue-preview-tag">
                 <%= item.item.name %>
               </span>
             <% end %>
-            <% if route.route_items.count > 5 %>
+            <% if route.route_items.count > 4 %>
               <span class="venue-preview-tag">
-                +<%= route.route_items.count - 5 %>
+                +<%= route.route_items.count - 4 %>
               </span>
             <% end %>
           </div>
@@ -192,13 +192,13 @@
           <div class="route-footer">
             <div class="route-actions">
               <button class="route-action-btn" onclick="event.stopPropagation()">
-                ❤️ いいね
+                いいね!
               </button>
               <button class="route-action-btn" onclick="event.stopPropagation()">
-                🔖 保存
+                保存
               </button>
               <button class="route-action-btn" onclick="event.stopPropagation()">
-                📤 共有
+                共有
               </button>
             </div>
             
