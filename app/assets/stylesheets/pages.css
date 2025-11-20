@@ -238,10 +238,152 @@
 	font-size: 12px;
 }
 
+/* Routes */
+.routes-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 28px;
+	margin-bottom: 40px;
+}
+
+/* Card */
+.route-card {
+	background: #fff;
+	border-radius: 12px;
+	overflow: hidden;
+	padding: 20px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
+	cursor: pointer;
+}
+
+.route-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+/* Header */
+.route-header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 14px;
+}
+
+.route-title {
+	font-size: 19px;
+	font-weight: 700;
+	color: #222;
+	margin-bottom: 4px;
+}
+
+.route-author {
+	font-size: 13px;
+	color: #666;
+}
+
+/* Stats */
+.route-stats {
+	display: flex;
+	gap: 10px;
+	font-size: 14px;
+	color: #555;
+}
+
+/* Description */
+.route-description {
+	color: #555;
+	line-height: 1.6;
+	font-size: 14px;
+	margin-bottom: 16px;
+}
+
+/* Meta info */
+.route-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	font-size: 14px;
+	color: #444;
+	margin-bottom: 16px;
+}
+
+.route-badge {
+	padding: 3px 10px;
+	border-radius: 10px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: capitalize;
+}
+
+/* Difficulty colors */
+.badge-easy {
+	background: #e3fceb;
+	color: #2e7d32;
+}
+.badge-moderate {
+	background: #fff3cd;
+	color: #b8860b;
+}
+.badge-hard {
+	background: #fdecea;
+	color: #c62828;
+}
+
+/* Venues preview tags */
+.route-venues-preview {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin-bottom: 18px;
+}
+
+.venue-preview-tag {
+	background: #e3f2fd;
+	color: #0277bd;
+	padding: 3px 8px;
+	font-size: 12px;
+	border-radius: 10px;
+}
+
+/* Footer */
+.route-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.route-actions {
+	display: flex;
+	gap: 10px;
+}
+
+.route-action-btn {
+	background: #f6f6f6;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 13px;
+	transition: background 0.2s;
+}
+
+.route-action-btn:hover {
+	background: #e9e9e9;
+}
+
+.view-route-btn {
+	padding: 8px 14px;
+	font-size: 14px;
+	background: #0288d1;
+	color: #fff;
+	border-radius: 8px;
+}
+
 /* Pagination */
 .pagination {
 	display: flex;
 	justify-content: center;
-	gap: 10px;
 	margin: 40px 0;
 }

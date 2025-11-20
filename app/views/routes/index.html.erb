@@ -8,46 +8,14 @@
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   <%= stylesheet_link_tag "pages", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "routes", "data-turbo-track": "reload" %>
+
   
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <a href="/" class="logo">SmartRoutes</a>
-
-      <ul class="nav-links">
-        <li><%=link_to "ルート一覧", routes_path %></li>
-        <li><%= link_to "場所を探す", venues_path %></li>
-      <li><%= link_to "都市", cities_path %></li>
-      </ul>
-
-      <div class="auth-links">
-      <% if user_signed_in? %>
-        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
-      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
-    <% end %>
-  <% else %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
-  <% end %>
-  <style>
+  <%# Header %>
+  <%= render 'pages/header' %>
   
-.inline-logout-form {
-  display: inline;
-}
-.login-btn {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  
-}
-</style>
-      </div>
-    </div>
-  </header>
-  
-
   <!-- Hero Banner -->
   <section class="hero-banner">
     <h1 class="hero-title">人気のルートを探す</h1>
