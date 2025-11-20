@@ -1,2 +1,492 @@
-<h1>Routes#show</h1>
-<p>Find me in app/views/routes/show.html.erb</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @route.name %> - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'pages', media: 'all' %>
+  <style>
+    .route-hero {
+      position: relative;
+      background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
+      color: white;
+      padding: 60px 20px;
+    }
+    
+    .route-hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .route-meta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255,255,255,0.9);
+    }
+    
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .route-stats {
+      display: flex;
+      gap: 20px;
+      color: rgba(255,255,255,0.9);
+    }
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .route-title-section h1 {
+      font-size: 36px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    
+    .route-quick-info {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 16px;
+    }
+    
+    .quick-info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .route-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .action-btn {
+      padding: 12px 24px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    
+    .btn-like {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-save {
+      background: #00bcd4;
+      color: white;
+    }
+    
+    .btn-share {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+    
+    .route-detail-content {
+      max-width: 1200px;
+      margin: -30px auto 0;
+      padding: 0 20px;
+      position: relative;
+    }
+    
+    .route-detail-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+    
+    .content-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .venue-list-item {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background: #f8f9fa;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    
+    .venue-list-item:hover {
+      transform: translateX(5px);
+      background: #e3f2fd;
+    }
+    
+    .venue-number {
+      width: 40px;
+      height: 40px;
+      background: #0288d1;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .venue-info h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    
+    .venue-info p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .venue-tags-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .tag-inline {
+      background: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #0288d1;
+    }
+    
+    .map-container {
+      width: 100%;
+      height: 400px;
+      background: #e0e0e0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+    }
+    
+    .sidebar {
+      position: sticky;
+      top: 100px;
+    }
+    
+    .author-card {
+      text-align: center;
+    }
+    
+    .author-avatar-large {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+    
+    .follow-btn {
+      width: 100%;
+      padding: 10px;
+      background: #0288d1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    
+    .review-item {
+      padding: 20px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .review-author {
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .review-rating {
+      color: #f59e0b;
+    }
+    
+    .review-text {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    
+    .review-date {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .tab-container {
+      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 20px;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      gap: 30px;
+    }
+    
+    .tab-btn {
+      padding: 15px 5px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: 16px;
+      color: #666;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .tab-btn.active {
+      color: #0288d1;
+      border-bottom-color: #0288d1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <%= render 'pages/header' %>
+
+  <!-- Route Hero -->
+  <section class="route-hero">
+    <div class="route-hero-content">
+      <div class="route-meta-header">
+        <div class="user-info">
+          <div class="user-avatar">👤</div>
+          <div>
+            <div style="font-weight: 600;">@<%= @route.user.username %></div>
+            <div style="font-size: 14px; opacity: 0.8;">
+              <%= @route.created_at.strftime('%Y年%m月%d日') %>に作成
+            </div>
+          </div>
+        </div>
+        
+        <div class="route-stats">
+          <div class="stat-item">
+            👁️ <%= @route.view_count || 0 %>
+          </div>
+          <div class="stat-item">
+            ❤️ <%= @route.likes_count || 12 %>
+          </div>
+          <div class="stat-item">
+            💾 <%= @route.bookmarks_count || 5 %>
+          </div>
+        </div>
+      </div>
+      
+      <div class="route-title-section">
+        <h1><%= @route.name %></h1>
+        <p style="font-size: 18px; opacity: 0.9; margin-bottom: 20px;">
+          <%= @route.description %>
+        </p>
+        
+        <div class="route-quick-info">
+          <div class="quick-info-item">
+            <span style="background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 15px;">
+              <%= @route.difficulty_level || 'easy' %>
+            </span>
+          </div>
+          <div class="quick-info-item">
+            ⏱️ <%= @route.estimated_duration %>分
+          </div>
+          <div class="quick-info-item">
+            💰 約¥<%= number_with_delimiter(@route.estimated_cost) %>
+          </div>
+          <div class="quick-info-item">
+            📍 <%= @venues.count %>箇所
+          </div>
+        </div>
+      </div>
+      
+      <div class="route-actions">
+        <button class="action-btn btn-like">
+          ❤️ いいね
+        </button>
+        <button class="action-btn btn-save">
+          💾 保存
+        </button>
+        <button class="action-btn btn-share">
+          📤 共有
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="route-detail-content">
+    <div class="route-detail-grid">
+      <!-- Left Column -->
+      <div>
+        <!-- Tabs -->
+        <div class="content-card">
+          <div class="tab-container">
+            <div class="tab-buttons">
+              <button class="tab-btn active">作成したルート</button>
+              <button class="tab-btn">保存したルート</button>
+              <button class="tab-btn">レビュー</button>
+              <button class="tab-btn">アクティビティ</button>
+            </div>
+          </div>
+          
+          <!-- Route Stops -->
+          <h2 class="section-title">🗺️ ルート詳細</h2>
+          
+          <% @venues.each_with_index do |venue, index| %>
+            <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>
+              <div class="venue-list-item">
+                <div class="venue-number"><%= index + 1 %></div>
+                <div class="venue-info">
+                  <h4><%= venue.name %></h4>
+                  <p><%= truncate(venue.description, length: 100) %></p>
+                  <div class="venue-tags-inline">
+                    <span class="tag-inline">⏱️ 60分</span>
+                    <span class="tag-inline"><%= venue.cuisine_type %></span>
+                    <span class="tag-inline"><%= venue.price_range %></span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+
+        <!-- Map -->
+        <div class="content-card">
+          <h2 class="section-title">🗺️ マップ</h2>
+          <div class="map-container">
+            <div>地図がここに表示されます</div>
+          </div>
+        </div>
+
+        <!-- Reviews -->
+        <div class="content-card">
+          <h2 class="section-title">⭐ レビュー (<%= @reviews.count %>)</h2>
+          
+          <% if @reviews.any? %>
+            <% @reviews.limit(5).each do |review| %>
+              <div class="review-item">
+                <div class="review-header">
+                  <span class="review-author">@<%= review.user.username %></span>
+                  <span class="review-rating">⭐ <%= review.total_score %></span>
+                </div>
+                <p class="review-text"><%= review.text %></p>
+                <div class="review-date">
+                  <%= review.created_at.strftime('%Y年%m月%d日') %>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <p style="color: #999; text-align: center; padding: 40px 0;">
+              まだレビューがありません
+            </p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="sidebar">
+        <!-- Author Card -->
+        <div class="content-card author-card">
+          <div class="author-avatar-large">👤</div>
+          <h3 style="margin-bottom: 5px;">@<%= @route.user.username %></h3>
+          <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+            <%= @route.user.bio || "旅行が大好きです！" %>
+          </p>
+          
+          <div style="display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+            <div style="text-align: center;">
+              <div style="font-weight: 700; font-size: 20px;">12</div>
+              <div style="color: #666; font-size: 12px;">フォロー</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-weight: 700; font-size: 20px;">95</div>
+              <div style="color: #666; font-size: 12px;">フォロワー</div>
+            </div>
+          </div>
+          
+          <button class="follow-btn">フォロー</button>
+        </div>
+
+        <!-- Similar Routes -->
+        <div class="content-card">
+          <h3 style="margin-bottom: 15px; font-size: 16px;">似ているルート</h3>
+          
+          <% Route.where(is_public: true).where.not(id: @route.id).limit(3).each do |similar_route| %>
+            <%= link_to route_path(similar_route), style: "text-decoration: none;" do %>
+              <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
+                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #333;">
+                  <%= truncate(similar_route.name, length: 40) %>
+                </h4>
+                <small style="color: #666;">
+                  ⏱️ <%= similar_route.estimated_duration %>分 • 
+                  💰 ¥<%= number_with_delimiter(similar_route.estimated_cost) %>
+                </small>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <%= render 'pages/footer' %>
+</body>
+</html>

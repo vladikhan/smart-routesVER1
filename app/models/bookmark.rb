@@ -1,6 +1,7 @@
 class Bookmark < ApplicationRecord
   belongs_to :user
   belongs_to :item, polymorphic: true
+  belongs_to :route, counter_cache: true
 
   validates :user_id, uniqueness: {
     scope: [:item_type, :item_id],

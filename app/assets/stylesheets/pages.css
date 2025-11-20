@@ -183,7 +183,6 @@
 	width: 100%;
 	height: 200px;
 	object-fit: cover;
-	background: linear-gradient(135deg, #64b5f7, #0288d1);
 }
 
 .venue-content {
