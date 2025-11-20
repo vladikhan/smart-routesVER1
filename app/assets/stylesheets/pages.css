@@ -158,84 +158,106 @@
 /* Venues Grid */
 .venues-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	gap: 25px;
-	margin-bottom: 40px;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: 28px;
+	margin-bottom: 45px;
 }
 
+/* Venue Card */
 .venue-card {
-	background: white;
-	border-radius: 12px;
+	background: #fff;
+	border-radius: 14px;
 	overflow: hidden;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 	transition:
-		transform 0.3s,
-		box-shadow 0.3s;
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
 	cursor: pointer;
+	display: flex;
+	flex-direction: column;
 }
 
 .venue-card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+	transform: translateY(-4px);
+	box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
 }
 
+/* Venue Image */
 .venue-image {
 	width: 100%;
-	height: 200px;
+	height: 220px;
 	object-fit: cover;
+	background: #f0f0f0;
 }
 
+/* Content */
 .venue-content {
-	padding: 20px;
+	padding: 18px 20px 22px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
 }
 
+/* Name */
 .venue-name {
-	font-size: 18px;
-	font-weight: bold;
-	margin-bottom: 8px;
-	color: #333;
+	font-size: 20px;
+	font-weight: 700;
+	color: #222;
+	margin-bottom: 6px;
+	line-height: 1.3;
 }
 
+/* Description */
 .venue-description {
-	color: #666;
 	font-size: 14px;
-	line-height: 1.5;
-	margin-bottom: 12px;
+	color: #555;
+	line-height: 1.55;
+	margin-bottom: 14px;
+	flex-grow: 1;
 }
 
+/* Meta Section */
 .venue-meta {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 12px;
+	margin-bottom: 14px;
 }
 
 .venue-rating {
 	display: flex;
 	align-items: center;
-	gap: 5px;
-	color: #f59e0b;
-	font-size: 14px;
-}
-
-.venue-price {
-	color: #666;
+	gap: 4px;
+	color: #f4a100;
 	font-size: 14px;
 	font-weight: 600;
 }
 
+.venue-price {
+	color: #444;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+/* Tags */
 .venue-tags {
 	display: flex;
-	gap: 8px;
 	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .venue-tag {
-	background: #e3f2fd;
-	color: #0288d1;
-	padding: 4px 10px;
-	border-radius: 12px;
+	padding: 5px 11px;
 	font-size: 12px;
+	border-radius: 16px;
+	background: #e7f3ff;
+	color: #0277bd;
+	font-weight: 500;
+	transition: background 0.2s ease;
+}
+
+.venue-tag:hover {
+	background: #d2e9ff;
 }
 
 /* Routes */
