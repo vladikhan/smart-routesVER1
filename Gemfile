@@ -70,6 +70,9 @@ gem 'sprockets-rails'
 
 gem 'debug'
 
+gem 'carrierwave', '~>2.2'
+gem 'mini_magick', '~> 4.11'
+
 
 # gem 'jquery-rails'
 gem 'acts_as_list'

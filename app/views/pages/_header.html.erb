@@ -5,12 +5,26 @@
       <ul class="nav-links">
         <li><%=link_to "ルート一覧", routes_path %></li>
         <li><%= link_to "場所を探す", venues_path %></li>
-      <li><%= link_to "都市", cities_path %></li>
+        <li><%= link_to "都市", cities_path %></li>
+        <li><%= link_to "メッセージ", "#", title: "メッセージ" %></li>  
+
       </ul>
 
       <div class="auth-links">
       <% if user_signed_in? %>
+
+      <%= link_to user_path(current_user), class: "page-nav-icon", title: "Mypage" do %>
+        <% if current_user.avatar.present? %>
+        <%= image_tag current_user.avatar.thumb.url %>
+      <% else %>
+          👤
+        <% end %>
+      <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
+      <% end %>
+      
+
         <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
+
       <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
     <% end %>
   <% else %>

@@ -249,18 +249,6 @@ body {
 	color: $text-color;
 }
 
-/* === Cards Grid === */
-.cards-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	gap: 25px;
-	margin-bottom: 60px;
-
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-	}
-}
-
 .card {
 	background: white;
 	border-radius: 12px;

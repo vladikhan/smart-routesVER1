@@ -2,15 +2,13 @@ class User < ApplicationRecord
 	devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, 
          :confirmable 
-	# リレーション
- has_many :routes, dependent: :destroy
- has_many :reviews, dependent: :destroy
- has_many :comments, dependent: :destroy
- has_many :likes, dependent: :destroy
- has_many :bookmarks, dependent: :destroy
- has_many :notifications, dependent: :destroy
 
- #Verification code constants
+	#Avatar upload
+	mount_uploader :avatar, AvatarUploader
+
+
+
+ #Verification code
  VERIFICATION_CODE_LENGTH = 6
  VERIFICATION_CODE_EXPIRY = 15.minutes
 
@@ -68,6 +66,20 @@ class User < ApplicationRecord
 	validates :username, presence: true, uniqueness: true, length: { minimum:3, maximum: 30 }
 	validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 	validates :password, length: { minimum: 8 }, if: -> { new_record? || password.present? }
+	validates :bio, length: { maximum: 500 }
+
+		# リレーション
+ has_many :routes, dependent: :destroy
+ has_many :reviews, dependent: :destroy
+ has_many :comments, dependent: :destroy
+ has_many :likes, dependent: :destroy
+ has_many :bookmarks, dependent: :destroy
+ has_many :notifications, dependent: :destroy
+
+ # Avatar helper
+ def avatar_url
+	avatar.prseent? ? avatar.url : "/images/default_avatar.png"
+ end
 
 	# メソッド
 	def following?(user)

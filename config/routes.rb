@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   resources :venues, only: [:index, :show]
   resources :cities, only: [:index, :show]
 
-  # Letter Opener Web для разработки
+  # Letter Opener Web for developing
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>プロフィール編集 Smart Routes</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<%= csrf_meta_tags %>
+	<%= csp_meta_tag %>
+	<%= stylesheet_link_tag 'application', media: 'all' %>
+	<%= stylesheet_link_tag 'pages', media: 'all' %>
+	<style>
+    .edit-profile-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .edit-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 25px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .avatar-upload-section {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .current-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #e0e0e0;
+    }
+    
+    .avatar-upload-controls {
+      flex: 1;
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+    
+    .file-input-btn {
+      background: #0288d1;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .file-hint {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .form-input,
+    .form-textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: #0288d1;
+    }
+    
+    .form-textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+    }
+    
+    .char-count {
+      text-align: right;
+      font-size: 13px;
+      color: #999;
+      margin-top: 5px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .btn-save {
+      flex: 1;
+      background: #0288d1;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .btn-save:hover {
+      background: #0277bd;
+    }
+    
+    .btn-cancel {
+      flex: 1;
+      background: #f5f5f5;
+      color: #666;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+    }
+    
+    .remove-avatar-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 15px;
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+	<%= render 'pages/header' %>
+
+	<div class="edit-profile-container">
+		<h1 style="font-size: 32px; margin-bottom: 30px;">プロフィール編集</h1>
+
+		<%= form_for @user, url: user_path(@user), method: :path, html: { multipart: true } do |f| %>
+		<%# Avatar Section %>
+		<div class="edit-section">
+			<h2 class="section-title">プロフィール写真</h2>
+
+			<div class="avatar-upload-section">
+				<%= image_tag @user.avatar_url, class: "current-avatar", id: "avatar-preview" %>
+
+				<div class="avatar-upload-controls">
+					<div class="file-input-wrapper">
+						<label class="file-input-btn">
+							写真を選択
+							<%= f.file_field :avatar, accept: "image/*", onchange: "previewAvatar(event)" %>
+						</label>
+					</div>
+
+					<div class="file-hint">
+						推奨: 正方形の画像, 最大5MB<br>
+            対応形式: JPG, PNG, GIF, WEBP
+					</div>
+
+					<% if @user.avatar.present? %>
+						<label class="remove-avatar-checkbox">
+							<%= f.check_box :remove_avatar %>
+								現在の写真を削除
+						</label>
+					<% end %>
+				</div>
+			</div>
+		</div>
+
+		<%# Basic Info Section %>
+		<div class="edit-section">
+			<h2 class="section-title">基本情報</h2>
+
+			<div class="form-group">
+				<%= f.label :username, "ユーザー名", class: "form-label" %>
+				<%= f.text_field :username, class: "form-input", placeholder: "yamada_taro" %>
+			</div>
+
+			<div class="form-group">
+				<%= f.label :bio, "自己紹介", class: "form-label" %>
+				<%= f.text_area :bio, class: "form-textarea", placeholder: "あなたについて教えてください。。。", 
+				maxlength: 500,
+				onkeyup: "updateCharCount(this)" %>
+				<div class="char-count">
+					<span id="char-count">0</span> / 500文字
+				</div>
+			</div>
+
+			<div class="form-group">
+				<%= f.label :location, "場所", class: "form-label" %>
+				<%= f.text_field :location, class: "form-input", placeholder: "大阪" %>
+			</div>
+		</div>
+
+		<%# Actions %>
+		<div class="form-acions">
+			<%= f.submit "保存", class: "btn-save" %>
+			<% link_to "キャンセル", user_path(@user) class: "btn-cancel" %>
+		</div>
+	<% end %>
+	</div>
+
+	<%= render 'pages/footer' %>
+
+	<script>
+	//Avatar preview
+	function previewAvatar(event) {
+		const file = event.target.files[0];
+		if (file){
+			const reader = new FileReader();
+			reader.onload = function(e){
+				document.getElementById('avatar-preview').src = e.target.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	}
+
+	// Chracter count
+	function updateCharCount(textarea){
+		const count = textarea.value.length;
+		document.getElementById('char-count').textContent = count;
+	}
+
+	//Initialize char count
+	document.addEventListener('DOMContentLoaded', function(){
+		const bioTextarea = document.querySelector('textarea[name="user[bio]"]');
+		if (bioTextarea){
+			updateCharCount(bioTextarea);
+		}
+	})
+	</script>
+</body>
+</html>
