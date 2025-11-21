@@ -1,7 +1,3 @@
-/* =============================== */
-/* VENUE DETAIL PAGE (SmartRoutes) */
-/* =============================== */
-
 /* Hero Section */
 .venue-detail-header {
 	position: relative;
@@ -9,7 +5,9 @@
 	background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
 	color: white;
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
+	justify-content: flex-start;
+	flex-direction: column-reverse;
 	padding: 50px 40px;
 }
 
