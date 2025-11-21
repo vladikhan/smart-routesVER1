@@ -78,7 +78,7 @@ class User < ApplicationRecord
 
  # Avatar helper
  def avatar_url
-	avatar.prseent? ? avatar.url : "/images/default_avatar.png"
+	avatar.present? ? avatar.url : "/images/default_avatar.png"
  end
 
 	# メソッド

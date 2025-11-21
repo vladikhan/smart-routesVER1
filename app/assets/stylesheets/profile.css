@@ -1,0 +1,121 @@
+.profile-header {
+	background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
+	color: white;
+	padding: 40px 20px;
+}
+
+.profile-header-content {
+	max-width: 1200px;
+	margin: 0 auto;
+	display: flex;
+	gap: 30px;
+	align-items: center;
+}
+
+.profile-avatar-large {
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	border: 5px solid white;
+	object-fit: cover;
+	background: white;
+}
+
+.profile-info h1 {
+	font-size: 32px;
+	margin-bottom: 10px;
+}
+
+.profile-stats {
+	display: flex;
+	gap: 30px;
+	margin-top: 20px;
+}
+
+.stat-box {
+	text-align: center;
+}
+
+.stat-number {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+.stat-label {
+	font-size: 14px;
+	opacity: 0.9;
+}
+
+.profile-actions {
+	margin-top: 20px;
+	display: flex;
+	gap: 15px;
+}
+
+.btn-edit {
+	background: white;
+	color: #0288d1;
+	padding: 10px 24px;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.btn-follow {
+	background: rgba(255, 255, 255, 0.2);
+	color: white;
+	padding: 10px 24px;
+	border-radius: 6px;
+	border: 2px solid white;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.profile-tabs {
+	background: white;
+	border-bottom: 2px solid #e0e0e0;
+	position: sticky;
+	top: 60px;
+	z-index: 50;
+}
+
+.tabs-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+	display: flex;
+	gap: 40px;
+}
+
+.tab-btn {
+	padding: 15px 5px;
+	background: none;
+	border: none;
+	border-bottom: 3px solid transparent;
+	cursor: pointer;
+	font-size: 16px;
+	color: #666;
+	font-weight: 600;
+	transition: all 0.3s;
+}
+
+.tab-btn.active {
+	color: #0288d1;
+	border-bottom-color: #0288d1;
+}
+
+.profile-content {
+	max-width: 1200px;
+	margin: 30px auto;
+	padding: 0 20px;
+}
+
+.content-card {
+	background: white;
+	border-radius: 12px;
+	padding: 25px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

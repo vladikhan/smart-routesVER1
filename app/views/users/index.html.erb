@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ユーザー一覧 - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'pages', media: 'all' %>
+  <style>
+    .users-list {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    
+    .user-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    
+    .user-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 15px;
+      border: 3px solid #e0e0e0;
+    }
+    
+    .user-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .user-bio {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      height: 60px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    
+    .user-stats {
+      display: flex;
+      justify-content: space-around;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .user-stat {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-weight: 700;
+      font-size: 18px;
+      color: #0288d1;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <%= render 'pages/header' %>
+
+  <!-- Hero Banner -->
+  <section class="hero-banner" style="padding: 60px 20px;">
+    <h1 class="hero-title">ユーザー一覧</h1>
+    <p class="hero-subtitle">Smart Routesのメンバーを探す</p>
+  </section>
+
+  <!-- Users List -->
+  <main class="users-list">
+    <div style="margin-bottom: 30px;">
+      <h2 style="font-size: 24px; font-weight: 700;">
+        <%= @users.total_count %>人のユーザー
+      </h2>
+    </div>
+
+    <div class="users-grid">
+      <% @users.each do |user| %>
+        <%= link_to user_path(user), class: "user-card" do %>
+          <%= image_tag user.avatar_url, class: "user-avatar", alt: user.username %>
+          
+          <h3 class="user-name">@<%= user.username %></h3>
+          
+          <p class="user-bio">
+            <%= user.bio || "まだ自己紹介がありません" %>
+          </p>
+          
+          <div class="user-stats">
+            <div class="user-stat">
+              <div class="stat-number"><%= user.routes.count %></div>
+              <div class="stat-label">ルート</div>
+            </div>
+            <div class="user-stat">
+              <div class="stat-number"><%= user.reviews.count %></div>
+              <div class="stat-label">レビュー</div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <%= paginate @users %>
+    </div>
+  </main>
+
+  <%= render 'pages/footer' %>
+</body>
+</html>

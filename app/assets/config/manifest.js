@@ -5,3 +5,4 @@
 //= link routes.css
 //= link login.css
 //= link venues.css
+//= link profile.css

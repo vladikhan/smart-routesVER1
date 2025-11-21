@@ -1,194 +1,84 @@
 <!DOCTYPE html>
-<html >
+<html>
 <head>
-	<title>@<%= @user.username %> - Smart Routes</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<%= csrf_meta_tags %>
-	<%= csp_meta_tag %>
-	<%= stylesheet_link_tag 'application', media: 'all' %>
-	<%= stylesheet_link_tag 'pages', media: 'all' %>
-	 <style>
-    .profile-header {
-      background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
-      color: white;
-      padding: 40px 20px;
-    }
-    
-    .profile-header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      gap: 30px;
-      align-items: center;
-    }
-    
-    .profile-avatar-large {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      border: 5px solid white;
-      object-fit: cover;
-      background: white;
-    }
-    
-    .profile-info h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-    
-    .profile-stats {
-      display: flex;
-      gap: 30px;
-      margin-top: 20px;
-    }
-    
-    .stat-box {
-      text-align: center;
-    }
-    
-    .stat-number {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    
-    .stat-label {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    
-    .profile-actions {
-      margin-top: 20px;
-      display: flex;
-      gap: 15px;
-    }
-    
-    .btn-edit {
-      background: white;
-      color: #0288d1;
-      padding: 10px 24px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .btn-follow {
-      background: rgba(255,255,255,0.2);
-      color: white;
-      padding: 10px 24px;
-      border-radius: 6px;
-      border: 2px solid white;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    
-    .profile-tabs {
-      background: white;
-      border-bottom: 2px solid #e0e0e0;
-      position: sticky;
-      top: 60px;
-      z-index: 50;
-    }
-    
-    .tabs-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      display: flex;
-      gap: 40px;
-    }
-    
-    .tab-btn {
-      padding: 15px 5px;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      font-size: 16px;
-      color: #666;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-    
-    .tab-btn.active {
-      color: #0288d1;
-      border-bottom-color: #0288d1;
-    }
-    
-    .profile-content {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-  </style>
+  <title>@<%= @user.username %> - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'profile', media: 'all' %>
+  
 </head>
 <body>
-	<%= render 'pages/header' %>
-	
-	<%# Profile Header %>
-	<section class="profile-header">
-		<div class="profile-header-content">
-			<%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+  <%= render 'pages/header' %>
 
-			<div class="profile-info">
-				<h1>@<%= @user.username %></h1>
-				<p style="opacity: 0.9; margin-bottom: 15px;">
-					<%= @user.bio || "まだ自己紹介ありません" %>
-				</p>
+  <!-- Profile Header -->
+  <section class="profile-header">
+    <div class="profile-header-content">
+      <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+      
+      <div class="profile-info">
+        <h1>@<%= @user.username %></h1>
+        <p style="opacity: 0.9; margin-bottom: 15px;">
+          <%= @user.bio || "まだ自己紹介がありません" %>
+        </p>
+        
+        <% if @user.location.present? %>
+          <p style="opacity: 0.9;">📍 <%= @user.location %></p>
+        <% end %>
+        
+        <div class="profile-stats">
+          <div class="stat-box">
+            <div class="stat-number"><%= @user.routes.count %></div>
+            <div class="stat-label">ルート</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">12</div>
+            <div class="stat-label">フォロー</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">95</div>
+            <div class="stat-label">フォロワー</div>
+          </div>
+        </div>
+        
+        <div class="profile-actions">
+          <% if current_user == @user %>
+            <%= link_to "✏️ プロフィール編集", edit_user_path(@user), class: "btn-edit" %>
+          <% else %>
+            <button class="btn-follow">フォロー</button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
 
-				<%= if @user.locaiton.present? %>
-					<p style="opacity: 0.9;">📍<%= @user.location %></p>
-					<% end %>
+  <!-- Tabs -->
+  <section class="profile-tabs">
+    <div class="tabs-container">
+      <button class="tab-btn active">作成したルート</button>
+      <button class="tab-btn">保存したルート</button>
+      <button class="tab-btn">レビュー</button>
+      <button class="tab-btn">アクティビティ</button>
+    </div>
+  </section>
 
-					<div class="profile-stats">
-						<div class="stat-box">
-							<div class="stat-number"><%= @user.routes.count %></div>
-							<div class="stat-label">ルート</div>
-						</div>
-						<div class="stat-box">
-							<div class="stat-number">12</div>
-							<div class="stat-label">フォロー</div>
-						</div>
-					</div>
-
-					<div class="profile-actions">
-						<% if current_user == @user %>
-							<%= link_to "プロフィール編集", edit_user_path(@user), class: "btn-edit" %>
-						<% else %>
-							<button class="btn-follow">フォロー</button>
-							<% end %>
-					</div>
-			</div>
-		</div>
-	</section>
-
-	<%# Tabs %>
-	<section class="profile-tabs">
-		<div class="tabs-container">
-			<button class="tab-btn active">作成したルート</button>
-			<button class="tab-btn">保存したルート</button>
-			<button class="tab-btn">レビュー</button>
-			<button class="tab-btn">アクティビティ</button>
-		</div>	
-	</section>
-
-	<%# Content %>
-	<main class="profile-content">
-		<h2 style="margin-bottom: 25px; font-size: 25px;">作成したルート (<%= @routes.count %>)</h2>
-
-		<% if @routes.any? %>
-			<div class="venues-grid">
-				 <% @routes.each do |route| %>
-				 	<%= link_to route_path(route), style: "text-decoration: none;" do %>
-						<div class="venue-card">
-							<div class="venue-image" style="background: linear-gradient(135deg, #64b5f7, #0288d1); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">🗺️
-							</div>
-							<div class="venue-content">
-								<h3 class="venue-name"><%= route.name %></h3>
-								<p class="venue-decription"><%= truncate(route.description, length: 80) %></p>
-									 <div class="venue-meta">
+  <!-- Content -->
+  <main class="profile-content">
+    <h2 style="margin-bottom: 25px; font-size: 24px;">作成したルート (<%= @routes.count %>)</h2>
+    
+    <% if @routes.any? %>
+      <div class="venues-grid">
+        <% @routes.each do |route| %>
+          <%= link_to route_path(route), style: "text-decoration: none;" do %>
+            <div class="venue-card">
+              <div class="venue-image" style="background: linear-gradient(135deg, #64b5f7, #0288d1); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">
+                🗺️
+              </div>
+              <div class="venue-content">
+                <h3 class="venue-name"><%= route.name %></h3>
+                <p class="venue-description"><%= truncate(route.description, length: 80) %></p>
+                <div class="venue-meta">
                   <div class="venue-rating">👁️ <%= route.view_count || 0 %></div>
                   <div class="venue-price">💰 ¥<%= number_with_delimiter(route.estimated_cost) %></div>
                 </div>
@@ -196,21 +86,22 @@
                   <span class="venue-tag">⏱️ <%= route.estimated_duration %>分</span>
                   <span class="venue-tag">📍 <%= route.route_items.count %>箇所</span>
                 </div>
-							</div>
-						</div>
-						<% end %>
-					<% end %>
-			</div>
-		<% else %>
-			 <div style="text-align: center; padding: 60px 20px; color: #999;">
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div style="text-align: center; padding: 60px 20px; color: #999;">
         <p style="font-size: 48px; margin-bottom: 20px;">📭</p>
         <p>まだルートを作成していません</p>
-				</div>
-			<% end %>
-
-			<%# Reviews Section %>
-			    <h2 style="margin: 60px 0 25px; font-size: 24px;">レビュー (<%= @reviews.count %>)</h2>
-			<% if @reviews.any? %>
+      </div>
+    <% end %>
+    
+    <!-- Reviews Section -->
+    <h2 style="margin: 60px 0 25px; font-size: 24px;">レビュー (<%= @reviews.count %>)</h2>
+    
+    <% if @reviews.any? %>
       <% @reviews.each do |review| %>
         <div class="content-card" style="margin-bottom: 20px;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
@@ -230,7 +121,6 @@
     <% end %>
   </main>
 
-  <%= render 'shared/footer' %>
+  <%= render 'pages/footer' %>
 </body>
 </html>
-	
