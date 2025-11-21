@@ -20,7 +20,7 @@ class UsersController < ApplicationController
   # GET /users/:id
   def show
     @routes = @user.routes.where(is_public: true).order(created_at: :desc).limit(6)
-    @reviews = @user.reviews.includes(:venue).order(created_at: :desc).limit(5)
+    @reviews = @user.reviews.order(created_at: :desc).limit(5)
   end
 
   # GET /users/:id/edit
