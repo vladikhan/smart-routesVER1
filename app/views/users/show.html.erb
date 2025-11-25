@@ -54,6 +54,7 @@
 </section>
 
   <!-- Tabs -->
+  <div class="content-card">
   <section class="profile-tabs">
     <div class="tabs-container">
       <button class="tab-btn active">作成したルート</button>
@@ -65,62 +66,65 @@
 
   <!-- Created Routes -->
   <main class="profile-content">
-    <h2 class="profile-content__title">作成したルート (<%= @routes.count %>)</h2>
+    <h2 class="profile-content-title">作成したルート (<%= @routes.count %>)</h2>
     
     <% if @routes.any? %>
       <div class="profile-routes-grid">
         <% @routes.each do |route| %>
           <%= link_to route_path(route), class: "profile-route-card" do %>
-            <div class="profile-route-card__image">🗺️</div>
-            <div class="profile-route-card__content">
-              <h3 class="profile-route-card__name"><%= route.name %></h3>
-              <p class="profile-route-card__description"><%= truncate(route.description, length: 80) %></p>
-              <div class="profile-route-card__meta">
-                <span class="profile-route-card__views">👁️ <%= route.view_count || 0 %></span>
-                <span class="profile-route-card__price">💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
+            <div class="profile-route-card-image">🗺️</div>
+            <div class="profile-route-card-content">
+              <h3 class="profile-route-card-name"><%= route.name %></h3>
+              <p class="profile-route-card-description"><%= truncate(route.description, length: 80) %></p>
+              <div class="profile-route-card-meta">
+                <span class="profile-route-card-views">👁️ <%= route.view_count || 0 %></span>
+                <span class="profile-route-card-price">💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
               </div>
-              <div class="profile-route-card__tags">
-                <span class="profile-route-card__tag">⏱️ <%= route.estimated_duration %>分</span>
-                <span class="profile-route-card__tag">📍 <%= route.route_items.count %>箇所</span>
+              <div class="profile-route-card-tags">
+                <span class="profile-route-card-tag">⏱️ <%= route.estimated_duration %>分</span>
+                <span class="profile-route-card-tag">📍 <%= route.route_items.count %>箇所</span>
               </div>
             </div>
           <% end %>
         <% end %>
       </div>
     <% else %>
-      <div class="profile-empty">
-        <p class="profile-empty__icon">📭</p>
-        <p class="profile-empty__text">まだルートを作成していません</p>
+      <div class="empty-state">
+        <p class="empty-state-icon">📭</p>
+        <p class="empty-state-text">まだルートを作成していません</p>
       </div>
+
     <% end %>
 
     <!-- Reviews Section -->
-    <h2 class="profile-content__title">レビュー (<%= @reviews.count %>)</h2>
+    <h2 class="profile-content">レビュー (<%= @reviews.count %>)</h2>
 
     <% if @reviews.any? %>
       <% @reviews.each do |review| %>
   <% reviewable = review.reviewable %>
   <div class="profile-review-card">
-    <div class="profile-review-card__header">
-      <div class="profile-review-card__target">
+    <div class="review-card-header">
+      <div class="review-card-target">
         <% if reviewable.is_a?(Venue) %>
-          <%= link_to reviewable.name, venue_path(reviewable), class: "profile-review-card__link" %>
+          <%= link_to reviewable.name, venue_path(reviewable), class: "review-card-link" %>
         <% elsif reviewable.is_a?(Route) %>
-          <%= link_to reviewable.name, route_path(reviewable), class: "profile-review-card__link" %>
+          <%= link_to reviewable.name, route_path(reviewable), class: "review-card-link" %>
         <% else %>
-          <span class="profile-review-card__link--empty">関連情報なし</span>
+          <span class="review-card-link-empty">関連情報なし</span>
         <% end %>
       </div>
-      <div class="profile-review-card__score">⭐ <%= review.total_score %></div>
+      <div class="review-card-score">⭐ <%= review.total_score %></div>
     </div>
-    <p class="profile-review-card__text"><%= review.text %></p>
-    <small class="profile-review-card__date"><%= review.created_at.strftime('%Y年%m月%d日') %></small>
+    <p class="review-card-text"><%= review.text %></p>
+    <small class="review-card-date"><%= review.created_at.strftime('%Y年%m月%d日') %></small>
   </div>
 <% end %>
     <% else %>
-      <div class="profile-empty">
-        <p class="profile-empty__text">まだレビューがありません</p>
+      <div class="empty-state">
+        <p class="empty-state-text">まだレビューがありません</p>
       </div>
+  </div>
+
     <% end %>
   </main>
 
