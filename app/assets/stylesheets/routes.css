@@ -27,7 +27,7 @@
 .user-avatar {
 	width: 48px;
 	height: 48px;
-	border-radius: 50%;
+	border-radius: 10%;
 	background: white;
 	display: flex;
 	align-items: center;
@@ -151,7 +151,7 @@
 	height: 40px;
 	background: #0288d1;
 	color: white;
-	border-radius: 50%;
+	border-radius: 10%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -209,7 +209,7 @@
 .author-avatar-large {
 	width: 80px;
 	height: 80px;
-	border-radius: 50%;
+	border-radius: 10%;
 	background: #e0e0e0;
 	margin: 0 auto 15px;
 	display: flex;

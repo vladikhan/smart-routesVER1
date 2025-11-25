@@ -5,7 +5,7 @@ class UsersController < ApplicationController
 
   # GET /users - список пользователей
   def index
-    @users = User.where(confirmed_at: nil..).order(created_at: :desc).page(params[:page]).per(20)
+    @users = User.where(confirmed_at: nil).order(created_at: :desc).page(params[:page]).per(20)
   end
 
   # GET /my_profile - редирект на профиль текущего пользователя
@@ -47,11 +47,10 @@ class UsersController < ApplicationController
 
   def authorize_user!
     unless current_user == User.find(params[:id])
-      redirect_to root_path, alert: 'アクセスが拒否されました。' unless current_user == @user
     end
   end
 
   def user_params
-    params.require(:user).permit(:username, :bio, :location, :avatar, :remove_avatar)
+    params.require(:user).permit(:username, :bio, :location, :avatar, :remove_avatar, :birthday, :gender)
   end
 end

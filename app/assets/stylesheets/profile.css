@@ -16,7 +16,7 @@
 .profile-avatar-large {
 	width: 150px;
 	height: 150px;
-	border-radius: 50%;
+	border-radius: 10%;
 	border: 5px solid white;
 	object-fit: cover;
 	background: white;
@@ -300,7 +300,7 @@
 .current-avatar {
 	width: 120px;
 	height: 120px;
-	border-radius: 50%;
+	border-radius: 10%;
 	object-fit: cover;
 	border: 3px solid #e0e0e0;
 	flex-shrink: 0;
