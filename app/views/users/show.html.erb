@@ -13,51 +13,53 @@
 
 
   <!-- Profile Header -->
-  <section class="profile-header">
-    <div class="profile-header-content">
-      <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
-      
-      <div class="header-info">
-        <h1 class="header-username">@<%= @user.username %></h1>
-        <p class="header-bio"><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
-        
-        <% if @user.location.present? %>
-          <p class="header-location">📍 <%= @user.location %></p>
-        <% end %>
-        
-        <div class="header-stats">
-          <div class="profile-stat">
-            <div class="stat-number"><%= @user.routes.count %></div>
-            <div class="stat-label">ルート</div>
-          </div>
-          <div class="profile-stat">
-            <div class="stat-number">12</div>
-            <div class="stat-label">フォロー</div>
-          </div>
-          <div class="profile-stat">
-            <div class="stat-number">95</div>
-            <div class="stat-label">フォロワー</div>
-          </div>
+<section class="profile-header">
+  <div class="profile-header-content">
+
+    <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+
+    <div class="profile-info">
+      <h1>@<%= @user.username %></h1>
+      <p><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
+
+      <% if @user.location.present? %>
+        <p class="header-location">📍 <%= @user.location %></p>
+      <% end %>
+
+      <div class="profile-stats">
+        <div class="stat-box">
+          <span class="stat-number"><%= @user.routes.count %></span>
+          <span class="stat-label">ルート</span>
         </div>
-        
-        <div class="profile-header">
-          <% if current_user == @user %>
-            <%= link_to "✏️ プロフィール編集", edit_user_path(@user), class: "btn btn--edit" %>
-          <% else %>
-            <button class="btn btn-follow">フォロー</button>
-          <% end %>
+        <div class="stat-box">
+          <span class="stat-number">12</span>
+          <span class="stat-label">フォロー</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">95</span>
+          <span class="stat-label">フォロワー</span>
         </div>
       </div>
+
+      <div class="profile-actions">
+        <% if current_user == @user %>
+          <%= link_to "✏️ プロフィール編集", edit_user_path(@user), class: "btn-edit" %>
+        <% else %>
+          <button class="btn-follow">フォロー</button>
+        <% end %>
+      </div>
+
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Tabs -->
   <section class="profile-tabs">
     <div class="tabs-container">
-      <button class="profile-tab profile-tab--active">作成したルート</button>
-      <button class="profile-tab">保存したルート</button>
-      <button class="profile-tab">レビュー</button>
-      <button class="profile-tab">アクティビティ</button>
+      <button class="tab-btn active">作成したルート</button>
+      <button class="tab-btn">保存したルート</button>
+      <button class="tab-btn">レビュー</button>
+      <button class="tab-btn">アクティビティ</button>
     </div>
   </section>
 
