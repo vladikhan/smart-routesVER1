@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,12 +9,12 @@
   <%= stylesheet_link_tag 'application', media: 'all' %>
   <%= stylesheet_link_tag 'profile', media: 'all' %>
   <%= stylesheet_link_tag 'editProfile', media: 'all' %>
-
   
 </head>
 <body>
   <%= render 'pages/header' %>
 
+	 <!-- Profile Header -->
 <section class="profile-header">
   <div class="profile-header-content">
 
@@ -42,12 +43,7 @@
         </div>
       </div>
 
-      <div class="profile-actions">
-        <% if current_user == @user %>
-        <% else %>
-          <button class="btn-follow">フォロー</button>
-        <% end %>
-      </div>
+     
 
     </div>
   </div>
@@ -56,13 +52,14 @@
   <div class="edit-container">
     <%= form_for @user, url: user_path(@user), method: :patch, html: { multipart: true } do |f| %>
       
+      <!-- Avatar Section -->
       <div class="avatar-section">
         <div class="avatar-placeholder" id="avatar-preview">
-				<% if @user.avatar.present? %>
-          <%= image_tag @user.avatar_url, alt: @user.username %>
-					<% else %>
-					📷
-					<% end %>
+          <% if @user.avatar.present? %>
+            <%= image_tag @user.avatar_url, alt: @user.username %>
+          <% else %>
+            📷
+          <% end %>
         </div>
         
         <div class="username-display">@<%= @user.username %></div>
@@ -73,32 +70,32 @@
           
           <div class="upload-tabs">
             <div class="upload-tab" id="select-photo-btn">
-						<% if @user.avatar.present? %>
-              	写真を変更
-							<% else %>
-								写真を選択
-							<% end %>
+              <% if @user.avatar.present? %>
+                📷 写真を変更
+              <% else %>
+                📁 写真を選択
+              <% end %>
               <%= f.file_field :avatar, accept: "image/*", onchange: "handleFileSelect(event)", id: "avatar-input" %>
             </div>
+            
+            <% if @user.avatar.present? %>
+              <div class="upload-tab upload-tab-delete" onclick="confirmDelete()">
+                🗑️ 写真を削除
+              </div>
+              <%= f.hidden_field :remove_avatar, id: "remove-avatar-field", value: "0" %>
+            <% end %>
           </div>
-
-					<% if @user.avatar.present? %>
-						<div class="upload-tab upload-tab-delete" onclick="confirmDelete()">
-							写真を削除
-						</div>
-						<%= f.hidden_field :remove_avatar, id: "remove-avatar-field", value: "0" %>
-						<% end %>
-					</div>
-
           
           <div class="upload-hint">
-            推奨：正方形の画像、(240×240、PNG、GIF、JPG)
+            推奨：正方形の画像、最大5MB<br>
+            対応形式：JPG, PNG, GIF, WEBP
           </div>
 
-			<div id="selected-file-info" class="selected-file-info hidden"></div>
+          <div id="selected-file-info" class="selected-file-info hidden"></div>
         </div>
       </div>
 
+      <!-- Basic Information -->
       <div class="form-section">
         <h2 class="section-title">基本情報</h2>
 
@@ -107,7 +104,7 @@
           <%= f.text_field :username, class: "form-input", placeholder: "ユーザー名を入力" %>
         </div>
 
-				<div class="form-group">
+        <div class="form-group">
           <%= f.label :birthday, "生年月日", class: "form-label" %>
           <div class="date-group">
             <%= f.date_select :birthday, 
@@ -119,26 +116,25 @@
                 },
                 class: "form-select" %>
           </div>
-				</div>
+        </div>
 
-				<div class="form-group">
-					<%= f.label :gender, "性別", class: "form-label" %>
-					<div class="radio-group">
-						<label for="radio-option">
-							<%= f.radio_button :gender, "female" %>
-							<span>女性</span>
-						</label>
-						<label for="radio-option">
-							<%= f.radio_button :gender, "male" %>
-							<span>男性</span>
-
-						</label>
-						<label for="radio-option">
-							<%= f.radio_button :gender, "other" %>
-							<span>その他</span>
-						</label>
-					</div>
-				</div>
+        <div class="form-group">
+          <%= f.label :gender, "性別", class: "form-label" %>
+          <div class="radio-group">
+            <label class="radio-option">
+              <%= f.radio_button :gender, "female" %>
+              <span>女性</span>
+            </label>
+            <label class="radio-option">
+              <%= f.radio_button :gender, "male" %>
+              <span>男性</span>
+            </label>
+            <label class="radio-option">
+              <%= f.radio_button :gender, "other" %>
+              <span>その他</span>
+            </label>
+          </div>
+        </div>
 
         <div class="form-group">
           <%= f.label :location, "居住地", class: "form-label" %>
@@ -146,16 +142,18 @@
         </div>
       </div>
 
+      <!-- Profile Information -->
       <div class="form-section">
         <h2 class="section-title">プロフィール情報</h2>
 
         <div class="form-group">
           <%= f.label :bio, "自己紹介", class: "form-label" %>
-          <%= f.text_area :bio, class: "form-textarea", maxlength: 500, onkeyup: "updateCharCount(this)" %>
+          <%= f.text_area :bio, class: "form-textarea", maxlength: 500, onkeyup: "updateCharCount(this)", placeholder: "あなたについて教えてください..." %>
           <div class="char-count"><span id="char-count">0</span> / 500文字</div>
         </div>
       </div>
 
+      <!-- Action Buttons -->
       <div class="action-buttons">
         <%= link_to "キャンセル", user_path(@user), class: "btn btn-cancel" %>
         <%= f.submit "保存", class: "btn btn-save" %>
@@ -167,85 +165,84 @@
   <%= render 'pages/footer' %>
 
   <script>
+    let hasNewFile = false;
 
-	let hasNewFile = false;
+    // Handle file selection
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      
+      if (file) {
+        // Check file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
+          event.target.value = '';
+          return;
+        }
 
-	//Handle file selection
-	function handleFilseSelection(event){
-		const file = event.target.files[0];
+        // Check file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+          alert('対応していないファイル形式です。JPG、PNG、GIF、WEBPのいずれかを選択してください。');
+          event.target.value = '';
+          return;
+        }
 
-		if (file){
-			if (file.size > 5 * 1024 * 1024){
-				alert('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
-				event.target.value = '';
-				return;
-			}
-
-			//Check file type
-			const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-			if (!validTypes.includes(file.type)){
-				alert('対応していないファイル形式です。JPG、PNG、GIF、WEBPのいずれかを選択してください。');
-				event.target.value = '';
-				return;
-			}
-
-			hasNewFile = true;
-
-			//Preview image
+        hasNewFile = true;
+        
+        // Preview image
         const reader = new FileReader();
         reader.onload = function(e) {
-          document.getElementById('avatar-preview').innerHTML = '<img src="' + e.target.result + '">';
+          document.getElementById('avatar-preview').innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
         };
         reader.readAsDataURL(file);
-      
 
-			//Show file info
-			const fileInfo = document.getElementById('selected-file-info');
-			const fileSizeKB = (file.size / 1024).toFixed(2);
-			fileInfo.textContent = '✓ 選択済み: ' + file.name + ' (' + fileSizeKB + ' KB)';
-			fileInfo.classList.remove('hidden');
+        // Show file info
+        const fileInfo = document.getElementById('selected-file-info');
+        const fileSizeKB = (file.size / 1024).toFixed(2);
+        fileInfo.textContent = '✓ 選択済み: ' + file.name + ' (' + fileSizeKB + ' KB)';
+        fileInfo.classList.remove('hidden');
 
-			//Update button text
-			document.getElementById('select-photo-btn').innerHTML = '別の写真を選択<input type="file" name="user[avatar]" accept="image/*" onchange="handleFileSelect(event)" id="avatar-input" />';
+        // Update button text
+        document.getElementById('select-photo-btn').innerHTML = '🔄 別の写真を選択<input type="file" name="user[avatar]" accept="image/*" onchange="handleFileSelect(event)" id="avatar-input" />';
 
-			//Reset delete flag if it was set
-			const removeField = document.getElementById('remove-avatar-field');
-			if (removeField){
-				removeField.value = '0';
-			}
-		}
-	}
+        // Reset delete flag if it was set
+        const removeField = document.getElementById('remove-avatar-field');
+        if (removeField) {
+          removeField.value = '0';
+        }
+      }
+    }
 
-	//Confirm delete
-	fucntion confirmDelete(){
-		if (confirm('プロフィール写真を削除しますか？')){
-			//Set remove flag
-			document.getElementById('remote-avatar-field').value. = '1';
+    // Confirm delete
+    function confirmDelete() {
+      if (confirm('プロフィール写真を削除しますか？')) {
+        // Set remove flag
+        document.getElementById('remove-avatar-field').value = '1';
+        
+        // Clear preview
+        document.getElementById('avatar-preview').innerHTML = '📷';
+        
+        // Hide file info
+        document.getElementById('selected-file-info').classList.add('hidden');
+        
+        // Clear file input
+        const fileInput = document.getElementById('avatar-input');
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        
+        hasNewFile = false;
+        
+        // Show confirmation
+        const fileInfo = document.getElementById('selected-file-info');
+        fileInfo.textContent = '🗑️ 写真は保存時に削除されます';
+        fileInfo.style.background = '#ffebee';
+        fileInfo.style.color = '#c62828';
+        fileInfo.classList.remove('hidden');
+      }
+    }
 
-			//Clear preview
-			document.getElementById('avatar-preview').innerHTML = '📷';
-
-			//Hide file info
-			document.getElementById('selected-file-info').classList.add('hidden');
-
-			//Clear file input
-			const fileInput = document.getElementById('avatar-input');
-			if (fileInput){
-				fileInput.value = '';
-			}
-
-			hasNewFile = false;
-
-			//Show confirmation
-			const fileInfo = document.getElementById('selected-file-info');
-			fileInfo.textContent = '写真は保存時に削除されます';
-			fileInfo.style.background = '#ffebee';
-			fileInfo.style.color = '#c62828';
-			fileInfo.classList.remove('hidden')
-		}
-	}
-
-
+    // Character count
     function updateCharCount(textarea) {
       document.getElementById('char-count').textContent = textarea.value.length;
     }
@@ -253,7 +250,9 @@
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
       const bio = document.querySelector('textarea[name="user[bio]"]');
-      if (bio) updateCharCount(bio);
+      if (bio) {
+        updateCharCount(bio);
+      }
     });
   </script>
 </body>
