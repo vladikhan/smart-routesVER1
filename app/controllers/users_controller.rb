@@ -47,7 +47,7 @@ class UsersController < ApplicationController
 
   def authorize_user!
     unless current_user == User.find(params[:id])
-      redirect_to root_path, alert: 'アクセスが拒否されました。'
+      redirect_to root_path, alert: 'アクセスが拒否されました。' unless current_user == @user
     end
   end
 

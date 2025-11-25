@@ -1,8 +1,11 @@
-/* -----------------------------
-   Profile Header
--------------------------------- */
+/* ===================================================================
+   Profile Page Styles - Smart Routes
+   Following pages.css structure and conventions
+   =================================================================== */
+
+/* ----------------------------- Profile Header -------------------------------- */
 .profile-header {
-	background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
+	background: #0277bd;
 	color: white;
 	padding: 50px 20px;
 	border-bottom-left-radius: 20px;
@@ -15,8 +18,6 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 30px;
-	align-items: center;
-	justify-content: flex-start;
 }
 
 .profile-avatar-large {
@@ -27,6 +28,7 @@
 	object-fit: cover;
 	background: white;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	flex-shrink: 0;
 }
 
 .profile-info {
@@ -36,39 +38,45 @@
 
 .profile-info h1 {
 	font-size: 32px;
-	margin-bottom: 10px;
+	margin: 0 0 10px 0;
 	font-weight: 700;
+	line-height: 1.2;
 }
 
 .profile-info p {
-	margin-bottom: 10px;
+	margin: 0 0 10px 0;
 	opacity: 0.9;
 	font-size: 14px;
-	line-height: 1.4;
+	line-height: 1.5;
 }
 
-/* Stats */
+/* Profile Stats */
 .profile-stats {
 	display: flex;
 	gap: 30px;
 	margin-top: 20px;
+	flex-wrap: wrap;
 }
 
 .stat-box {
 	text-align: center;
+	min-width: 60px;
 }
 
 .stat-number {
 	font-size: 24px;
 	font-weight: 700;
+	display: block;
+	margin-bottom: 4px;
 }
 
 .stat-label {
 	font-size: 14px;
 	opacity: 0.9;
+	display: block;
 }
 
-/* Actions */
+/* Profile Actions */
 .profile-actions {
 	margin-top: 20px;
 	display: flex;
@@ -76,41 +84,45 @@
 	flex-wrap: wrap;
 }
 
-.btn-edit {
-	background: white;
-	color: #0288d1;
+.btn-edit,
+.btn-follow {
 	padding: 10px 24px;
 	border-radius: 8px;
-	text-decoration: none;
 	font-weight: 600;
+	font-size: 14px;
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	transition: all 0.3s;
+	transition: all 0.3s ease;
+	cursor: pointer;
+	border: none;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.btn-edit {
+	background: white;
+	color: #0288d1;
 }
 
 .btn-edit:hover {
 	background: #f0f0f0;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-follow {
 	background: rgba(255, 255, 255, 0.2);
 	color: white;
-	padding: 10px 24px;
-	border-radius: 8px;
 	border: 2px solid white;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.3s;
 }
 
 .btn-follow:hover {
-	background: rgba(255, 255, 255, 0.3);
+	background: rgba(255, 255, 255, 0.35);
+	transform: translateY(-1px);
 }
 
-/* -----------------------------
-   Tabs
--------------------------------- */
+/* ----------------------------- Profile Tabs -------------------------------- */
 .profile-tabs {
 	background: white;
 	border-bottom: 2px solid #e0e0e0;
@@ -126,7 +138,13 @@
 	padding: 0 20px;
 	display: flex;
 	gap: 40px;
-	flex-wrap: wrap;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+}
+
+.tabs-container::-webkit-scrollbar {
+	display: none;
 }
 
 .tab-btn {
@@ -138,7 +156,9 @@
 	font-size: 16px;
 	color: #666;
 	font-weight: 600;
-	transition: all 0.3s;
+	transition: all 0.3s ease;
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 
 .tab-btn:hover {
@@ -150,27 +170,30 @@
 	border-bottom-color: #0288d1;
 }
 
-/* -----------------------------
-   Profile Content
--------------------------------- */
+/* ----------------------------- Profile Content -------------------------------- */
 .profile-content {
 	max-width: 1200px;
 	margin: 30px auto;
 	padding: 0 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 30px;
 }
 
-/* Card */
+.profile-section-title {
+	font-size: 24px;
+	font-weight: 700;
+	margin: 0 0 25px 0;
+	color: #333;
+}
+
+/* Content Cards */
 .content-card {
 	background: white;
 	border-radius: 16px;
 	padding: 25px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 	transition:
-		transform 0.25s,
-		box-shadow 0.25s;
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
+	margin-bottom: 20px;
 }
 
 .content-card:hover {
@@ -178,55 +201,279 @@
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* Reviews Cards */
-.profile-review-card {
-	background: white;
-	border-radius: 12px;
-	padding: 20px;
-	margin-bottom: 20px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.profile-review-card__header {
+/* Review Cards */
+.review-card-header {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
 	margin-bottom: 15px;
+	gap: 15px;
 }
 
-.profile-review-card__link {
+.review-card-title {
 	font-weight: 600;
 	color: #333;
 	text-decoration: none;
+	transition: color 0.2s ease;
+	flex: 1;
 }
 
-.profile-review-card__link--empty {
+.review-card-title:hover {
+	color: #0288d1;
+}
+
+.review-card-title--deleted {
+	color: #999;
+	cursor: default;
+}
+
+.review-card-title--deleted:hover {
 	color: #999;
 }
 
-.profile-review-card__score {
+.review-card-score {
 	color: #f59e0b;
 	font-weight: 600;
+	font-size: 14px;
+	white-space: nowrap;
 }
 
-.profile-review-card__text {
+.review-card-text {
 	color: #666;
 	line-height: 1.6;
-	margin-bottom: 8px;
+	margin-bottom: 12px;
+	font-size: 14px;
 }
 
-.profile-review-card__date {
+.review-card-date {
 	color: #999;
 	font-size: 12px;
+	display: block;
 }
 
-/* -----------------------------
-   Responsive
--------------------------------- */
+/* Empty State */
+.empty-state {
+	text-align: center;
+	padding: 60px 20px;
+	color: #999;
+}
+
+.empty-state-icon {
+	font-size: 48px;
+	margin-bottom: 20px;
+	display: block;
+}
+
+.empty-state-text {
+	font-size: 16px;
+	margin: 0;
+}
+
+/* ----------------------------- Edit Profile Page -------------------------------- */
+.edit-profile-container {
+	max-width: 800px;
+	margin: 40px auto;
+	padding: 0 20px;
+}
+
+.edit-profile-title {
+	font-size: 32px;
+	font-weight: 700;
+	margin: 0 0 30px 0;
+	color: #333;
+}
+
+.edit-section {
+	background: white;
+	border-radius: 12px;
+	padding: 30px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+	margin-bottom: 30px;
+}
+
+.section-title {
+	font-size: 20px;
+	font-weight: 700;
+	margin: 0 0 25px 0;
+	color: #333;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+/* Avatar Upload */
+.avatar-upload-section {
+	display: flex;
+	align-items: center;
+	gap: 30px;
+	margin-bottom: 30px;
+	flex-wrap: wrap;
+}
+
+.current-avatar {
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 3px solid #e0e0e0;
+	flex-shrink: 0;
+}
+
+.avatar-upload-controls {
+	flex: 1;
+	min-width: 200px;
+}
+
+.file-input-wrapper {
+	position: relative;
+	overflow: hidden;
+	display: inline-block;
+}
+
+.file-input-btn {
+	background: #0288d1;
+	color: white;
+	padding: 12px 24px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	transition: background 0.3s ease;
+}
+
+.file-input-btn:hover {
+	background: #0277bd;
+}
+
+.file-input-wrapper input[type='file'] {
+	position: absolute;
+	left: 0;
+	top: 0;
+	opacity: 0;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+}
+
+.file-hint {
+	margin-top: 10px;
+	font-size: 13px;
+	color: #666;
+	line-height: 1.5;
+}
+
+.remove-avatar-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 15px;
+	color: #f44336;
+	cursor: pointer;
+}
+
+/* Form Elements */
+.form-group {
+	margin-bottom: 25px;
+}
+
+.form-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: #333;
+	font-size: 14px;
+}
+
+.form-input,
+.form-textarea {
+	width: 100%;
+	padding: 12px 15px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 15px;
+	transition: border-color 0.3s ease;
+	font-family: inherit;
+	box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+	outline: none;
+	border-color: #0288d1;
+	box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1);
+}
+
+.form-textarea {
+	resize: vertical;
+	min-height: 120px;
+}
+
+.char-count {
+	text-align: right;
+	font-size: 13px;
+	color: #999;
+	margin-top: 5px;
+}
+
+/* Form Actions */
+.form-actions {
+	display: flex;
+	gap: 15px;
+	margin-top: 30px;
+}
+
+.btn-save,
+.btn-cancel {
+	flex: 1;
+	padding: 14px;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+	text-align: center;
+	display: block;
+	transition: all 0.3s ease;
+}
+
+.btn-save {
+	background: #0288d1;
+	color: white;
+}
+
+.btn-save:hover {
+	background: #0277bd;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(2, 136, 209, 0.3);
+}
+
+.btn-cancel {
+	background: #f5f5f5;
+	color: #666;
+}
+
+.btn-cancel:hover {
+	background: #e0e0e0;
+}
+
+/* ----------------------------- Responsive Design -------------------------------- */
 @media (max-width: 768px) {
+	.profile-header {
+		padding: 30px 20px;
+		border-radius: 0;
+	}
+
 	.profile-header-content {
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
+	}
+
+	.profile-info h1 {
+		font-size: 24px;
 	}
 
 	.profile-stats {
@@ -235,9 +482,66 @@
 
 	.profile-actions {
 		justify-content: center;
+		width: 100%;
+	}
+
+	.btn-edit,
+	.btn-follow {
+		flex: 1;
+		justify-content: center;
 	}
 
 	.tabs-container {
-		justify-content: center;
+		gap: 20px;
+		padding: 0 15px;
+	}
+
+	.tab-btn {
+		font-size: 14px;
+		padding: 12px 5px;
+	}
+
+	.profile-content {
+		padding: 0 15px;
+	}
+
+	.avatar-upload-section {
+		flex-direction: column;
+		text-align: center;
+	}
+
+	.form-actions {
+		flex-direction: column;
+	}
+
+	.content-card {
+		padding: 20px;
+	}
+}
+
+@media (max-width: 480px) {
+	.profile-avatar-large {
+		width: 100px;
+		height: 100px;
+	}
+
+	.profile-info h1 {
+		font-size: 20px;
+	}
+
+	.stat-number {
+		font-size: 20px;
+	}
+
+	.profile-stats {
+		gap: 20px;
+	}
+
+	.edit-profile-container {
+		margin: 20px auto;
+	}
+
+	.edit-section {
+		padding: 20px;
 	}
 }

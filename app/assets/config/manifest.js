@@ -6,3 +6,4 @@
 //= link login.css
 //= link venues.css
 //= link profile.css
+//= link users.css

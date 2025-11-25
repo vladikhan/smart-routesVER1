@@ -1,4 +1,83 @@
-/*
-  Place all the styles related to the matching controller here.
-  They will automatically be included in application.css.
-*/
+.users-list {
+	max-width: 1200px;
+	margin: 40px auto;
+	padding: 0 20px;
+}
+
+.users-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 25px;
+	margin-bottom: 40px;
+}
+
+.user-card {
+	background: white;
+	border-radius: 12px;
+	padding: 30px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	text-align: center;
+	transition:
+		transform 0.3s,
+		box-shadow 0.3s;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+	display: block;
+}
+
+.user-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.user-avatar {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin: 0 auto 15px;
+	border: 3px solid #e0e0e0;
+}
+
+.user-name {
+	font-size: 18px;
+	font-weight: 700;
+	margin-bottom: 8px;
+	color: #333;
+}
+
+.user-bio {
+	color: #666;
+	font-size: 14px;
+	line-height: 1.5;
+	margin-bottom: 15px;
+	height: 60px;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+
+.user-stats {
+	display: flex;
+	justify-content: space-around;
+	padding-top: 15px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.user-stat {
+	text-align: center;
+}
+
+.stat-number {
+	font-weight: 700;
+	font-size: 18px;
+	color: #0288d1;
+}
+
+.stat-label {
+	font-size: 12px;
+	color: #999;
+	margin-top: 2px;
+}

@@ -6,90 +6,8 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%= stylesheet_link_tag 'pages', media: 'all' %>
-  <style>
-    .users-list {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    
-    .users-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 25px;
-      margin-bottom: 40px;
-    }
-    
-    .user-card {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-    
-    .user-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-    
-    .user-avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin: 0 auto 15px;
-      border: 3px solid #e0e0e0;
-    }
-    
-    .user-name {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #333;
-    }
-    
-    .user-bio {
-      color: #666;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 15px;
-      height: 60px;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-    }
-    
-    .user-stats {
-      display: flex;
-      justify-content: space-around;
-      padding-top: 15px;
-      border-top: 1px solid #e0e0e0;
-    }
-    
-    .user-stat {
-      text-align: center;
-    }
-    
-    .stat-number {
-      font-weight: 700;
-      font-size: 18px;
-      color: #0288d1;
-    }
-    
-    .stat-label {
-      font-size: 12px;
-      color: #999;
-      margin-top: 2px;
-    }
-  </style>
+  <%= stylesheet_link_tag 'users', media: 'all' %>
+  
 </head>
 <body>
   <%= render 'pages/header' %>
@@ -98,6 +16,17 @@
   <section class="hero-banner" style="padding: 60px 20px;">
     <h1 class="hero-title">ユーザー一覧</h1>
     <p class="hero-subtitle">Smart Routesのメンバーを探す</p>
+		<div class="search-box-container">
+      <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>
+        <%= f.text_field :q,
+            value: params[:q],
+            placeholder: "ルート名、場所、アクティビティで検索...",
+            class: "search-input" %>
+        <button type="submit" class="search-btn">
+          検索
+        </button>
+      <% end %>
+    </div>
   </section>
 
   <!-- Users List -->
