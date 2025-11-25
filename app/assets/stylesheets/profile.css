@@ -1,6 +1,6 @@
 /* ----------------------------- Profile Header -------------------------------- */
 .profile-header {
-	background: #0277bd;
+	background: linear-gradient(135deg, #d8f7e7 0%, #338aed 100%);
 	color: white;
 	padding: 50px 20px;
 }
