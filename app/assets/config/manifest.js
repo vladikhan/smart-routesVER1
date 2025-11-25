@@ -7,3 +7,4 @@
 //= link venues.css
 //= link profile.css
 //= link users.css
+//= link editProfile.css

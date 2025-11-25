@@ -3,8 +3,6 @@
 	background: #0277bd;
 	color: white;
 	padding: 50px 20px;
-	border-bottom-left-radius: 20px;
-	border-bottom-right-radius: 20px;
 }
 
 .profile-header-content {
@@ -182,18 +180,12 @@
 /* Content Cards */
 .content-card {
 	background: white;
-	border-radius: 16px;
 	padding: 25px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 	transition:
 		transform 0.25s ease,
 		box-shadow 0.25s ease;
 	margin-bottom: 20px;
-}
-
-.content-card:hover {
-	transform: translateY(-3px);
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* Review Cards */

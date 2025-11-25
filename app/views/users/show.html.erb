@@ -43,7 +43,7 @@
 
       <div class="profile-actions">
         <% if current_user == @user %>
-          <%= link_to "✏️ プロフィール編集", edit_user_path(@user), class: "btn-edit" %>
+          <%= link_to "プロフィール編集", edit_user_path(@user), class: "btn-edit" %>
         <% else %>
           <button class="btn-follow">フォロー</button>
         <% end %>

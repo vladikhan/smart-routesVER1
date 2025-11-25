@@ -18,7 +18,7 @@
         <% if current_user.avatar.present? %>
         <%= image_tag current_user.avatar.thumb.url %>
       <% else %>
-          👤
+          👤1
         <% end %>
       <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
       <% end %>

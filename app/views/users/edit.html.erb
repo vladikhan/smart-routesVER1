@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>プロフィール編集 - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'editProfile', media: 'all' %>
+
+  
+</head>
+<body>
+  <%= render 'pages/header' %>
+
+  <div class="edit-container">
+    <%= form_for @user, url: user_path(@user), method: :patch, html: { multipart: true } do |f| %>
+      
+      <div class="avatar-section">
+        <div class="avatar-placeholder" id="avatar-preview">
+          <%= image_tag @user.avatar_url, alt: @user.username %>
+        </div>
+        
+        <div class="username-display">@<%= @user.username %></div>
+        <div class="user-stats"><%= @user.bio || "まだ自己紹介がありません" %></div>
+
+        <div class="photo-upload-box">
+          <div class="upload-title">現在のプロフィール写真</div>
+          
+          <div class="upload-tabs">
+            <div class="upload-tab">
+              写真を変更
+              <%= f.file_field :avatar, accept: "image/*", onchange: "previewAvatar(event)" %>
+            </div>
+          </div>
+          
+          <div class="upload-hint">
+            推奨：正方形の画像、(240×240、PNG、GIF、JPG）
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">基本情報</h2>
+
+        <div class="form-group">
+          <%= f.label :username, "ユーザー名", class: "form-label" %>
+          <%= f.text_field :username, class: "form-input" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :location, "居住地", class: "form-label" %>
+          <%= f.text_field :location, class: "form-input", placeholder: "都市名を入力" %>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">プロフィール情報</h2>
+
+        <div class="form-group">
+          <%= f.label :bio, "自己紹介", class: "form-label" %>
+          <%= f.text_area :bio, class: "form-textarea", maxlength: 500, onkeyup: "updateCharCount(this)" %>
+          <div class="char-count"><span id="char-count">0</span> / 500文字</div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <%= link_to "キャンセル", user_path(@user), class: "btn btn-cancel" %>
+        <%= f.submit "保存", class: "btn btn-save" %>
+      </div>
+
+    <% end %>
+  </div>
+
+  <%= render 'pages/footer' %>
+
+  <script>
+    function previewAvatar(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('avatar-preview').innerHTML = '<img src="' + e.target.result + '">';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function updateCharCount(textarea) {
+      document.getElementById('char-count').textContent = textarea.value.length;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const bio = document.querySelector('textarea[name="user[bio]"]');
+      if (bio) updateCharCount(bio);
+    });
+  </script>
+</body>
+</html>
