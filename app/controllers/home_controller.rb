@@ -13,9 +13,6 @@ class HomeController < ApplicationController
     else
       @routes = fetch_new_routes
       @search_active = true
-    else
-      @routes = fetch_new_routes
-      @search_active = false
     end
 
     #Cache statistics
@@ -99,7 +96,7 @@ class HomeController < ApplicationController
     Rails.cache.fetch('home:stats', expires_in: 1.hour) do
       {
         routes_count: Route.where(is_public: true).count,
-        venues_count: Venues.count,
+        venues_count: Venue.count,
         users_count: User.where.not(confirmed_at: nil).count,
         reviews_count: Review.count
       }
@@ -124,8 +121,8 @@ class HomeController < ApplicationController
   def cache_key_from_params
     [
       @query.presence || 'no_query',
-      @city.presence || 'no_city'
-      @tags&.join('_') || 'no_tags'
+      @city.presence || 'no_city',
+      @tags&.join('_') || 'no_tags',
       @budget.presence || 'no_budget'
   ].join(':')
   end

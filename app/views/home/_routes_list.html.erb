@@ -1,0 +1,35 @@
+<% routes.each do |route| %>
+  <%= link_to route_path(route), style: "text-decoration: none;" do %>
+    <div class="venue-card">
+      <div class="venue-image" style="background: linear-gradient(135deg, #64b5f7, #0288d1); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">
+        🗺️
+      </div>
+      <div class="venue-content">
+        <h3 class="venue-name"><%= route.name %></h3>
+        <p class="venue-description"><%= truncate(route.description, length: 80) %></p>
+        
+        <div class="venue-meta">
+          <div class="venue-rating">
+            <% if route.city %>
+              📍 <%= route.city.name %>
+            <% end %>
+          </div>
+          <div class="venue-price">💰 ¥<%= number_with_delimiter(route.estimated_cost) %></div>
+        </div>
+        
+        <div class="venue-tags">
+          <span class="venue-tag">⏱️ <%= route.estimated_duration %>分</span>
+          <span class="venue-tag">👤 <%= route.user.username %></span>
+        </div>
+
+        <% if route.tags.present? %>
+          <div class="route-tags" style="margin-top: 10px;">
+            <% route.tags.first(3).each do |tag_object| %>
+              <span class="tag-badge"><%= tag_object.parameter %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

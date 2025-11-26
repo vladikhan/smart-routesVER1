@@ -1,5 +1,6 @@
 class Route < ApplicationRecord
   belongs_to :user
+  belongs_to :city, optional: true
 
   has_many :route_items, -> { order(position: :asc) }, dependent: :destroy
   has_many :venues, through: :route_items, source: :item, source_type: 'Venue'

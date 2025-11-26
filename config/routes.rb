@@ -13,9 +13,9 @@ Rails.application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
   
-  #Home 
   root "pages#home"
 
+  #Home 
   get 'search', to: 'home#search'
   
   # My Profile shortcuts
