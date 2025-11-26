@@ -1,11 +1,9 @@
 /* Body & Background */
 body.logout-page {
-	background: #9e9e9e;
+	background: #9e9e9e !important;
 	min-height: 100vh;
-	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 20px;
 	margin: 0;
 }
 
@@ -63,7 +61,8 @@ body.logout-page {
 .logout-modal {
 	background: white;
 	border-radius: 12px;
-	padding: 40px;
+	padding: 70px 40px;
+	height: 320px;
 	width: 100%;
 	max-width: 420px;
 	text-align: center;

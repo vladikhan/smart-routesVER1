@@ -5,16 +5,33 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'logout', media: 'all' %>
+  
   <%= stylesheet_link_tag 'application', media: 'all' %>
 </head>
 <body class="logout-page">
   <!-- Header -->
-  <div class="logout-header">
-    <%= link_to root_path, class: "logout-header-logo" do %>
-      <span>🗺️</span>
-      <span>Smart<strong>Routes</strong></span>
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo">SmartRoutes</a>
+
+      <ul class="nav-links">
+        <li><%=link_to "ルート一覧", routes_path %></li>
+        <li><%= link_to "場所を探す", venues_path %></li>
+      <li><%= link_to "都市", cities_path %></li>
+      </ul>
+
+      <div class="auth-links">
+      <% if user_signed_in? %>
+        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
+      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
     <% end %>
-  </div>
+  <% else %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
+  <% end %>
+  
+      </div>
+    </div>
+  </header>
 
   <!-- Logout Modal -->
   <div class="logout-container">

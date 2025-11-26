@@ -9,28 +9,24 @@
         <li><%= link_to "メッセージ", "#", title: "メッセージ" %></li>  
         <li><%= link_to "ユーザー", users_path, title: "ユーザー" %></li>
 
+
       </ul>
 
       <div class="auth-links">
       <% if user_signed_in? %>
 
-      <%= link_to user_path(current_user), class: "page-nav-icon", title: "Mypage" do %>
+      <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
         <% if current_user.avatar.present? %>
         <%= image_tag current_user.avatar.thumb.url %>
       <% else %>
           👤1
         <% end %>
-      <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
       <% end %>
-      
-
-        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
-
-      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
-    <% end %>
+      <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
+      <%= link_to "ログアウト", logout_confirm_path, class: "login-btn", title: "ログアウト" %>
   <% else %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
-  <% end %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-btn", style: "background: white; color: #0288d1; padding: 6px 16px; border-radius: 4px; text-decoration: none;" %>
+    <% end %>
   <style>
 .inline-logout-form {
   display: inline;

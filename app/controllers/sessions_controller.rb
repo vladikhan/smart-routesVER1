@@ -5,7 +5,7 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def create
-    self.resource = warden.authenticate!(auth_options)
+    
     user = User.find_by(email: params[:email])
 
     if user && user.authenticate(params[:password])
