@@ -56,10 +56,11 @@ group :test do
 end
 
 
+gem 'redis', '~>5.0'
+gem 'redis-rails'
 
 gem "kaminari", "~> 1.2.2"
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Используем Dart Sass вместо sassc

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'home/index'
   devise_for :users, path: '', path_names: {
     sign_in: 'login',
     sign_out: 'logout',
@@ -12,7 +13,10 @@ Rails.application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
   
+  #Home 
   root "pages#home"
+
+  get 'search', to: 'home#search'
   
   # My Profile shortcuts
   get 'my_profile', to: 'users#my_profile'

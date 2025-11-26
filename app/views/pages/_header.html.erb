@@ -5,7 +5,6 @@
       <ul class="nav-links">
         <li><%=link_to "ルート一覧", routes_path %></li>
         <li><%= link_to "場所を探す", venues_path %></li>
-        <li><%= link_to "都市", cities_path %></li>
         <li><%= link_to "メッセージ", "#", title: "メッセージ" %></li>  
         <li><%= link_to "ユーザー", users_path, title: "ユーザー" %></li>
 
@@ -25,20 +24,9 @@
       <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
       <%= link_to "ログアウト", logout_confirm_path, class: "login-btn", title: "ログアウト" %>
   <% else %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-btn", style: "background: white; color: #0288d1; padding: 6px 16px; border-radius: 4px; text-decoration: none;" %>
+    <%= link_to "ログイン", new_user_session_path, class: "login-btn"  %>
     <% end %>
-  <style>
-.inline-logout-form {
-  display: inline;
-}
-.login-btn {
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
   
-}
-</style>
       </div>
     </div>
   </header>
