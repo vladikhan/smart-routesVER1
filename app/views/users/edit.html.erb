@@ -71,9 +71,9 @@
           <div class="upload-tabs">
             <div class="upload-tab" id="select-photo-btn">
               <% if @user.avatar.present? %>
-                📷 写真を変更
+                写真を変更
               <% else %>
-                📁 写真を選択
+                写真を選択
               <% end %>
               <%= f.file_field :avatar, accept: "image/*", onchange: "handleFileSelect(event)", id: "avatar-input" %>
             </div>

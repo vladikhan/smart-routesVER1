@@ -1,4 +1,6 @@
 class Users::SessionsController < Devise::SessionsController
+#before_action :configure_sign_in_params, only: [:create]
+
   # GET /login
   def new
     super
@@ -6,33 +8,19 @@ class Users::SessionsController < Devise::SessionsController
 
   # POST /login
   def create
-    self.resource = warden.authenticate(auth_options)
+    super
+  end
 
-    if resource.nil?
-      # Аутентификация не удалась
-      flash.now[:alert] = "メールアドレスまたはパスワードが正しくありません"
-      self.resource = resource_class.new(sign_in_params)
-      clean_up_passwords(resource)
-      #render page instead of error page 
-      respond_with(resource, location: new_user_session_path) and return
-    end
+  #DELETE /logout
+  def destroy
+    signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
+    yield if block_given?
+    respond_to_on_destroy
+  end
 
-    # Check if email is confirmed
-    unless resource.confirmed?
-      # Store user id in session
-      session[:pending_user_id] = resource.id
+  protected
 
-      # Send verification code
-      resource.send_verification_code
-
-      # Redirect to verification page
-      redirect_to email_verification_path and return
-    end
-
-    # If confirmed, sign in normally
-    set_flash_message!(:notice, :signed_in)
-    sign_in(resource_name, resource)
-    yield resource if block_given?
-    respond_with resource, location: after_sign_in_path_for(resource)
+  def configure_sign_in_params
+    devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
   end
 end

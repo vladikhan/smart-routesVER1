@@ -8,3 +8,4 @@
 //= link profile.css
 //= link users.css
 //= link editProfile.css
+//= link logout.css

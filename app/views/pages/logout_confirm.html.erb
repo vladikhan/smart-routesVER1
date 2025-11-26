@@ -1,31 +1,30 @@
-
-<!DOCTYPE html>
 <html>
 <head>
   <title>ログアウト - Smart Routes</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-  <%= stylesheet_link_tag "login", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag 'logout', media: 'all' %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
 </head>
-<body>
-  <header class="login-header">
-    <%= link_to root_path, class: "login-logo" do %>
-      <span class="login-logo-icon">🗺️</span>
+<body class="logout-page">
+  <!-- Header -->
+  <div class="logout-header">
+    <%= link_to root_path, class: "logout-header-logo" do %>
+      <span>🗺️</span>
       <span>Smart<strong>Routes</strong></span>
     <% end %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-link" %>
-  </header>
+  </div>
 
-  <div class="login-container">
-    <div class="login-box">
-      <h2 class="logout-title">ログアウトしますか?</h2>
-
-      <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "btn-primary" %>
-
-      <button class="btn-cancel" onclick="window.history.back()">
-        キャンセル
-      </button>
+  <!-- Logout Modal -->
+  <div class="logout-container">
+    <div class="logout-modal">
+      <h2 class="logout-title">ログアウトしますか？</h2>
+      
+      <div class="logout-buttons">
+        <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "btn-logout" %>
+        <%= link_to "キャンセル", :back, class: "btn-logout-cancel" %>
+      </div>
     </div>
   </div>
 </body>
