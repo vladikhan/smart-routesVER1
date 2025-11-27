@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,52 +7,52 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%= stylesheet_link_tag 'profile', media: 'all' %>
+    <%= stylesheet_link_tag 'profile', media: 'all' %>
+
+  
+  
 </head>
-<body class="profile-page">
+<body>
   <%= render 'pages/header' %>
 
-
   <!-- Profile Header -->
-<section class="profile-header">
-  <div class="profile-header-content">
+  <section class="profile-header">
+    <div class="profile-header-content">
+      <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
 
-    <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+      <div class="profile-info">
+        <h1>@<%= @user.username %></h1>
+        <p><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
 
-    <div class="profile-info">
-      <h1>@<%= @user.username %></h1>
-      <p><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
+        <% if @user.location.present? %>
+          <p class="header-location">📍 <%= @user.location %></p>
+        <% end %>
 
-      <% if @user.location.present? %>
-        <p class="header-location">📍 <%= @user.location %></p>
-      <% end %>
-
-      <div class="profile-stats">
-        <div class="stat-box">
-          <span class="stat-number"><%= @user.routes.count %></span>
-          <span class="stat-label">ルート</span>
+        <div class="profile-stats">
+          <div class="stat-box">
+            <span class="stat-number"><%= @user.routes.count %></span>
+            <span class="stat-label">ルート</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number">12</span>
+            <span class="stat-label">フォロー</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number">95</span>
+            <span class="stat-label">フォロワー</span>
+          </div>
         </div>
-        <div class="stat-box">
-          <span class="stat-number">12</span>
-          <span class="stat-label">フォロー</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">95</span>
-          <span class="stat-label">フォロワー</span>
-        </div>
-      </div>
 
-      <div class="profile-actions">
         <% if current_user == @user %>
-          <%= link_to "プロフィール編集", edit_user_path(@user), class: "btn-edit" %>
-        <% else %>
-          <button class="btn-follow">フォロー</button>
+          <div class="profile-actions">
+            <%= link_to edit_user_path(@user), class: "btn-edit" do %>
+              ✏️ プロフィール編集
+            <% end %>
+          </div>
         <% end %>
       </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
   <!-- Tabs Navigation -->
   <section class="profile-tabs">
@@ -64,55 +65,49 @@
     </div>
   </section>
 
-
-
-
-
-
-
   <!-- Tab Content -->
   <main class="profile-content">
-  <!-- Created Routes Tab -->
-    <h2 class="profile-content-title">作成したルート (<%= @routes.count %>)</h2>
-    
-    <% if @routes.any? %>
-  <div class="profile-routes-grid">
-    <% @routes.each do |route| %>
-      <%= link_to route_path(route), class: "profile-route-card" do %>
-        <div class="profile-route-card-image">🗺️</div>
+    <!-- Created Routes Tab -->
+    <div class="tab-content active" id="routes-tab">
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
+        作成したルート (<%= @routes.count %>)
+      </h2>
 
-        <div class="profile-route-card-content">
-          <h3 class="profile-route-card-name"><%= route.name %></h3>
-          <p class="profile-route-card-description"><%= truncate(route.description, length: 80) %></p>
-
-          <div class="profile-route-card-meta">
-            <span>👁️ <%= route.view_count || 0 %></span>
-            <span>💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
-            <span>⏱️ <%= route.estimated_duration %>分</span>
-          </div>
-
-          <% if route.tags.present? %>
-            <div class="profile-route-card-tags">
-              <% route.tags.split(',').first(2).each do |tag| %>
-                <span class="tag-badge">#<%= tag.strip %></span>
-              <% end %>
-            </div>
+      <% if @routes.any? %>
+        <div class="routes-grid">
+          <% @routes.each do |route| %>
+            <%= link_to route_path(route), class: "route-card" do %>
+              <div class="route-card-image">🗺️</div>
+              <div class="route-card-content">
+                <h3 class="route-card-title"><%= route.name %></h3>
+                <p class="route-card-desc"><%= truncate(route.description, length: 80) %></p>
+                <div class="route-card-meta">
+                  <span>💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
+                  <span>⏱️ <%= route.estimated_duration %>分</span>
+                </div>
+                <% if route.tags.present? %>
+                  <div class="route-card-tags">
+                    <% route.tags.split(',').first(2).each do |tag| %>
+                      <span class="tag-badge">#<%= tag.strip %></span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
           <% end %>
-
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <p class="empty-state-text">まだルートを作成していません</p>
         </div>
       <% end %>
-    <% end %>
-  </div>
-<% else %>
-  <div class="empty-state">
-    <p class="empty-state-icon">📭</p>
-    <p class="empty-state-text">まだルートを作成していません</p>
-  </div>
-<% end %>
+    </div>
 
-    <%# Saved Routes Tab %>
+    <!-- Saved Routes Tab -->
     <div class="tab-content" id="saved-tab">
-      <h2>保存したルート (0)
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
+        保存したルート (0)
       </h2>
       <div class="empty-state">
         <div class="empty-state-icon">💾</div>
@@ -120,37 +115,50 @@
       </div>
     </div>
 
-    <!-- Reviews Section -->
-    <h2 class="profile-content">レビュー (<%= @reviews.count %>)</h2>
+    <!-- Reviews Tab -->
+    <div class="tab-content" id="reviews-tab">
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
+        レビュー (<%= @reviews.count %>)
+      </h2>
 
-    <% if @reviews.any? %>
-      <% @reviews.each do |review| %>
-  <% reviewable = review.reviewable %>
-  <div class="profile-review-card">
-    <div class="review-card-header">
-      <div class="review-card-target">
-        <% if reviewable.is_a?(Venue) %>
-          <%= link_to reviewable.name, venue_path(reviewable), class: "review-card-link" %>
-        <% elsif reviewable.is_a?(Route) %>
-          <%= link_to reviewable.name, route_path(reviewable), class: "review-card-link" %>
-        <% else %>
-          <span class="review-card-link-empty">削除されたアイテム</span>
+      <% if @reviews.any? %>
+        <% @reviews.each do |review| %>
+          <% reviewable = review.reviewable %>
+          <div class="review-card">
+            <div class="review-header">
+              <% if reviewable %>
+                <% if reviewable.is_a?(Venue) %>
+                  <%= link_to reviewable.name, venue_path(reviewable), class: "review-venue" %>
+                <% elsif reviewable.is_a?(Route) %>
+                  <%= link_to reviewable.name, route_path(reviewable), class: "review-venue" %>
+                <% end %>
+              <% else %>
+                <span class="review-venue" style="color: #999;">削除されたアイテム</span>
+              <% end %>
+              <span class="review-rating">⭐ <%= review.total_score %></span>
+            </div>
+            <p class="review-text"><%= review.text %></p>
+            <span class="review-date"><%= review.created_at.strftime('%Y年%m月%d日') %></span>
+          </div>
         <% end %>
-      </div>
-      <div class="review-card-score">⭐ <%= review.total_score %></div>
+      <% else %>
+        <div class="empty-state">
+          <div class="empty-state-icon">📝</div>
+          <p class="empty-state-text">まだレビューがありません</p>
+        </div>
+      <% end %>
     </div>
-    <p class="review-card-text"><%= review.text %></p>
-    <span class="review-card-date"><%= review.created_at.strftime('%Y年%m月%d日') %></span>
-  </div>
-<% end %>
-    <% else %>
+
+    <!-- Activity Tab -->
+    <div class="tab-content" id="activity-tab">
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
+        アクティビティ
+      </h2>
       <div class="empty-state">
-        <p class="empty-state-text">まだレビューがありません</p>
+        <div class="empty-state-icon">📊</div>
+        <p class="empty-state-text">アクティビティがありません</p>
       </div>
-
-    <% end %>
-      </div>
-
+    </div>
   </main>
 
   <%= render 'pages/footer' %>
@@ -161,47 +169,48 @@
       const indicator = document.querySelector('.tab-indicator');
       const contents = document.querySelectorAll('.tab-content');
 
-      //Initialize indicator position
+      // Initialize indicator position
       updateIndicator(document.querySelector('.tab-btn.active'));
 
       tabs.forEach(tab => {
         tab.addEventListener('click', function() {
-          //Remove active class from all  tabs and contents
-          tabs.forEach(t = t.classList.remove('active'));
-          contents.forEach(c = c.classList.remove('active'));
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
 
-          //Add active class to clicked tab
+          // Add active class to clicked tab
           this.classList.add('active');
 
-          //Show corresponding content
+          // Show corresponding content
           const tabName = this.getAttribute('data-tab');
-          const content = document.getElementById(tabName + 'tab');
+          const content = document.getElementById(tabName + '-tab');
           if (content) {
             content.classList.add('active');
           }
 
-          //Update indicator position
+          // Update indicator position
           updateIndicator(this);
-        })
-      })
+        });
+      });
 
       function updateIndicator(tab) {
-        const tabRect = tab.getBouningClientRect();
+        const tabRect = tab.getBoundingClientRect();
         const containerRect = tab.parentElement.getBoundingClientRect();
-        const left = tabRect.width;
+        const left = tabRect.left - containerRect.left;
+        const width = tabRect.width;
 
         indicator.style.width = width + 'px';
         indicator.style.left = left + 'px';
       }
 
-      //Update indicator on window resize
-      window.addEventListener('resize', function(){
+      // Update indicator on window resize
+      window.addEventListener('resize', function() {
         const activeTab = document.querySelector('.tab-btn.active');
         if (activeTab) {
           updateIndicator(activeTab);
         }
-      })
-    })
+      });
+    });
   </script>
 </body>
 </html>
