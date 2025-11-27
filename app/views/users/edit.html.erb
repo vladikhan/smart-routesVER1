@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,413 +8,156 @@
   <%= stylesheet_link_tag 'application', media: 'all' %>
   <%= stylesheet_link_tag 'profile', media: 'all' %>
   <%= stylesheet_link_tag 'editProfile', media: 'all' %>
-  
 </head>
-<body>
-  <%= render 'pages/header' %>
 
-	 <!-- Profile Header -->
+<body>
+<%= render 'pages/header' %>
+
+
+<!-- =========== PROFILE HEADER =========== -->
 <section class="profile-header">
   <div class="profile-header-content">
 
-    <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username, id: "header-avatar" %>
+    <%= image_tag @user.avatar_url, class: "profile-avatar-large", id: "header-avatar" %>
 
     <div class="profile-info">
       <h1>@<%= @user.username %></h1>
       <p><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
 
       <% if @user.location.present? %>
-        <p class="header-location">📍 <%= @user.location %></p>
+        <p>📍 <%= @user.location %></p>
       <% end %>
 
       <div class="profile-stats">
-        <div class="stat-box">
-          <span class="stat-number"><%= @user.routes.count %></span>
-          <span class="stat-label">ルート</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">12</span>
-          <span class="stat-label">フォロー</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-number">95</span>
-          <span class="stat-label">フォロワー</span>
-        </div>
+        <div class="stat-box"><span class="stat-number"><%= @user.routes.count %></span><span class="stat-label">ルート</span></div>
+        <div class="stat-box"><span class="stat-number">12</span><span class="stat-label">フォロー</span></div>
+        <div class="stat-box"><span class="stat-number">95</span><span class="stat-label">フォロワー</span></div>
       </div>
-
-     
-
     </div>
   </div>
 </section>
 
-  <div class="edit-container">
-    <div id="upload-notification" 
 
-    <%= form_for @user, url: user_path(@user), method: :patch, html: { multipart: true } do |f| %>
-      
-      <!-- Avatar Section -->
-      <div class="avatar-section">
-      <h2 class="section-title">プロフィール写真</h2>
-        <div class="avatar-placeholder" id="avatar-preview">
-          <% if @user.avatar.present? %>
-            <%= image_tag @user.avatar_url, alt: @user.username %>
-          <% else %>
-            📷1
-          <% end %>
-        </div>
-        
-        <div class="username-display">@<%= @user.username %></div>
-        <div class="user-stats"><%= @user.bio || "まだ自己紹介がありません" %></div>
+<!-- =========== EDIT FORM =========== -->
+<div class="edit-container">
 
-        <div class="photo-upload-box">
-
-          <div class="upload-buttons">
-            <label class="btn-upload" id="upload-btn">
-              写真を選択
-              <%= f.file_field :avatar, accept: "image/*", onchange: "handleAvatarUpload(event)", id: "avatar-input", style: "display: none;"%>
-            </label>
-
-            <% if @user.avatar.present? %>
-              <button type="button" class="btn-delete-photo" id="delete-btn" onclick="handleDeletePhoto()">写真を削除
-              </button>
-              <%= f.hidden_field :remove_avatar, id: "remove-avatar-field", value: "0" %>
-            <% end %>
-          </div>
-          
-          <div class="upload-hint">
-            推奨：正方形の画像、最大5MB<br>
-            対応形式：JPG, PNG, GIF, WEBP
-          </div>
-        </div>
-      </div>
-
-
-          
-
-      <!-- Basic Information -->
-      <div class="form-section">
-        <h2 class="section-title">基本情報</h2>
-
-        <div class="form-group">
-          <%= f.label :username, "ユーザー名", class: "form-label" %>
-          <%= f.text_field :username, class: "form-input", placeholder: "ユーザー名を入力" %>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :birthday, "生年月日", class: "form-label" %>
-          <div class="date-group">
-            <%= f.date_select :birthday, 
-                {
-                  start_year: 1950,
-                  end_year: Time.current.year,
-                  default: @user.birthday || 25.years.ago,
-                  prompt: { year: '年 (YYYY)', month: '月', day: '日 (DD)' }
-                },
-                class: "form-select" %>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :gender, "性別", class: "form-label" %>
-          <div class="radio-group">
-            <label class="radio-option">
-              <%= f.radio_button :gender, "female" %>
-              <span>女性</span>
-            </label>
-            <label class="radio-option">
-              <%= f.radio_button :gender, "male" %>
-              <span>男性</span>
-            </label>
-            <label class="radio-option">
-              <%= f.radio_button :gender, "other" %>
-              <span>その他</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :location, "居住地", class: "form-label" %>
-          <%= f.text_field :location, class: "form-input", placeholder: "都市名を入力" %>
-        </div>
-      </div>
-
-      <!-- Profile Information -->
-      <div class="form-section">
-        <h2 class="section-title">プロフィール情報</h2>
-
-        <div class="form-group">
-          <%= f.label :bio, "自己紹介", class: "form-label" %>
-          <%= f.text_area :bio, class: "form-textarea", maxlength: 500, onkeyup: "updateCharCount(this)", placeholder: "あなたについて教えてください..." %>
-          <div class="char-count"><span id="char-count">0</span> / 500文字</div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <%= link_to "キャンセル", user_path(@user), class: "btn btn-cancel" %>
-        <%= f.submit "保存", class: "btn btn-save" %>
-      </div>
-
-    <% end %>
+  <!-- Flash Notification -->
+  <div id="upload-notification" class="notification hidden">
+    <span class="notification-icon"></span>
+    <span id="notification-message"></span>
   </div>
 
-  <%= render 'pages/footer' %>
 
-  <script>
-    let hasNewFile = false;
+  <%= form_for @user, url: user_path(@user), method: :patch, html: { multipart: true, id: "profile-form" } do |f| %>
 
-    // Handle file selection
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-        if (!file) return;
-      
-        // Validate size (5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-          showNotification('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
-          event.target.value = '';
-          return;
-        }
 
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!validTypes.includes(file.type)) {
-          alert('対応していないファイル形式です。JPG、PNG、GIF、WEBPのいずれかを選択してください。');
-          event.target.value = '';
-          return;
-        }
+    <!-- Avatar -->
+    <div class="avatar-section">
+      <h2 class="section-title">プロフィール写真</h2>
 
-        hasNewFile = true;
-        
-        // Preview image
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const preview = document.getElementById('avatar-preview').
-          cosnt headerAvatar = document.getElementById('header-avatar');
-          preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
-          if headerAvatar {
-            headerAvatar.src = e.target.result;
-          }
-        };
-        reader.readAsDataURL(file);
+      <div class="avatar-placeholder" id="avatar-preview">
+        <% if @user.avatar.present? %>
+          <%= image_tag @user.avatar_url %>
+        <% else %>📷<% end %>
+      </div>
 
-        //Show upload button if hidden
-        showDeleteButton();
+      <div class="upload-buttons">
+        <label class="btn-upload">
+          写真を選択
+          <%= f.file_field :avatar, accept: "image/*", id: "avatar-input", onchange: "previewAvatar(event)" %>
+        </label>
 
-        //Auto-submit form
-        uploadAvatar();
+        <% if @user.avatar.present? %>
+          <button type="button" id="delete-btn" class="btn-delete-photo" onclick="deleteAvatar()">写真を削除</button>
+          <%= f.hidden_field :remove_avatar, id: "remove-avatar-field", value: "0" %>
+        <% end %>
+      </div>
 
-        //Upload avatar via AJAX
-        function uploadAvatar(){
-          const form = document.getElementById('profile-form');
-          const formData = new FormData(form);
-          const saveBtn = document.getElementById('save-btn');
-          const uploadBtn = document.getElementById('upload-btn')
-
-          //Show loading
-          uploadBtn.innerHTML = '<span class="spinner"></span>アップロード中...';
-          uploadBtn.style.pointerEvents = ' none';
-
-          fetch(forml.action, {
-            method: 'PATCH',
-            body: formData,
-            headers: {
-              'X-CSRF-Token' : document.querySelector('[name="csrf-token"]').content,
-              'Accept': 'application/json'
-            }
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success){
-              showNotification(data.message, 'success');
-
-              //Update avatars
-              if (data.avatar_url){
-                const preview = document.getElementById('avatar-preview');
-                const headerAvatar = document.getElementById('header-avatar');
-
-                preview.innerHTML = 'img src="' + data.avatar_url + '" alt="Preview">';
-                if (headerAvatar){
-                  headerAvatar.src = data.avatar_url;
-                }
-              }
-
-              showDeleteButton()
-            }else{
-              showNotification(data.message || 'アップロードに失敗しました', 'error');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showNotification('アップロードに失敗しました', 'error');
-          })
-          .finally(()=>{
-            uploadBtn.innerHTML = "写真を選択";
-            uploadBtn.style.pointerEvents = 'auto';
-          });
-        }
-
-        //Handle delete photo
-        function handleDeletePhoto(){
-          if (!confirm('プロフィール写真を削除しますか？')) {
-            return;
-          }
-
-          const form = document.getElementById('profile-form');
-          const formData = new FormData(form);
-        
-          //Set remove flag
-          formData.set('user[remove_avatar]', '1');
-          formData.delete('user[avatar]');
-
-          const deleteBtn = document.getElementById('delete-btn');
-          deleteBtn.innerHTML = '<span class="spinner"></span> 削除中...'
-          deleteBtn.style.pointerEvents = 'none';
-
-          fetch(form.action, {
-            method: 'PATCH',
-            body: formData,
-            headers: {
-              'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
-              'Accept': 'application/json'
-            }
-          })
-          .then(response => resonse.json())
-          .then(data => {
-            if (data.success){
-              showNotification('プロフィール写真が削除されました', 'success');
-
-              //Reset preview
-              const preview = document.getElementById('avatar-preview');
-              const headerAvatar = document.getElementById('header-avatar');
-
-              preview.innerHTML = '📷';
-              if (headerAvatar){
-                headerAvatar.src = '/images/default_avatar.svg';
-              }
-
-              hideDeleteButton();
-            }else {
-              showNotification('削除に失敗しました', 'error');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            showNotification('削除に失敗しました', 'error');
-          })
-          .finally(()=>{
-            deleteBtn.innerHTML = '写真を削除';
-            deleteBtn.style.pointerEvents = 'auto'
-          })
-        }
-
-        //Show notification
-        function showNotification(message, type = 'success') {
-          const notification = document.getElementById('upload-notification');
-          const messageEl = document.getElementById('notification-message');
-          const icon = notification.querySelector('.notification-icon');
-
-          messageEl.textContent = message;
-
-          //Set type
-          notification.classList.remove('success', 'error');
-          notification.classList.add(type);
-
-          //Set icon
-          icon.textContent = type === 'success' ? '✓' : '⚠️';
-
-          //Show
-          notification.classList.add('show');
-
-          //Auto hide after 5 seconds 
-          setTimeout(() => {
-            norifications.classList.remove('show');
-          }, 5000);
-        }
-
-        //Show/hide delete button
-        function showDeleteButton(){
-          const deleteBtn = document.getElementById('delete-btn');
-          if (deleteBtn){
-            deleteBtn.classList.remove('hidden');
-          }else{
-            //Delete button
-            const uploadButtons = document.querySelector('.upload-buttons');
-            const newDeleteBtn = document.createElement('button');
-            newDeleteBtn.type = 'button';
-            newDeleteBtn.className = 'btn-delete-photo';
-            newDeleteBtn.id = 'delete-btn';
-            newDeleteBtn.innerHTML = '写真を削除';
-            newDeleteBtn.onclick = handleDeletePhoto;
-            uploadButtons.appendChild(newDeleteBtn);
-          }
-        }
-
-        function hideDeleteButton(){
-          const deleteBtn = document.getElementById('delete-btn');
-          if (deleteBtn){
-            deleteBtn.remove();
-          }
-        }
-
-      // Character count
-      function updateCharCount(textarea) {
-        document.getElementById('char-count').textContent = textarea.value.length;
-       }
-
-       // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      const bio = document.querySelector('textarea[name="user[bio]"]');
-      if (bio) {
-        updateCharCount(bio);
-      }
-
-      //Show flash message if present
-      <% if flash[:notice] %>
-      showNotification('<%= flash[:notice] %>', 'success');
-      <% end %>
-
-      <% if flash[:alert] %>
-        showNotification('<%= flash[:alert] %>', 'error');
-      <% end %>
-    });
+      <p class="upload-hint">推奨: 正方形画像 / 最大5MB / JPG PNG GIF WEBP</p>
+    </div>
 
 
 
-        
+    <!-- Basic Profile -->
+    <div class="form-section">
+      <h2 class="section-title">基本情報</h2>
 
-    // Confirm delete
-    function confirmDelete() {
-      if (confirm('プロフィール写真を削除しますか？')) {
-        // Set remove flag
-        document.getElementById('remove-avatar-field').value = '1';
-        
-        // Clear preview
-        document.getElementById('avatar-preview').innerHTML = '📷';
-        
-        // Hide file info
-        document.getElementById('selected-file-info').classList.add('hidden');
-        
-        // Clear file input
-        const fileInput = document.getElementById('avatar-input');
-        if (fileInput) {
-          fileInput.value = '';
-        }
-        
-        hasNewFile = false;
-        
-        // Show confirmation
-        const fileInfo = document.getElementById('selected-file-info');
-        fileInfo.textContent = '🗑️ 写真は保存時に削除されます';
-        fileInfo.style.background = '#ffebee';
-        fileInfo.style.color = '#c62828';
-        fileInfo.classList.remove('hidden');
-      }
-    }
+      <div class="form-group">
+        <%= f.label :username, "ユーザー名" %>
+        <%= f.text_field :username, class: "form-input" %>
+      </div>
 
-    
+      <div class="form-group">
+        <%= f.label :birthday, "生年月日" %>
+        <%= f.date_select :birthday, start_year:1950, end_year:Time.current.year, default:@user.birthday || 25.years.ago, prompt:true %>
+      </div>
 
-    
-  </script>
+      <div class="form-group">
+        <b>性別</b><br>
+        <%= f.radio_button :gender, "female" %> 女性
+        <%= f.radio_button :gender, "male" %> 男性
+        <%= f.radio_button :gender, "other" %> その他
+      </div>
+
+      <div class="form-group">
+        <%= f.label :location, "居住地" %>
+        <%= f.text_field :location, class:"form-input", placeholder:"東京・大阪など" %>
+      </div>
+    </div>
+
+
+    <!-- BIO -->
+    <div class="form-section">
+      <h2 class="section-title">プロフィール情報</h2>
+      <%= f.text_area :bio, class:"form-textarea", maxlength:500, id:"bio-textarea", placeholder:"自己紹介を入力..." %>
+      <div class="char-count"><span id="char-count">0</span>/500文字</div>
+    </div>
+
+
+    <!-- Buttons -->
+    <div class="action-buttons">
+      <%= link_to "キャンセル", user_path(@user), class:"btn btn-cancel" %>
+      <%= f.submit "保存", id:"save-btn", class:"btn btn-save" %>
+    </div>
+
+  <% end %>
+</div>
+
+
+<%= render 'pages/footer' %>
+
+
+<!-- ================= JS FIXED ================= -->
+<script>
+
+function previewAvatar(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const preview = document.getElementById("avatar-preview");
+  const header = document.getElementById("header-avatar");
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    preview.innerHTML = `<img src="${e.target.result}">`;
+    header.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function deleteAvatar(){
+  document.getElementById("remove-avatar-field").value = "1";
+  document.getElementById("avatar-preview").innerHTML = "📷";
+  document.getElementById("header-avatar").src = "/images/default_avatar.png";
+}
+
+function updateCount(){
+  document.getElementById("char-count").textContent =
+    document.getElementById("bio-textarea").value.length;
+}
+document.getElementById("bio-textarea").addEventListener("input",updateCount);
+updateCount();
+
+</script>
 </body>
 </html>
