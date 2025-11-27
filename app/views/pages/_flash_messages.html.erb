@@ -1,21 +1,4 @@
-<% if flash.any? %>
-  <div class="flash-messages" id="flash-messages">
-    <% flash.each do |type, message| %>
-      <div class="flash-message flash-<%= type %>" data-flash-type="<%= type %>">
-        <span class="flash-message-icon">
-          <% if type == 'notice' %>
-            ✓
-          <% elsif type == 'alert' %>
-            ⚠️
-          <% elsif type == 'warning' %>
-            ⚡
-          <% end %>
-        </span>
-        <span class="flash-message-content"><%= message %></span>
-        <button class="flash-message-close" onclick="closeFlash(this)">×</button>
-      </div>
-    <% end %>
-  </div>
+
 
   <script>
     setTimeout(function() {
@@ -36,4 +19,5 @@
       }, 400);
     }
 	</script>
-<% end %>
+
+  

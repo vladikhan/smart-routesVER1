@@ -33,9 +33,29 @@ class UsersController < ApplicationController
     @user = current_user
     
     if @user.update(user_params)
-      redirect_to user_path(@user), notice: 'プロフィールが更新されました。'
+      respond_to do |format|
+        format.html {
+          redirect_to user_path(@user), notice: 'プロフィールが更新されました111!'
+        }
+        format.json {
+          render json: {
+            success: true,
+            message: 'プロフィール写真が更新されました！',
+            avatar_url: @user.avatar_url
+          }
+        }
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html { render :edit }
+        format.json {
+          render json: {
+            success: false,
+            message: '更新に失敗しました',
+            errors: @user.errors.full_messages
+          }, status: :unprocessable_entity
+        }
+      end
     end
   end
 
@@ -47,6 +67,7 @@ class UsersController < ApplicationController
 
   def authorize_user!
     unless current_user == User.find(params[:id])
+      redirect_to root_path, alert: 'アクセスが拒否されました。'
     end
   end
 

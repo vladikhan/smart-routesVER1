@@ -10,8 +10,6 @@ class Users::SessionsController < Devise::SessionsController
 
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
-      redirect_to root_path, notice: 'ログインしました
-      '
     else
       flash.now[:alert] = '入力されたメールアドレスはアカウントにリンクされていません。アカウントを検索してログイン'
       render :new

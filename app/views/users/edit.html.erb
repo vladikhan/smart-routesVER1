@@ -18,7 +18,7 @@
 <section class="profile-header">
   <div class="profile-header-content">
 
-    <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+    <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username, id: "header-avatar" %>
 
     <div class="profile-info">
       <h1>@<%= @user.username %></h1>
@@ -50,15 +50,18 @@
 </section>
 
   <div class="edit-container">
+    <div id="upload-notification" 
+
     <%= form_for @user, url: user_path(@user), method: :patch, html: { multipart: true } do |f| %>
       
       <!-- Avatar Section -->
       <div class="avatar-section">
+      <h2 class="section-title">プロフィール写真</h2>
         <div class="avatar-placeholder" id="avatar-preview">
           <% if @user.avatar.present? %>
             <%= image_tag @user.avatar_url, alt: @user.username %>
           <% else %>
-            📷
+            📷1
           <% end %>
         </div>
         
@@ -66,22 +69,16 @@
         <div class="user-stats"><%= @user.bio || "まだ自己紹介がありません" %></div>
 
         <div class="photo-upload-box">
-          <div class="upload-title">現在のプロフィール写真</div>
-          
-          <div class="upload-tabs">
-            <div class="upload-tab" id="select-photo-btn">
-              <% if @user.avatar.present? %>
-                写真を変更
-              <% else %>
-                写真を選択
-              <% end %>
-              <%= f.file_field :avatar, accept: "image/*", onchange: "handleFileSelect(event)", id: "avatar-input" %>
-            </div>
-            
+
+          <div class="upload-buttons">
+            <label class="btn-upload" id="upload-btn">
+              写真を選択
+              <%= f.file_field :avatar, accept: "image/*", onchange: "handleAvatarUpload(event)", id: "avatar-input", style: "display: none;"%>
+            </label>
+
             <% if @user.avatar.present? %>
-              <div class="upload-tab upload-tab-delete" onclick="confirmDelete()">
-                🗑️ 写真を削除
-              </div>
+              <button type="button" class="btn-delete-photo" id="delete-btn" onclick="handleDeletePhoto()">写真を削除
+              </button>
               <%= f.hidden_field :remove_avatar, id: "remove-avatar-field", value: "0" %>
             <% end %>
           </div>
@@ -90,10 +87,11 @@
             推奨：正方形の画像、最大5MB<br>
             対応形式：JPG, PNG, GIF, WEBP
           </div>
-
-          <div id="selected-file-info" class="selected-file-info hidden"></div>
         </div>
       </div>
+
+
+          
 
       <!-- Basic Information -->
       <div class="form-section">
@@ -109,7 +107,7 @@
           <div class="date-group">
             <%= f.date_select :birthday, 
                 {
-                  start_year: 1940,
+                  start_year: 1950,
                   end_year: Time.current.year,
                   default: @user.birthday || 25.years.ago,
                   prompt: { year: '年 (YYYY)', month: '月', day: '日 (DD)' }
@@ -170,16 +168,16 @@
     // Handle file selection
     function handleFileSelect(event) {
       const file = event.target.files[0];
+        if (!file) return;
       
-      if (file) {
-        // Check file size (5MB max)
+        // Validate size (5MB max)
         if (file.size > 5 * 1024 * 1024) {
-          alert('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
+          showNotification('ファイルサイズが大きすぎます。5MB以下のファイルを選択してください。');
           event.target.value = '';
           return;
         }
 
-        // Check file type
+        // Validate file type
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
         if (!validTypes.includes(file.type)) {
           alert('対応していないファイル形式です。JPG、PNG、GIF、WEBPのいずれかを選択してください。');
@@ -192,26 +190,199 @@
         // Preview image
         const reader = new FileReader();
         reader.onload = function(e) {
-          document.getElementById('avatar-preview').innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+          const preview = document.getElementById('avatar-preview').
+          cosnt headerAvatar = document.getElementById('header-avatar');
+          preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+          if headerAvatar {
+            headerAvatar.src = e.target.result;
+          }
         };
         reader.readAsDataURL(file);
 
-        // Show file info
-        const fileInfo = document.getElementById('selected-file-info');
-        const fileSizeKB = (file.size / 1024).toFixed(2);
-        fileInfo.textContent = '✓ 選択済み: ' + file.name + ' (' + fileSizeKB + ' KB)';
-        fileInfo.classList.remove('hidden');
+        //Show upload button if hidden
+        showDeleteButton();
 
-        // Update button text
-        document.getElementById('select-photo-btn').innerHTML = '🔄 別の写真を選択<input type="file" name="user[avatar]" accept="image/*" onchange="handleFileSelect(event)" id="avatar-input" />';
+        //Auto-submit form
+        uploadAvatar();
 
-        // Reset delete flag if it was set
-        const removeField = document.getElementById('remove-avatar-field');
-        if (removeField) {
-          removeField.value = '0';
+        //Upload avatar via AJAX
+        function uploadAvatar(){
+          const form = document.getElementById('profile-form');
+          const formData = new FormData(form);
+          const saveBtn = document.getElementById('save-btn');
+          const uploadBtn = document.getElementById('upload-btn')
+
+          //Show loading
+          uploadBtn.innerHTML = '<span class="spinner"></span>アップロード中...';
+          uploadBtn.style.pointerEvents = ' none';
+
+          fetch(forml.action, {
+            method: 'PATCH',
+            body: formData,
+            headers: {
+              'X-CSRF-Token' : document.querySelector('[name="csrf-token"]').content,
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success){
+              showNotification(data.message, 'success');
+
+              //Update avatars
+              if (data.avatar_url){
+                const preview = document.getElementById('avatar-preview');
+                const headerAvatar = document.getElementById('header-avatar');
+
+                preview.innerHTML = 'img src="' + data.avatar_url + '" alt="Preview">';
+                if (headerAvatar){
+                  headerAvatar.src = data.avatar_url;
+                }
+              }
+
+              showDeleteButton()
+            }else{
+              showNotification(data.message || 'アップロードに失敗しました', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showNotification('アップロードに失敗しました', 'error');
+          })
+          .finally(()=>{
+            uploadBtn.innerHTML = "写真を選択";
+            uploadBtn.style.pointerEvents = 'auto';
+          });
         }
+
+        //Handle delete photo
+        function handleDeletePhoto(){
+          if (!confirm('プロフィール写真を削除しますか？')) {
+            return;
+          }
+
+          const form = document.getElementById('profile-form');
+          const formData = new FormData(form);
+        
+          //Set remove flag
+          formData.set('user[remove_avatar]', '1');
+          formData.delete('user[avatar]');
+
+          const deleteBtn = document.getElementById('delete-btn');
+          deleteBtn.innerHTML = '<span class="spinner"></span> 削除中...'
+          deleteBtn.style.pointerEvents = 'none';
+
+          fetch(form.action, {
+            method: 'PATCH',
+            body: formData,
+            headers: {
+              'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => resonse.json())
+          .then(data => {
+            if (data.success){
+              showNotification('プロフィール写真が削除されました', 'success');
+
+              //Reset preview
+              const preview = document.getElementById('avatar-preview');
+              const headerAvatar = document.getElementById('header-avatar');
+
+              preview.innerHTML = '📷';
+              if (headerAvatar){
+                headerAvatar.src = '/images/default_avatar.svg';
+              }
+
+              hideDeleteButton();
+            }else {
+              showNotification('削除に失敗しました', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showNotification('削除に失敗しました', 'error');
+          })
+          .finally(()=>{
+            deleteBtn.innerHTML = '写真を削除';
+            deleteBtn.style.pointerEvents = 'auto'
+          })
+        }
+
+        //Show notification
+        function showNotification(message, type = 'success') {
+          const notification = document.getElementById('upload-notification');
+          const messageEl = document.getElementById('notification-message');
+          const icon = notification.querySelector('.notification-icon');
+
+          messageEl.textContent = message;
+
+          //Set type
+          notification.classList.remove('success', 'error');
+          notification.classList.add(type);
+
+          //Set icon
+          icon.textContent = type === 'success' ? '✓' : '⚠️';
+
+          //Show
+          notification.classList.add('show');
+
+          //Auto hide after 5 seconds 
+          setTimeout(() => {
+            norifications.classList.remove('show');
+          }, 5000);
+        }
+
+        //Show/hide delete button
+        function showDeleteButton(){
+          const deleteBtn = document.getElementById('delete-btn');
+          if (deleteBtn){
+            deleteBtn.classList.remove('hidden');
+          }else{
+            //Delete button
+            const uploadButtons = document.querySelector('.upload-buttons');
+            const newDeleteBtn = document.createElement('button');
+            newDeleteBtn.type = 'button';
+            newDeleteBtn.className = 'btn-delete-photo';
+            newDeleteBtn.id = 'delete-btn';
+            newDeleteBtn.innerHTML = '写真を削除';
+            newDeleteBtn.onclick = handleDeletePhoto;
+            uploadButtons.appendChild(newDeleteBtn);
+          }
+        }
+
+        function hideDeleteButton(){
+          const deleteBtn = document.getElementById('delete-btn');
+          if (deleteBtn){
+            deleteBtn.remove();
+          }
+        }
+
+      // Character count
+      function updateCharCount(textarea) {
+        document.getElementById('char-count').textContent = textarea.value.length;
+       }
+
+       // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const bio = document.querySelector('textarea[name="user[bio]"]');
+      if (bio) {
+        updateCharCount(bio);
       }
-    }
+
+      //Show flash message if present
+      <% if flash[:notice] %>
+      showNotification('<%= flash[:notice] %>', 'success');
+      <% end %>
+
+      <% if flash[:alert] %>
+        showNotification('<%= flash[:alert] %>', 'error');
+      <% end %>
+    });
+
+
+
+        
 
     // Confirm delete
     function confirmDelete() {
@@ -242,18 +413,9 @@
       }
     }
 
-    // Character count
-    function updateCharCount(textarea) {
-      document.getElementById('char-count').textContent = textarea.value.length;
-    }
+    
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      const bio = document.querySelector('textarea[name="user[bio]"]');
-      if (bio) {
-        updateCharCount(bio);
-      }
-    });
+    
   </script>
 </body>
 </html>
