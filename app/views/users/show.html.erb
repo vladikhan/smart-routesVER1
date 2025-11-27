@@ -53,48 +53,72 @@
   </div>
 </section>
 
-  <!-- Tabs -->
-  <div class="content-card">
+  <!-- Tabs Navigation -->
   <section class="profile-tabs">
     <div class="tabs-container">
-      <button class="tab-btn active">作成したルート</button>
-      <button class="tab-btn">保存したルート</button>
-      <button class="tab-btn">レビュー</button>
-      <button class="tab-btn">アクティビティ</button>
+      <button class="tab-btn active" data-tab="routes">作成したルート</button>
+      <button class="tab-btn" data-tab="saved">保存したルート</button>
+      <button class="tab-btn" data-tab="reviews">レビュー</button>
+      <button class="tab-btn" data-tab="activity">アクティビティ</button>
+      <div class="tab-indicator"></div>
     </div>
   </section>
 
-  <!-- Created Routes -->
+
+
+
+
+
+
+  <!-- Tab Content -->
   <main class="profile-content">
+  <!-- Created Routes Tab -->
     <h2 class="profile-content-title">作成したルート (<%= @routes.count %>)</h2>
     
     <% if @routes.any? %>
-      <div class="profile-routes-grid">
-        <% @routes.each do |route| %>
-          <%= link_to route_path(route), class: "profile-route-card" do %>
-            <div class="profile-route-card-image">🗺️</div>
-            <div class="profile-route-card-content">
-              <h3 class="profile-route-card-name"><%= route.name %></h3>
-              <p class="profile-route-card-description"><%= truncate(route.description, length: 80) %></p>
-              <div class="profile-route-card-meta">
-                <span class="profile-route-card-views">👁️ <%= route.view_count || 0 %></span>
-                <span class="profile-route-card-price">💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
-              </div>
-              <div class="profile-route-card-tags">
-                <span class="profile-route-card-tag">⏱️ <%= route.estimated_duration %>分</span>
-                <span class="profile-route-card-tag">📍 <%= route.route_items.count %>箇所</span>
-              </div>
+  <div class="profile-routes-grid">
+    <% @routes.each do |route| %>
+      <%= link_to route_path(route), class: "profile-route-card" do %>
+        <div class="profile-route-card-image">🗺️</div>
+
+        <div class="profile-route-card-content">
+          <h3 class="profile-route-card-name"><%= route.name %></h3>
+          <p class="profile-route-card-description"><%= truncate(route.description, length: 80) %></p>
+
+          <div class="profile-route-card-meta">
+            <span>👁️ <%= route.view_count || 0 %></span>
+            <span>💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
+            <span>⏱️ <%= route.estimated_duration %>分</span>
+          </div>
+
+          <% if route.tags.present? %>
+            <div class="profile-route-card-tags">
+              <% route.tags.split(',').first(2).each do |tag| %>
+                <span class="tag-badge">#<%= tag.strip %></span>
+              <% end %>
             </div>
           <% end %>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="empty-state">
-        <p class="empty-state-icon">📭</p>
-        <p class="empty-state-text">まだルートを作成していません</p>
-      </div>
 
+        </div>
+      <% end %>
     <% end %>
+  </div>
+<% else %>
+  <div class="empty-state">
+    <p class="empty-state-icon">📭</p>
+    <p class="empty-state-text">まだルートを作成していません</p>
+  </div>
+<% end %>
+
+    <%# Saved Routes Tab %>
+    <div class="tab-content" id="saved-tab">
+      <h2>保存したルート (0)
+      </h2>
+      <div class="empty-state">
+        <div class="empty-state-icon">💾</div>
+        <p class="empty-state-text">まだ保存されたルートがありません</p>
+      </div>
+    </div>
 
     <!-- Reviews Section -->
     <h2 class="profile-content">レビュー (<%= @reviews.count %>)</h2>
@@ -110,24 +134,74 @@
         <% elsif reviewable.is_a?(Route) %>
           <%= link_to reviewable.name, route_path(reviewable), class: "review-card-link" %>
         <% else %>
-          <span class="review-card-link-empty">関連情報なし</span>
+          <span class="review-card-link-empty">削除されたアイテム</span>
         <% end %>
       </div>
       <div class="review-card-score">⭐ <%= review.total_score %></div>
     </div>
     <p class="review-card-text"><%= review.text %></p>
-    <small class="review-card-date"><%= review.created_at.strftime('%Y年%m月%d日') %></small>
+    <span class="review-card-date"><%= review.created_at.strftime('%Y年%m月%d日') %></span>
   </div>
 <% end %>
     <% else %>
       <div class="empty-state">
         <p class="empty-state-text">まだレビューがありません</p>
       </div>
-  </div>
 
     <% end %>
+      </div>
+
   </main>
 
   <%= render 'pages/footer' %>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const indicator = document.querySelector('.tab-indicator');
+      const contents = document.querySelectorAll('.tab-content');
+
+      //Initialize indicator position
+      updateIndicator(document.querySelector('.tab-btn.active'));
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          //Remove active class from all  tabs and contents
+          tabs.forEach(t = t.classList.remove('active'));
+          contents.forEach(c = c.classList.remove('active'));
+
+          //Add active class to clicked tab
+          this.classList.add('active');
+
+          //Show corresponding content
+          const tabName = this.getAttribute('data-tab');
+          const content = document.getElementById(tabName + 'tab');
+          if (content) {
+            content.classList.add('active');
+          }
+
+          //Update indicator position
+          updateIndicator(this);
+        })
+      })
+
+      function updateIndicator(tab) {
+        const tabRect = tab.getBouningClientRect();
+        const containerRect = tab.parentElement.getBoundingClientRect();
+        const left = tabRect.width;
+
+        indicator.style.width = width + 'px';
+        indicator.style.left = left + 'px';
+      }
+
+      //Update indicator on window resize
+      window.addEventListener('resize', function(){
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+          updateIndicator(activeTab);
+        }
+      })
+    })
+  </script>
 </body>
 </html>
