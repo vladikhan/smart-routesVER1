@@ -1,2 +1,175 @@
-<h1>Routes#new</h1>
-<p>Find me in app/views/routes/new.html.erb</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @route.name %> - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <style>
+    body {
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .route-header {
+      background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
+      color: white;
+      padding: 40px 20px;
+    }
+
+    .route-header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .route-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .route-meta {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      opacity: 0.95;
+    }
+
+    .route-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .content-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .spots-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .spot-card {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #0288d1;
+    }
+
+    .spot-number {
+      background: #0288d1;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .spot-info {
+      flex: 1;
+    }
+
+    .spot-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .spot-duration {
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <%= render 'pages/header' %>
+
+  <div class="route-meta-header">
+        <div class="user-info">
+          <div class="user-avatar">
+            <% if @route.user.avatar.present? %>
+              <%= image_tag @route.user.avatar.thumb.url%>
+              <% else %>
+          👤
+          <% end %>
+          </div>
+          <div>
+            <div>@<%= @route.user.username %></div>
+            <div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="route-stats">
+          <div class="stat-item">
+            👁️ <%= @route.view_count || 0 %>
+          </div>
+          <div class="stat-item">
+            ❤️ <%= @route.likes_count || 12 %>
+          </div>
+          <div class="stat-item">
+            💾 <%= @route.bookmarks_count || 5 %>
+          </div>
+        </div>
+      </div>
+
+  <div class="route-container">
+    <div class="content-card">
+      <h2 class="section-title">📝 説明</h2>
+      <p style="color: #666; line-height: 1.8;"><%= @route.description %></p>
+    </div>
+
+    <% @venues.each_with_index do |venue, index| %>
+            <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>
+              <div class="venue-list-item">
+                <div class="venue-number"><%= index + 1 %></div>
+                <div class="venue-info">
+                  <h4><%= venue.name %></h4>
+                  <p><%= truncate(venue.description, length: 100) %></p>
+                  <div class="venue-tags-inline">
+                    <span class="tag-inline">⏱️ 60分</span>
+                    <span class="tag-inline"><%= venue.cuisine_type %></span>
+                    <span class="tag-inline"><%= venue.price_range %></span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+    </div>
+
+    <% if current_user == @route.user %>
+      <div style="display: flex; gap: 15px;">
+        <%= link_to "編集", edit_route_path(@route), class: "btn btn-primary" %>
+        <%= button_to "削除", route_path(@route), method: :delete, 
+            data: { confirm: "本当に削除しますか？" }, 
+            class: "btn btn-danger" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render 'pages/footer' %>
+</body>
+</html>

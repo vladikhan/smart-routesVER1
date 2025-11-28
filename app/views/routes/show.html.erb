@@ -84,7 +84,7 @@
           📤 共有
         </button>
         <% if current_user == @route.user %>
-          <% link_to edit_route_path(@route), class: "action-btn", do %>
+          <%= link_to edit_route_path(@route), class: "action-btn" do %>
           編集
           <% end %>
         <% end %>
