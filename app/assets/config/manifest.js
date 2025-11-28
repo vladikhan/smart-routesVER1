@@ -9,3 +9,4 @@
 //= link users.css
 //= link editProfile.css
 //= link logout.css
+//= link newRoute.css

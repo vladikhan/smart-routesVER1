@@ -1,175 +1,217 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= @route.name %> - Smart Routes</title>
+  <title>ルート作成 - Smart Routes</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
-  <style>
-    body {
-      background: #f8f9fa;
-      margin: 0;
-      padding: 0;
-    }
-
-    .route-header {
-      background: linear-gradient(135deg, #0288d1 0%, #0277bd 100%);
-      color: white;
-      padding: 40px 20px;
-    }
-
-    .route-header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .route-title {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    .route-meta {
-      display: flex;
-      gap: 30px;
-      flex-wrap: wrap;
-      opacity: 0.95;
-    }
-
-    .route-container {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-
-    .content-card {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 25px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    .spots-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .spot-card {
-      display: flex;
-      gap: 20px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 12px;
-      border-left: 4px solid #0288d1;
-    }
-
-    .spot-number {
-      background: #0288d1;
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .spot-info {
-      flex: 1;
-    }
-
-    .spot-name {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    .spot-duration {
-      color: #666;
-      font-size: 14px;
-    }
-  </style>
+  <%= stylesheet_link_tag 'newRoute', media: 'all' %>
+  
 </head>
 <body>
   <%= render 'pages/header' %>
 
-  <div class="route-meta-header">
-        <div class="user-info">
-          <div class="user-avatar">
-            <% if @route.user.avatar.present? %>
-              <%= image_tag @route.user.avatar.thumb.url%>
-              <% else %>
-          👤
-          <% end %>
-          </div>
-          <div>
-            <div>@<%= @route.user.username %></div>
-            <div>
-            </div>
-          </div>
+  <div class="create-container">
+		<h1 class="page-title">ルート作成</h1>
+
+		<%= form_with model: @route, local: true do |f| %>
+			<%# Route information %>
+			<div class="form-section">
+				<h2 class="section-title">ルート詳細</h2>
+
+				<div class="form-group">
+					<%= f.label :name, "タイトル (必須)", class: "form-label required" %>
+					<%= f.text_field :name, class: "form-input", placeholder: "例：京都の隠れ名所巡り", required: true %>
+				</div>
+
+				<div class="form-group">
+					<%= f.label :description, "説明 (任意)", class: "form-label" %>
+					<%= f.text_area :description, class: "form-textarea", placeholder: "このルートの魅力や特徴を教えてください..." %>
+					<div class="input-hint">最大500文字</div>
+				</div>
+
+				<div class="form-group">
+					<%= f.label :city_id, "京都", class: "form-label required" %>
+					<%= f.select :city_id, options_from_collection_for_select(@cities, :id, :name),  { prompt: "都市を選択してください" }, class: "form-select", required: true %>
+				</div>
+
+				<div class="form-group">
+          <%= f.label :tags, "タグ", class: "form-label" %>
+          <%= f.text_field :tags, class: "form-input", placeholder: "文化,歴史,グルメ (カンマ区切り)" %>
+          <div class="input-hint">カンマで区切って複数のタグを入力できます</div>
         </div>
-        
-        <div class="route-stats">
-          <div class="stat-item">
-            👁️ <%= @route.view_count || 0 %>
-          </div>
-          <div class="stat-item">
-            ❤️ <%= @route.likes_count || 12 %>
-          </div>
-          <div class="stat-item">
-            💾 <%= @route.bookmarks_count || 5 %>
-          </div>
-        </div>
-      </div>
+				
+				<div class="form-group">
+					<%= f.label :estimated_duration, "所要時間（分）", class: "form-label" %>
+					<%= f.number_field :estimated_duration, class: "form-input", placeholder: "180", min: 0 %>
+				</div>
 
-  <div class="route-container">
-    <div class="content-card">
-      <h2 class="section-title">📝 説明</h2>
-      <p style="color: #666; line-height: 1.8;"><%= @route.description %></p>
-    </div>
+				<div class="form-group">
+					<%= f.label :estimated_cost, "予算（円）", class: "form-label" %>
+					<%= f.number_field :estimated_cost, class: "form-input", placeholder: "5000", min: 0 %>
+				</div>
 
-    <% @venues.each_with_index do |venue, index| %>
-            <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>
-              <div class="venue-list-item">
-                <div class="venue-number"><%= index + 1 %></div>
-                <div class="venue-info">
-                  <h4><%= venue.name %></h4>
-                  <p><%= truncate(venue.description, length: 100) %></p>
-                  <div class="venue-tags-inline">
-                    <span class="tag-inline">⏱️ 60分</span>
-                    <span class="tag-inline"><%= venue.cuisine_type %></span>
-                    <span class="tag-inline"><%= venue.price_range %></span>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-          <% end %>
-    </div>
+				<div class="form-group">
+					<%= f.label :difficulty_level, "難易度", class: "form-label" %>
+					<%= f.select :difficulty_level, [['簡単', 'easy'], ['普通', 'medium'], ['難しい', 'hard']],
+              { prompt: "選択してください" },
+							class: "form-select" %>
+				</div>
+			</div>
 
-    <% if current_user == @route.user %>
-      <div style="display: flex; gap: 15px;">
-        <%= link_to "編集", edit_route_path(@route), class: "btn btn-primary" %>
-        <%= button_to "削除", route_path(@route), method: :delete, 
-            data: { confirm: "本当に削除しますか？" }, 
-            class: "btn btn-danger" %>
-      </div>
-    <% end %>
-  </div>
+			<%# Spots section %>
+			<div class="form-section">
+				<h2 class="section-title">📍 訪問場所を追加</h2>
+
+				<div class="spots-list" id="spots-list">
+				<%# Spots will be added here dynamically %>
+				</div>
+
+				<button type="button" class="add-spot-btn" onclick="addSpot()">➕ スポットを追加
+				</button>
+			</div>
+
+			<%# Map Preview %>
+			<div class="form-section">
+				<h2 class="section-title">マッププレビュー</h2>
+				<div class="map-preview">
+				マップは準備中です
+				</div>
+				<button type="button" class="map-btn">📍 現在のルートを地図に表示</button>
+			</div>
+
+			<%# RoutePreview %>
+			<div class="form-section">
+				<h2 class="section-title">現在のルート一覧</h2>
+				<div class="route-preview-list" id="route-preview">
+				<p style="text-align: center; color: #999; padding: 20px;">
+            まだスポットが追加されていません
+          </p>
+				</div>
+			</div>
+
+			<%# Action Buttons %>
+			<div class="action-buttons">
+				<%= link_to "キャンセル", routes_path, class: "btn btn-cancel" %>
+				<%= f.submit "ルートを作成", class: "btn btn-submit" %>
+			</div>
+			<% end %>
+	</div>
 
   <%= render 'pages/footer' %>
+
+  <script>
+    let spotCount = 0;
+    const venues = <%= raw @venues.to_json(only: [:id, :name]) %>;
+
+    function addSpot() {
+      spotCount++;
+      const spotsContainer = document.getElementById('spots-list');
+      
+      const spotHtml = `
+        <div class="spot-item" id="spot-${spotCount}">
+          <div class="spot-number">${spotCount}</div>
+          <button type="button" class="remove-spot" onclick="removeSpot(${spotCount})">×</button>
+          
+          <div class="spot-search">
+            <input type="text" class="search-input" placeholder="🔍 場所を検索..." 
+                   onkeyup="filterVenues(this, ${spotCount})">
+            <span class="search-icon">🔍</span>
+          </div>
+
+          <select name="route_items[][venue_id]" class="spot-select" id="venue-select-${spotCount}" required>
+            <option value="">場所を選択してください</option>
+            ${venues.map(v => `<option value="${v.id}">${v.name}</option>`).join('')}
+          </select>
+
+          <input type="number" name="route_items[][duration_minutes]" class="spot-duration" 
+                 placeholder="滞在時間（分）" min="0" value="60">
+        </div>
+      `;
+
+      spotsContainer.insertAdjacentHTML('beforeend', spotHtml);
+      updatePreview();
+    }
+
+    function removeSpot(id) {
+      const spot = document.getElementById(`spot-${id}`);
+      if (spot) {
+        spot.remove();
+        renumberSpots();
+        updatePreview();
+      }
+    }
+
+    function renumberSpots() {
+      const spots = document.querySelectorAll('.spot-item');
+      spots.forEach((spot, index) => {
+        const number = spot.querySelector('.spot-number');
+        if (number) {
+          number.textContent = index + 1;
+        }
+      });
+    }
+
+    function filterVenues(input, spotId) {
+      const filter = input.value.toLowerCase();
+      const select = document.getElementById(`venue-select-${spotId}`);
+      const options = select.querySelectorAll('option');
+
+      options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        if (text.includes(filter) || option.value === '') {
+          option.style.display = '';
+        } else {
+          option.style.display = 'none';
+        }
+      });
+    }
+
+    function updatePreview() {
+      const preview = document.getElementById('route-preview');
+      const spots = document.querySelectorAll('.spot-item');
+
+      if (spots.length === 0) {
+        preview.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">まだスポットが追加されていません</p>';
+        return;
+      }
+
+      let html = '';
+      spots.forEach((spot, index) => {
+        const select = spot.querySelector('select');
+        const duration = spot.querySelector('input[type="number"]');
+        const selectedOption = select.options[select.selectedIndex];
+        const name = selectedOption.text !== '場所を選択してください' ? selectedOption.text : '未選択';
+        const time = duration.value || '0';
+
+        html += `
+          <div class="preview-item">
+            <div class="preview-number">${index + 1}</div>
+            <div class="preview-info">
+              <div class="preview-name">${name}</div>
+              <div class="preview-duration">⏱️ ${time}分</div>
+            </div>
+            <button type="button" class="preview-delete" onclick="removeSpot(${spot.id.split('-')[1]})">×</button>
+          </div>
+        `;
+      });
+
+      preview.innerHTML = html;
+    }
+
+    // Update preview when selections change
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('spot-select') || e.target.classList.contains('spot-duration')) {
+        updatePreview();
+      }
+    });
+
+    // Add first spot on load
+    document.addEventListener('DOMContentLoaded', function() {
+      addSpot();
+    });
+  </script>
 </body>
 </html>

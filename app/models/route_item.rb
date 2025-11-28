@@ -8,7 +8,7 @@ class RouteItem < ApplicationRecord
   validates :position, uniqueness: { scope: :route_id }
   validates :duration_minutes, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
-  default_scope { order(position: :asc) }
+    default_scope { order(position: :asc) }
 
   acts_as_list scope: :route
 end

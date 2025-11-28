@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   get 'home/index'
+  
   devise_for :users, path: '', path_names: {
     sign_in: 'login',
     sign_out: 'logout',
@@ -15,7 +16,7 @@ Rails.application.routes.draw do
   
   root "pages#home"
 
-  #Home 
+  # Home
   get 'search', to: 'home#search'
   
   # My Profile shortcuts
@@ -33,9 +34,9 @@ Rails.application.routes.draw do
   
   # Logout confirmation
   get 'logout_confirm', to: 'pages#logout_confirm'
-  
+
   # Routes
   resources :routes
-  resources :venues, only: [:index, :show]
+  resources :venues   # ← new, show, edit, index → работают сами
   resources :cities, only: [:index, :show]
 end

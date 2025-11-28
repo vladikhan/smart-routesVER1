@@ -28,4 +28,24 @@ class VenuesController < ApplicationController
 		@reviews = @venue.reviews.includes(:user).order(created_at: :desc)
 		@routes = @venue.routes.where(is_public: true).limit(4)
 	end
+
+	def new
+		@venue = Venue.new
+	end
+
+	def create
+		@venue = Venue.new(venue_params)
+
+		if @venue.save
+			redirect_to @venue, notice: "新しいスポットが登録されました！"
+		else 
+			render :new
+		end
+	end
+
+	private
+
+	def venue_params
+		params.require(:venue).permit(:name, :description, :cuisine_type, :price_range, :address)
+	end
 end
