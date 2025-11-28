@@ -13,7 +13,8 @@ body {
 .page-title {
 	font-size: 28px;
 	font-weight: 700;
-	color: #333;
+	color: #3d2755;
+
 	margin-bottom: 30px;
 }
 
@@ -28,7 +29,8 @@ body {
 .section-title {
 	font-size: 20px;
 	font-weight: 700;
-	color: #333;
+	color: #3d2755;
+
 	margin: 0 0 20px 0;
 	display: flex;
 	align-items: center;
@@ -43,13 +45,14 @@ body {
 	display: block;
 	font-size: 14px;
 	font-weight: 600;
-	color: #333;
+	color: #3d2755;
+
 	margin-bottom: 8px;
 }
 
 .required::after {
 	content: '*';
-	color: #f44336;
+	color: #c43838;
 	margin-left: 4px;
 }
 
@@ -70,7 +73,7 @@ body {
 .form-select:focus,
 .form-textarea:focus {
 	outline: none;
-	border-color: #0288d1;
+	border-color: #2296f3;
 	box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1);
 }
 
@@ -101,7 +104,7 @@ body {
 }
 
 .spot-item:hover {
-	border-color: #0288d1;
+	border-color: #2296f3;
 	box-shadow: 0 2px 8px rgba(2, 136, 209, 0.1);
 }
 
@@ -109,7 +112,7 @@ body {
 	position: absolute;
 	top: -12px;
 	left: 15px;
-	background: #0288d1;
+	background: #2296f3;
 	color: white;
 	width: 28px;
 	height: 28px;
@@ -173,7 +176,7 @@ body {
 	position: absolute;
 	top: 5px;
 	right: 5px;
-	background: #f44336;
+	background: #c43838;
 	color: white;
 	border: none;
 	border-radius: 50%;
@@ -188,12 +191,12 @@ body {
 }
 
 .remove-spot:hover {
-	background: #d32f2f;
+	background: #d26060;
 	transform: scale(1.1);
 }
 
 .add-spot-btn {
-	background: #4caf50;
+	background: #3ea43d;
 	color: white;
 	border: none;
 	border-radius: 8px;
@@ -208,7 +211,7 @@ body {
 }
 
 .add-spot-btn:hover {
-	background: #45a049;
+	background: #47ba45;
 	transform: translateY(-2px);
 	box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
@@ -228,7 +231,7 @@ body {
 }
 
 .map-btn {
-	background: #0288d1;
+	background: #4dc9e6;
 	color: white;
 	border: none;
 	border-radius: 8px;
@@ -240,7 +243,9 @@ body {
 }
 
 .map-btn:hover {
-	background: #0277bd;
+	background: #0cbdd1;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 /* Route Preview */
@@ -263,7 +268,7 @@ body {
 }
 
 .preview-number {
-	background: #0288d1;
+	background: #2296f3;
 	color: white;
 	width: 32px;
 	height: 32px;
@@ -281,7 +286,8 @@ body {
 
 .preview-name {
 	font-weight: 600;
-	color: #333;
+	color: #3d2755;
+
 	margin-bottom: 4px;
 }
 
@@ -291,7 +297,7 @@ body {
 }
 
 .preview-delete {
-	background: #f44336;
+	background: #c43838;
 	color: white;
 	border: none;
 	border-radius: 50%;
@@ -307,7 +313,7 @@ body {
 }
 
 .preview-delete:hover {
-	background: #d32f2f;
+	background: #d26060;
 	transform: scale(1.1);
 }
 
@@ -317,6 +323,7 @@ body {
 	gap: 15px;
 	margin-top: 30px;
 	padding-bottom: 30px;
+	align-items: baseline;
 }
 
 .btn {
@@ -327,10 +334,18 @@ body {
 	font-size: 16px;
 	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.3s;
+	transition:
+		background 0.25s ease,
+		box-shadow 0.25s ease,
+		transform 0.25s ease;
 	text-decoration: none;
 	text-align: center;
 	display: block;
+}
+
+.btn:focus {
+	outline: 2px solid rgba(0, 123, 255, 0.5);
+	outline-offset: 3px;
 }
 
 .btn-cancel {
@@ -344,7 +359,7 @@ body {
 }
 
 .btn-submit {
-	background: #0288d1;
+	background: #2296f3;
 	color: white;
 }
 
