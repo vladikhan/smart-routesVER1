@@ -13,7 +13,35 @@ class Route < ApplicationRecord
 
   # バリデーション
   validates :name, presence: true, length: { maximum: 255 }
+  validates :description, length: { maximum: 500 } 
+  validates :estimated_duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :estimated_cost, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :difficulty_level, inclusion: { in: %w[easy medium hard] }, allow_nil: true 
   validates :user, presence: true
+
+  #Default values
+  after_initialize :set_defaults, if: :new_record?
+
+  def set_defaults
+    self.view_count ||= 0 
+    self.is_public = true if is_public.nil?
+  end
+
+  #Average rating 
+  def avarage_rating
+    reviews.average(:total_score).to_f.round(1)
+  end
+
+  #Total reviews count
+  def reviews_count
+    reviews.count
+  end
+
+  #Check if user has bookmarkes this route
+  def bookmarked_by?(user)
+    return false unless user
+    bookmarks.exists?(user_id: user.id)
+  end
 
   # スコープ
   scope :public_routes, -> { where(is_public: true, is_deleted: false) }

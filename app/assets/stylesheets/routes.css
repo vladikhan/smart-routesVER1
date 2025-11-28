@@ -99,11 +99,13 @@
 	color: white;
 }
 
+/* Content */
 .route-detail-content {
 	max-width: 1200px;
 	margin: -40px auto 0;
 	padding: 0 20px;
 	position: relative;
+	z-index: 10;
 }
 
 .route-detail-grid {
@@ -137,20 +139,25 @@
 	padding: 20px;
 	border-radius: 8px;
 	margin-bottom: 15px;
+	border-left: 4px solid #2296f3;
+	color: inherit;
+	text-decoration: none;
+
 	background: #f8f9fa;
-	transition: transform 0.2s;
+	transition: all 0.3s;
 	cursor: pointer;
 }
 
 .venue-list-item:hover {
 	transform: translateX(5px);
 	background: #e3f2fd;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .venue-number {
 	width: 40px;
 	height: 40px;
-	background: #0288d1;
+	background: #2296f3;
 	color: white;
 	border-radius: 10%;
 	display: flex;
@@ -184,7 +191,7 @@
 	padding: 4px 10px;
 	border-radius: 12px;
 	font-size: 12px;
-	color: #0288d1;
+	color: #2296f3;
 }
 
 .map-container {
@@ -201,6 +208,7 @@
 .sidebar {
 	position: sticky;
 	top: 100px;
+	height: fit-content;
 }
 
 .author-card {
@@ -222,7 +230,7 @@
 .follow-btn {
 	width: 100%;
 	padding: 10px;
-	background: #0288d1;
+	background: #2296f3;
 	color: white;
 	border: none;
 	border-radius: 6px;
@@ -285,6 +293,6 @@
 }
 
 .tab-btn.active {
-	color: #0288d1;
-	border-bottom-color: #0288d1;
+	color: #2296f3;
+	border-bottom-color: #2296f3;
 }

@@ -19,10 +19,16 @@
     <div class="route-hero-content">
       <div class="route-meta-header">
         <div class="user-info">
-          <div class="user-avatar">👤</div>
+          <div class="user-avatar">
+            <% if @route.user.avatar.present? %>
+              <%= image_tag @route.user.avatar.thumb.url%>
+              <% else %>
+          👤
+          <% end %>
+          </div>
           <div>
-            <div style="font-weight: 600;">@<%= @route.user.username %></div>
-            <div style="font-size: 14px; opacity: 0.8;">
+            <div>@<%= @route.user.username %></div>
+            <div>
               <%= @route.created_at.strftime('%Y年%m月%d日') %>に作成
             </div>
           </div>
@@ -48,11 +54,13 @@
         </p>
         
         <div class="route-quick-info">
+          <% if @route.difficulty_level.present? %>
           <div class="quick-info-item">
             <span style="background: rgba(255,255,255,0.2); padding: 3px 12px; border-radius: 5px; margin-bottom: 5px;">
-              <%= @route.difficulty_level || 'easy' %>
+              <%= @route.difficulty_level %>
             </span>
           </div>
+          <% end %>
           <div class="quick-info-item">
             ⏱️ <%= @route.estimated_duration %>分
           </div>
@@ -75,6 +83,11 @@
         <button class="action-btn btn-share">
           📤 共有
         </button>
+        <% if current_user == @route.user %>
+          <% link_to edit_route_path(@route), class: "action-btn", do %>
+          編集
+          <% end %>
+        <% end %>
       </div>
     </div>
   </section>
@@ -96,7 +109,7 @@
           </div>
           
           <!-- Route Stops -->
-          <h2 class="section-title">ルート詳細</h2>
+          <h2 class="section-title">ルート詳細 (<%= @route_items.count %>場所)</h2>
           
           <% @venues.each_with_index do |venue, index| %>
             <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>

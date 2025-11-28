@@ -5,7 +5,7 @@ class RoutesController < ApplicationController
   #GET /routes
   def index
     @routes = Route.where(is_public: true)
-                   .includes(:user, :venues)
+                   .includes(:user, :city)
                    .page(params[:page])
                    .per(12)
 
@@ -62,6 +62,7 @@ class RoutesController < ApplicationController
   #GET /routes/:id
   def show
     @route.increment!(:view_count)
+    @route_items = @route.route_items.includes(:venue).order(position: :asc)
     @venues = @route.venues.includes(:district)
     @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10)
   end
@@ -69,14 +70,21 @@ class RoutesController < ApplicationController
   #GET /routes/new
   def new
     @route = current_user.routes.build
+    @cities = City.all
+    @venues = Venue.all
   end
 
   def create
     @route = current_user.routes.build(route_params)
 
     if @route.save
-      redirect_to @route, notice: 'マルートが正常に作成されました。'
+      #Create route items from params
+      create_route_items if params[:route_items].present?
+
+      redirect_to @route, notice: 'ルートが正常に作成されました。'
     else
+      render @cities = City.all
+      render @venues = Venue.all
       render :new, status: :unprocessable_entity
     end
   end
@@ -84,6 +92,8 @@ class RoutesController < ApplicationController
   #GET /routes/:id/edit
   def edit
     authorize_owner!
+    render @cities = City.all
+    render @venues = Venue.all
   end
 
   #GET /routes/:id
@@ -91,6 +101,9 @@ class RoutesController < ApplicationController
     authorize_owner!
 
     if @route.update(route_params)
+      #Update route items
+      update_route_items if params[:route_items].present?
+
       redirect_to @route, notice: 'ルートが更新されました。'
     else
       render :edit, status: :unprocessable_entity
@@ -112,8 +125,14 @@ end
 
 def route_params
   params.require(:route).permit(
-    :name, :description, :estimated_duration,
-    :estimated_cost, :difficulty_level, :is_public
+    :name, 
+    :description, 
+    :estimated_duration,
+    :estimated_cost, 
+    :difficulty_level, 
+    :is_public, 
+    :city_id, 
+    :tags
   )
 end
 
@@ -122,4 +141,28 @@ def authorize_owner!
     redirect_to routes_path, alert: 'アクセスが拒否されました。'
   end
 end
+
+#Create route items from submitted form
+def create_route_items
+  params[:route_items].each_with_index do |item_params, index|
+    next if item_params[:venue_id].blank?
+
+    @route.route_items.create(
+      venue_id: item_params[:venue_id],
+      position: index + 1,
+      duration_minutes: item_params[:duration_minutes].to_i,
+      notes: item_params[:notes]
+    )
+  end
+end
+
+#Update route items (delete old ones, create new ones)
+
+  def update_route_items
+    #Delete existing route items
+    @route.route_items.destroy_all
+
+    #Create new route items
+    create_route_items
+  end
 end
