@@ -38,7 +38,7 @@ class RoutesController < ApplicationController
       case params[:cost]
       when 'budget'
         @routes = @routes.where('estimated_cost <= ?', 3000)
-      when 'moderate'
+      when 'medium'
         @routes = @routes.where('estimated_cost BETWEEN ? AND ?', 3001, 8000)
       when 'expensive'
         @routes = @routes.where('estimated_cost > ?', 8000)

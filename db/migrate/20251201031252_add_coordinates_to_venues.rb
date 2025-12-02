@@ -1,6 +1,11 @@
 class AddCoordinatesToVenues < ActiveRecord::Migration[6.1]
   def change
-    add_column :venues, :latitude, :decimal, precision: 10, scale: 6
-    add_column :venues, :longtitude, :decimal, precision: 10, scale: 6
+    unless column_exists?(:venues, :geo_lat)
+      add_column :venues, :geo_lat, :decimal, precision: 10, scale: 6
+    end
+
+    unless column_exists?(:venues, :geo_lng)
+      add_column :venues, :geo_lng, :decimal, precision: 10, scale: 6
+    end
   end
 end

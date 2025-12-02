@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2025_12_02_024702) do
-=======
-ActiveRecord::Schema.define(version: 2025_12_01_031252) do
->>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -223,10 +219,7 @@ ActiveRecord::Schema.define(version: 2025_12_01_031252) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "venue_id"
-<<<<<<< HEAD
     t.integer "duration_minutes"
-=======
->>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
     t.index ["item_type", "item_id"], name: "index_route_items_on_item_type_and_item_id"
     t.index ["route_id", "position"], name: "index_route_items_on_route_id_and_position", unique: true
     t.index ["route_id"], name: "index_route_items_on_route_id"
@@ -343,10 +336,6 @@ ActiveRecord::Schema.define(version: 2025_12_01_031252) do
     t.datetime "updated_at", precision: 6, null: false
     t.float "average_rating", default: 0.0
     t.decimal "latitude", precision: 10, scale: 6
-<<<<<<< HEAD
-=======
-    t.decimal "longtitude", precision: 10, scale: 6
->>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
     t.index ["district_id"], name: "index_venues_on_district_id"
     t.index ["geo_lat", "geo_lng"], name: "index_venues_on_geo_lat_and_geo_lng"
     t.index ["is_featured"], name: "index_venues_on_is_featured"
@@ -378,10 +367,7 @@ ActiveRecord::Schema.define(version: 2025_12_01_031252) do
   add_foreign_key "reviews", "users"
   add_foreign_key "route_items", "routes"
   add_foreign_key "route_items", "venues"
-<<<<<<< HEAD
-=======
   add_foreign_key "routes", "cities"
->>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
   add_foreign_key "routes", "users"
   add_foreign_key "venues", "districts"
   add_foreign_key "venues", "users"

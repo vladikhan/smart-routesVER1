@@ -571,52 +571,34 @@ routes = routes_data.map.with_index do |data, idx|
   venues_to_add = Array(data.delete(:venues)).compact
   user = users[idx % users.length]
 
-<<<<<<< HEAD
-	route = Route.create!(
-		**data,
-		user: user,
-		is_public: true
-	)
-  puts venues_to_add.map { |v| v.class }
+  # city fallback: если первый venue не имеет city, берем случайный
+  cities = City.all.to_a
+  city = venues_to_add.first&.district&.city || cities.sample
 
-  
-  venues_to_add.compact.each_with_index do |venue_data, position|
-    venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
-    next unless venue
-
-    puts "venue attributes keys: #{venue.attributes.keys}",
-    
-    RouteItem.create!(
-    route: route,
-    item: venue,
-    position: position + 1,
-    notes: "おすすめポイント: #{venue.description[0..50]}"
-  )
-end
-
-=======
-  # city fallback
-  city = venues_to_add.first&.city || cities.sample
-
+  # создаём маршрут
   route = Route.create!(
     **data,
     user: user,
     city: city,
     is_public: true
   )
->>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
 
-  # route items
-  venues_to_add.each_with_index do |venue, position|
+  # создаём RouteItems
+  venues_to_add.each_with_index do |venue_data, position|
+    venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
+    next unless venue
+
+    puts "venue attributes keys: #{venue.attributes.keys}"
+
     RouteItem.create!(
       route: route,
       item: venue,
       position: position + 1,
-      notes: "おすすめポイント: #{venue.description[0..50]} "
+      notes: "おすすめポイント: #{venue.description[0..50]}"
     )
   end
 
-  # tags
+  # создаём теги
   tag_names.each do |tag_name|
     tag = tags.find { |t| t.parameter == tag_name }
     EntityTag.create!(entity: route, tag: tag) if tag
@@ -849,17 +831,17 @@ puts "Updating venues with coordinates..."
 
 #Kyoto venues
 kinkakuji = Venue.find_by(name: "金閣寺")
-kinkakuji&.update(latitude: 35.0934, longtitude: 135.7292)
+kinkakuji&.update(geo_lat: 35.0934, geo_lng: 135.7292)
 
 fushimi = Venue.find_by(name: "稲荷大社")
-fushimi&.updateI(latitude: 34.9671, longtitude: 135.7727)
+fushimi&.updateI(geo_lat: 34.9671, geo_lng: 135.7727)
 
 #Osaka venues
 osaka_castle = Venue.find_by(name: "大阪城")
-osaka_castle&.update(latitude:34.6873, longtitude: 135.5262)
+osaka_castle&.update(geo_lat:34.6873, geo_lng: 135.5262)
 
 dotonbori = Venue.find_by(name: "道頓堀")
-dotonbori&.update(latitude: 34.6686, longtitude: 135.5004)
+dotonbori&.update(geo_lat: 34.6686, geo_lng: 135.5004)
 
 puts "Venues coordinates updated"
 
