@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+# -*- encoding: utf-8 -*-
+
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_user, only: [:show]

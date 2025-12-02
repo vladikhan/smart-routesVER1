@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'faker'
 
 if Rails.env.development?
@@ -462,12 +463,22 @@ all_venues = kyoto_venues + osaka_venues
 puts "ルートを作成中..."
 
 routes_data = [
+  {
+    name: "京都 — 大阪 (3日間)",
+    description: "京都と大阪の主要観光スポットを巡る3日間のルート",
+    estimated_duration: 4320,
+    estimated_cost: 50000,
+    difficulty_level: 'easy',  # Changed from '簡単'
+    is_public: true,
+    user: users.sample,
+    city: kyoto
+  },
 	{
 		 name: '京都 世界遺産めぐり',
     description: '清水寺、金閣寺、伏見稲荷大社を一日で。京都の三大名所を制覇！',
 		estimated_duration: 480,
 		estimated_cost: 3000, 
-		difficulty_level: 'moderate',
+		difficulty_level: 'medium',
 		venues: [kyoto_venues[0], kyoto_venues[2], kyoto_venues[1]],
 		tags: ['historic', 'temple', 'world_heritage', 'walking']
 	},
@@ -493,7 +504,7 @@ routes_data = [
     description: '大阪城から梅田の超高層ビルまで。歴史と未来を感じる旅。',
     estimated_duration: 420,
     estimated_cost: 8000,
-    difficulty_level: 'moderate',
+    difficulty_level: 'medium',
     venues: [osaka_venues[1], osaka_venues[8], osaka_venues[10]],
     tags: ['historic', 'modern', 'shopping', 'castle']
   },
@@ -538,7 +549,7 @@ routes_data = [
     description: '子供も楽しめる！海遊館、大阪城、錦市場の家族旅行。',
     estimated_duration: 480,
     estimated_cost: 15000,
-    difficulty_level: 'moderate',
+    difficulty_level: 'medium',
     venues: [osaka_venues[11], osaka_venues[1], kyoto_venues[7]],
     tags: ['family_friendly', 'aquarium', 'castle', 'market']
   },
@@ -553,32 +564,40 @@ routes_data = [
   }
 ]
 
+
+
 routes = routes_data.map.with_index do |data, idx|
-	tag_names = data.delete(:tags)
-	venues_to_add = data.delete(:venues)
-	user = users[idx % users.length]
+  tag_names     = Array(data.delete(:tags))
+  venues_to_add = Array(data.delete(:venues)).compact
+  user = users[idx % users.length]
 
-	route = Route.create!(
-		**data,
-		user: user,
-		is_public: true
-	)
+  # city fallback
+  city = venues_to_add.first&.city || cities.sample
 
-	venues_to_add.each_with_index do |venue, position|
-		RouteItem.create!(
-			route: route,
-			item: venue,
-			position: position + 1,
-			notes: "おすすめポイント: #{venue.description[0..50]} "
-		)
-	end
+  route = Route.create!(
+    **data,
+    user: user,
+    city: city,
+    is_public: true
+  )
 
-	tag_names.each do |tag_name|
-		tag = tags.find { |t| t.parameter == tag_name }
-		EntityTag.create!(entity: route, tag: tag) if tag
-	end
+  # route items
+  venues_to_add.each_with_index do |venue, position|
+    RouteItem.create!(
+      route: route,
+      item: venue,
+      position: position + 1,
+      notes: "おすすめポイント: #{venue.description[0..50]} "
+    )
+  end
 
-	route
+  # tags
+  tag_names.each do |tag_name|
+    tag = tags.find { |t| t.parameter == tag_name }
+    EntityTag.create!(entity: route, tag: tag) if tag
+  end
+
+  route
 end
 
 puts "#{Route.count}件のルートを作成しました"
@@ -776,6 +795,27 @@ end
 end
 
 puts "#{PlaceOwner.count}件のビジネスアカウントを作成しました"
+
+# ============ 15. Cordinates for venues ============
+
+#Update venues with coordinates
+puts "Updating venues with coordinates..."
+
+#Kyoto venues
+kinkakuji = Venue.find_by(name: "金閣寺")
+kinkakuji&.update(latitude: 35.0934, longtitude: 135.7292)
+
+fushimi = Venue.find_by(name: "稲荷大社")
+fushimi&.updateI(latitude: 34.9671, longtitude: 135.7727)
+
+#Osaka venues
+osaka_castle = Venue.find_by(name: "大阪城")
+osaka_castle&.update(latitude:34.6873, longtitude: 135.5262)
+
+dotonbori = Venue.find_by(name: "道頓堀")
+dotonbori&.update(latitude: 34.6686, longtitude: 135.5004)
+
+puts "Venues coordinates updated"
 
 =begin
 # ==================== 完了 ====================

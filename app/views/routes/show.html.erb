@@ -7,7 +7,12 @@
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
   <%= stylesheet_link_tag 'routes', media: 'all' %>
+  <%= javascript_include_tag "https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_API_KEY']}&libraries=places&language=ja&callback=initMap", defer: true, async: true %>
 
+   <!-- Google Maps API -->
+  <script>
+    window.GOOGLE_MAPS_API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
+  </script>
   
 </head>
 <body>
@@ -132,9 +137,7 @@
         <!-- Map -->
         <div class="content-card">
           <h2 class="section-title">🗺️ マップ</h2>
-          <div class="map-container">
-            <div>地図がここに表示されます</div>
-          </div>
+          <%= render 'routes/map' %>
         </div>
 
         <!-- Reviews -->

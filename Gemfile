@@ -83,3 +83,5 @@ gem "bootstrap", "~> 5.3"
 # gem 'sass-rails'
 
 gem "jsbundling-rails", "~> 1.3"
+
+gem 'dotenv-rails', groups: [:development, :test]

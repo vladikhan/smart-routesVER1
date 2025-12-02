@@ -1,0 +1,159 @@
+<div class="map-wrapper">
+	<div id=="route-map" style="width: 100%; height: 400px; border-radius: 8px;"></div>
+</div>
+
+<script>
+	let map;
+	let markers = [];
+	let directionsService;
+	let directionsRenderer;
+
+	function initMap() {
+		//Route items data
+		const routeItems = <%= @route_items
+        .includes(:venue)
+        .where.not(venue_id: nil)        # отфильтровывает проблемные записи
+        .map { |item|
+          {
+            name: item.venue.name,
+            lat: item.venue.latitude,
+            lng: item.venue.longitude,
+            address: item.venue.address
+          }
+        }.to_json.html_safe
+    %>;
+
+		//Check if we have valid coordinates
+		const hasValidCoordinates = routeItems.length > 0 &&
+																routeItems[0].lat &&
+																routeItems[0].lng;
+
+		if (!hasValidCoordinates) {
+			document.getElementById('route-map').innerHTML =
+			'<div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f0f0f0; color: #666;">' +
+      '📍 位置情報が登録されていません</div>';
+			return;
+		}
+
+		//Initialize map centered on first location
+		const center = {
+			lat: parseFloat(routeItems[0].lat),
+			lng: parseFloat(routeItems[0].lng)
+		};
+
+		map = new google.maps.Map(document.getElementById('route-map'), {
+			zoom: 13,
+			center: center,
+			styles: [
+				{
+					featureType: 'poi',
+					elementType: 'labels',
+					stylers: [{ visibility: 'off' }]
+				}
+			]
+		});
+
+		//Initialize directions sevice
+		directionsService = new google.maps.DirectionsService();
+		directionsRenderer = new google.maps.DirectionsRenderer({
+			map: map,
+			suppressMarkers: true,
+			polylineOptions: {
+			strokeColor: '#0288d1',
+			strokeWeight: 4
+    }
+  });
+
+	//Add numbered markers for each loction
+	routeItems.forEach((item, index) => {
+		const position = {
+			lat: parselFloat(item.lat),
+			lng: parselFloat(item.lng)
+		};
+
+		const marker = new google.map.>Marker({
+			position: position,
+			map: map,
+			label: {
+				text: String(index + 1),
+				color: 'white',
+				fonstSize: '14px',
+				fontWeight: 'bold'
+			},
+			icon: {
+				path: google.maps.SymbolPath.CIRCLE,
+				fillColor: '#0288d1',
+				fillOpacity: 1,
+				strokeColor: 'white',
+				strokeWeight: 3,
+				scale: 20
+			}
+		});
+
+		// Aad info window
+		const infoWindow = new google.maps.InfoWindow({
+			content: `
+				<div style="padding: 10px;">
+          <h4 style="margin: 0 0 5px 0; font-size: 16px;">${item.name}</h4>
+          <p style="margin: 0; color: #666; font-size: 13px;">${item.address || ''}</p>
+        </div>
+			`
+		});
+
+		marker.addListener('click', () => {
+			InfoWindow.open(map, marker);
+		});
+
+		markers.push(marker);
+	});
+
+	//Draw route if there are multiple locations
+	if (routeItems.length > 1) {
+		drawRoute(routeItems);
+	}
+
+	//Fit bounds to show all markers
+	const bounds = new google.maps.LatLngBounds();
+	routeItems.forEach(item => {
+		bounds.extend ({
+			lat: parselFloat(item.lat),
+			lng: parselFloat(item.lng)
+		});
+	});
+
+	map.fitBounds(bounds);
+	}
+
+	function drawRoute(routeItems) {
+		if (routeItems.length < 2) return;
+
+		const waypoints = routeItems.slice(1, -1).map(item => ({
+			location: { lat: parselFloat(item.lat), lng: parselFloat(item,lng) },
+			stopover: true
+		}));
+
+		const request = {
+			origin: {
+				lat: parselFloat(routeItems[routeItems.[0]].lat),
+				lng: parselFloat(routeItems[routeItems.[0]].lng)
+			},
+			destination: { 
+				lat: parselFloat(routeItems[routeItems.length - 1].lat),
+				lng: parselFloat(routeItems[routeItems.length - 1].lng)
+			},
+
+			directionsService.route(request, (result, status) => {
+				if (status === 'OK') {
+					directionsRenderer.setDirections(result);
+				}
+			})
+		}
+
+		//Initialize map when script loads
+		if (typeof google !== 'undefined') {
+			initMap();
+		} else {
+			window.initMap = initMap;
+		}
+	}
+</script>
