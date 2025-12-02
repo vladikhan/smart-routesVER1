@@ -84,4 +84,8 @@ gem "bootstrap", "~> 5.3"
 
 gem "jsbundling-rails", "~> 1.3"
 
+<<<<<<< HEAD
 gem 'dotenv-rails', '~> 3.1.8'
+=======
+gem 'dotenv-rails', groups: [:development, :test]
+>>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60

@@ -1,4 +1,5 @@
 <div class="place-search-container">
+<<<<<<< HEAD
   <div class="search-input-wrapper">
     <input 
       type="text" 
@@ -16,6 +17,22 @@
   <input type="hidden" name="route_items[][venue_lng]" id="venue-lng-<%= index %>">
   
   <div id="place-details-<%= index %>" class="place-details" style="display: none;">
+=======
+	<div class="search-input-wrapper">
+	<input 
+	type="text"
+	id="place-search <%= index %>"
+	>
+	<span class="search-icon">🔍</span>
+	</div>
+
+<input type="hidden" name="route_items[][venue_name]" id="venue-name <%= index %>"> 	
+<input type="hidden" name="route_items[][venue_address]" id="venue-address <%= index %>">
+<input type="hidden" name="route_items[][venue_lat]" id="venue-lat <%= index %>">
+<input type="hidden" name="route_items[][venue_lng]" id="venue-lng <% index %>">	
+
+<div id="place-details-<%= index %>" class="place-details" style="display: none;">
+>>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
     <div class="place-info">
       <strong id="selected-place-name-<%= index %>"></strong>
       <p id="selected-place-address-<%= index %>" style="color: #666; font-size: 13px; margin: 5px 0 0 0;"></p>
@@ -73,6 +90,7 @@
 </style>
 
 <script>
+<<<<<<< HEAD
 function initPlaceAutocomplete_<%= index %>() {
   const input = document.getElementById('place-search-<%= index %>');
   if (!input) return;
@@ -119,4 +137,53 @@ if (typeof google !== 'undefined' && google.maps) {
     }
   });
 }
+=======
+function initPlaceAutocomplete <%= index %>() {
+	const input = document.getElementById('place-search <%= index %>');
+	if (!input) return;
+
+	const autocomplete = new google.maps.places.Autocomplete(input, {
+		componentRestrictions: { country: 'jp' },
+		fields: ['name', 'formatted_address', 'geometry', 'place_id'],
+		types: ['establishment', 'geocode']
+	});
+
+	autocomplete.addListener('place_changed', function() {
+		const place = autocomplete.getPlace();
+
+		if (!place.geometry) {
+      alert('場所の詳細が見つかりませんでした。');
+			return;
+		}
+
+		//Fill hidden fields
+		document.getElementById('venue-name <%= index %>').value = place.name || '';		
+		document.getElementById('venue-address <%= index %>').value = place.formatted_address || '';
+		document.getElementById('venue-lat <%= index %>').value = place.geometry.location.lat();
+		document.getElementById('venue-lng <%= index %>').value = place.geometry.location.lng();		
+
+		//Show selected place details
+		document.getElementById('selected-place-name <%= index %>').textContent = place.name || '';
+		document.getElementById('selected-place-address <%= index %>').textContent = place.formatted_address || '';
+		document.getElementById('place-details <%= index %>').style.display = 'block';
+
+		//Update preview if function exists
+		if (typeof updatePreview === 'function') {
+			updatePreview();
+		}
+	});
+}
+
+	//Initialize when Google Maps loads
+	if (typeof google !== 'undefined' && google.maps) {
+		initPlaceAutocomplete <%= index %>();
+	}else {
+		window.addEventListener('load', function() {
+			if (typeof google !== 'undefined' && google.maps) {
+				initPlaceAutocomplete <%= index %>();
+			}
+		});
+	}
+
+>>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
 </script>

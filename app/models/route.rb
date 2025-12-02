@@ -16,7 +16,11 @@ class Route < ApplicationRecord
   validates :description, length: { maximum: 500 } 
   validates :estimated_duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :estimated_cost, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+<<<<<<< HEAD
   validates :difficulty_level, inclusion: { in: %w[easy moderate hard] }, allow_nil: true 
+=======
+  validates :difficulty_level, inclusion: { in: %w[easy medium hard 簡単 普通 難しい] }, allow_nil: true 
+>>>>>>> 8d994cf380296bb5ab06377890efefaef983fc60
   validates :user, presence: true
 
   #Default values
