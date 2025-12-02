@@ -742,6 +742,27 @@ end
 puts "#{Notification.count}件の通知を作成しました"
 
 
+# Update venues with coordinates
+puts "Updating venues with coordinates..."
+
+# Kyoto venues
+kinkakuji = Venue.find_by(name: "金閣寺")
+kinkakuji&.update(latitude: 35.0394, longitude: 135.7292)
+
+fushimi = Venue.find_by(name: "伏見稲荷大社")
+fushimi&.update(latitude: 34.9671, longitude: 135.7727)
+
+# Osaka venues  
+osaka_castle = Venue.find_by(name: "大阪城")
+osaka_castle&.update(latitude: 34.6873, longitude: 135.5262)
+
+dotonbori = Venue.find_by(name: "道頓堀")
+dotonbori&.update(latitude: 34.6686, longitude: 135.5004)
+
+puts "✓ Venues coordinates updated"
+
+
+
 # ============ 14. Place Owners (ビジネスアカウント) ============
 puts "ビジネスアカウントを作成中..."
 

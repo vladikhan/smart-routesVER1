@@ -1,0 +1,122 @@
+<div class="place-search-container">
+  <div class="search-input-wrapper">
+    <input 
+      type="text" 
+      id="place-search-<%= index %>" 
+      class="search-input place-autocomplete" 
+      placeholder="🔍 場所を検索（Google Maps）..."
+      data-index="<%= index %>"
+    >
+    <span class="search-icon">🔍</span>
+  </div>
+  
+  <input type="hidden" name="route_items[][venue_name]" id="venue-name-<%= index %>">
+  <input type="hidden" name="route_items[][venue_address]" id="venue-address-<%= index %>">
+  <input type="hidden" name="route_items[][venue_lat]" id="venue-lat-<%= index %>">
+  <input type="hidden" name="route_items[][venue_lng]" id="venue-lng-<%= index %>">
+  
+  <div id="place-details-<%= index %>" class="place-details" style="display: none;">
+    <div class="place-info">
+      <strong id="selected-place-name-<%= index %>"></strong>
+      <p id="selected-place-address-<%= index %>" style="color: #666; font-size: 13px; margin: 5px 0 0 0;"></p>
+    </div>
+  </div>
+</div>
+
+<style>
+.place-search-container {
+  margin-bottom: 15px;
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.place-autocomplete {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.place-autocomplete:focus {
+  outline: none;
+  border-color: #0288d1;
+  box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.place-details {
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.place-info strong {
+  color: #2e7d32;
+  font-size: 14px;
+}
+</style>
+
+<script>
+function initPlaceAutocomplete_<%= index %>() {
+  const input = document.getElementById('place-search-<%= index %>');
+  if (!input) return;
+
+  const autocomplete = new google.maps.places.Autocomplete(input, {
+    componentRestrictions: { country: 'jp' },
+    fields: ['name', 'formatted_address', 'geometry', 'place_id'],
+    types: ['establishment', 'geocode']
+  });
+
+  autocomplete.addListener('place_changed', function() {
+    const place = autocomplete.getPlace();
+    
+    if (!place.geometry) {
+      alert('場所の詳細が見つかりませんでした。');
+      return;
+    }
+
+    // Fill hidden fields
+    document.getElementById('venue-name-<%= index %>').value = place.name || '';
+    document.getElementById('venue-address-<%= index %>').value = place.formatted_address || '';
+    document.getElementById('venue-lat-<%= index %>').value = place.geometry.location.lat();
+    document.getElementById('venue-lng-<%= index %>').value = place.geometry.location.lng();
+
+    // Show selected place details
+    document.getElementById('selected-place-name-<%= index %>').textContent = place.name || '';
+    document.getElementById('selected-place-address-<%= index %>').textContent = place.formatted_address || '';
+    document.getElementById('place-details-<%= index %>').style.display = 'block';
+
+    // Update preview if function exists
+    if (typeof updatePreview === 'function') {
+      updatePreview();
+    }
+  });
+}
+
+// Initialize when Google Maps loads
+if (typeof google !== 'undefined' && google.maps) {
+  initPlaceAutocomplete_<%= index %>();
+} else {
+  window.addEventListener('load', function() {
+    if (typeof google !== 'undefined' && google.maps) {
+      initPlaceAutocomplete_<%= index %>();
+    }
+  });
+}
+</script>

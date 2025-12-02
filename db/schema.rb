@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_11_26_080330) do
+ActiveRecord::Schema.define(version: 2025_12_02_014242) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -330,6 +330,8 @@ ActiveRecord::Schema.define(version: 2025_11_26_080330) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.float "average_rating", default: 0.0
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
     t.index ["district_id"], name: "index_venues_on_district_id"
     t.index ["geo_lat", "geo_lng"], name: "index_venues_on_geo_lat_and_geo_lng"
     t.index ["is_featured"], name: "index_venues_on_is_featured"
