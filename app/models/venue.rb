@@ -1,3 +1,4 @@
+
 class Venue < ApplicationRecord
   belongs_to :district
   belongs_to :user, optional: true
@@ -6,6 +7,8 @@ class Venue < ApplicationRecord
   has_many :routes, through: :route_items
   has_many :bookmarks, dependent: :destroy
   has_many :venue_photos, dependent: :destroy
+  has_many :entity_tags, as: :entity, dependent: :destroy
+  has_many :tags, through: :entity_tags
 
   validates :name, presence: true, length: { maximum: 100 }
   validates :address, presence: true
