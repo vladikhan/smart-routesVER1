@@ -20,8 +20,8 @@
       <% else %>
           👤
         <% end %>
-      <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
       <% end %>
+      <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
       <%= link_to "ログアウト", logout_confirm_path, class: "login-btn", title: "ログアウト" %>
   <% else %>
     <%= link_to "ログイン", new_user_session_path, class: "login-btn"  %>

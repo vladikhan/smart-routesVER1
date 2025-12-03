@@ -2,6 +2,19 @@
   <section class="hero-banner">
     <h1 class="hero-title">人気のルートを探す</h1>
     <p class="hero-subtitle">みんなが作成した最高のルートを発見しよう</p>
+
+     <div class="routes-hero-content">
+      
+      <% if user_signed_in? %>
+        <%= link_to new_route_path, class: "btn-create-route-large" do %>
+        新しいルートを作成
+        <% end %>
+      <% else %>
+        <%= link_to login_path, class: "btn-create-route-large" do %>
+          ログインしてルートを作成
+        <% end %>
+      <% end %>
+    </div>
     
     <div class="search-box-container">
       <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>

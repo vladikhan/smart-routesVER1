@@ -307,6 +307,38 @@
 	color: #777;
 }
 
+.routes-title {
+	font-size: 32px;
+	font-weight: 700;
+}
+
+.btn-create-route-large {
+	background: #4dc9e6;
+	color: white;
+	padding: 14px 32px;
+	border-radius: 12px;
+	font-size: 16px;
+	font-weight: 700;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 12px rgb(2, 119, 189);
+	border: none;
+	cursor: pointer;
+}
+
+.btn-create-route-large:hover {
+	background: #09c2d7;
+	transform: translateY(-3px);
+	box-shadow: #0cbdd1;
+}
+
+.btn-create-route-large::before {
+	font-size: 20px;
+}
+
 /* Stats */
 .route-stats {
 	display: flex;
