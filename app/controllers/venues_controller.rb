@@ -1,51 +1,30 @@
+
 class VenuesController < ApplicationController
-	def index
-		@venues = Venue.where(status: 'approved')
-			.includes(:district, :tags)
-			.order(popularity_score: :desc)
+  before_action :set_venue, only: [:show]
 
-		#Filter by query
-		if params[:q].present?
-			@venues = @venues.where('name LIKE ? OR description LIKE ?',
-				"%#{params[:q]}%", "%#{params[:q]}%")
-		end
+  def index
+    @venues = Venue.approved
+                   .includes(:district)
+                   .order(popularity_score: :desc)
+                   .page(params[:page])
+                   .per(12)
 
-		#Filter by cuisine type
-		if params[:cuisine_type].present?
-			@venues = @venues.where(cuisine_type: params[:cuisine_type])
-		end
+    # Фильтры
+    @venues = @venues.where(district_id: params[:district_id]) if params[:district_id].present?
+    @venues = @venues.where(venue_type: params[:venue_type]) if params[:venue_type].present?
+    @venues = @venues.where(cuisine_type: params[:cuisine_type]) if params[:cuisine_type].present?
+    @venues = @venues.where('name LIKE ?', "%#{params[:q]}%") if params[:q].present?
+  end
 
-		#Filter by price range
-		if params[:price_range].present?
-			@venues = @venues.where(price_range: params[:price_range])
-		end
+  def show
+    @venue.increment_view_count
+    @reviews = @venue.reviews.includes(:user).order(created_at: :desc).limit(10)
+    @routes = @venue.routes.where(is_public: true).limit(5)
+  end
 
-		@venues = @venues.page(params[:page]).per(12)
-	end
+  private
 
-	def show
-		@venue = Venue.find(params[:id])
-		@reviews = @venue.reviews.includes(:user).order(created_at: :desc)
-		@routes = @venue.routes.where(is_public: true).limit(4)
-	end
-
-	def new
-		@venue = Venue.new
-	end
-
-	def create
-		@venue = Venue.new(venue_params)
-
-		if @venue.save
-			redirect_to @venue, notice: "新しいスポットが登録されました！"
-		else 
-			render :new
-		end
-	end
-
-	private
-
-	def venue_params
-		params.require(:venue).permit(:name, :description, :cuisine_type, :price_range, :address)
-	end
+  def set_venue
+    @venue = Venue.find(params[:id])
+  end
 end
