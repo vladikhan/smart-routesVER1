@@ -2,6 +2,8 @@ class Comment < ApplicationRecord
   belongs_to :user
   belongs_to :commentable, polymorphic: true
   belongs_to :parent, class_name: 'Comment', optional: true
+  belongs_to :item, polymorphic: true
+
   has_many :replies, class_name: 'Comment', foreign_key: :parent_id, dependent: :destroy
 
   validates :text, presence: true, length: { minimum: 1, maximum: 1000 }

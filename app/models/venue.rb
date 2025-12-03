@@ -1,39 +1,74 @@
 class Venue < ApplicationRecord
   belongs_to :district
-  belongs_to :user, optional: true # 作成者
-
-  has_many :route_items, as: :item, dependent: :destroy
-  has_many :routes, through: :route_items
+  belongs_to :user, optional: true
   has_many :reviews, as: :reviewable, dependent: :destroy
-  has_many :likes, as: :likeable, dependent: :destroy
-  has_many :bookmarks, as: :item, dependent: :destroy
-  has_many :entity_tags, as: :entity, dependent: :destroy
-  has_many :tags, through: :entity_tags
-  has_many :place_owners, dependent: :destroy
-  has_many :owners, through: :place_owners, source: :user
+  has_many :route_items, dependent: :destroy
+  has_many :routes, through: :route_items
+  has_many :bookmarks, dependent: :destroy
+  has_many :venue_photos, dependent: :destroy
 
-  # Active Storage (写真)
-  has_many_attached :photos
-
-  # バリデーション
-  validates :name, presence: true, length: { maximum: 255 }
-  validates :venue_type, presence: true
+  validates :name, presence: true, length: { maximum: 100 }
   validates :address, presence: true
-  validates :geo_lat, :geo_lng, presence: true, numericality: true
-  validates :status, inclusion: { in: %w[pending approved rejected] }
+  validates :venue_type, presence: true
+  validates :description, length: { maximum: 1000 }
 
-  # スコープ
-  scope :approved, -> { where(status: 'approved') }
-  scope :pending, -> { where(status: 'pending') }
+  # Scopes
   scope :featured, -> { where(is_featured: true).order(featured_order: :asc) }
+  scope :approved, -> { where(status: 'approved') }
   scope :popular, -> { order(popularity_score: :desc) }
 
-  # メソッド
-  def approved?
-    status == 'approved'
+  # Default values
+  after_initialize :set_defaults, if: :new_record?
+
+  def set_defaults
+    self.view_count ||= 0
+    self.save_count ||= 0
+    self.popularity_score ||= 0.0
+    self.reviews_count ||= 0
+    self.likes_count ||= 0
+    self.average_rating ||= 0.0
+    self.status ||= 'approved'
   end
 
-  def average_rating
-    reviews.average(:total_score).to_f.round(1)
+  # Алиасы для координат
+  def latitude
+    super.presence || geo_lat
+  end
+
+  def latitude=(value)
+    self.geo_lat = value
+    super if has_attribute?(:latitude)
+  end
+
+  def longitude
+    read_attribute(:longitude).presence || geo_lng
+  end
+
+  def longitude=(value)
+    self.geo_lng = value
+    write_attribute(:longitude, value) if has_attribute?(:longitude)
+  end
+
+  # Get city through district
+  def city
+    district&.city
+  end
+
+  # Average rating
+  def calculate_average_rating
+    avg = reviews.average(:total_score).to_f
+    update_column(:average_rating, avg.round(1))
+    avg
+  end
+
+  # Increment view count
+  def increment_view_count
+    increment!(:view_count)
+  end
+
+  # Check if user has bookmarked
+  def bookmarked_by?(user)
+    return false unless user
+    bookmarks.exists?(user_id: user.id)
   end
 end

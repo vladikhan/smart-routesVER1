@@ -66,6 +66,9 @@ class RoutesController < ApplicationController
     @route_items = @route.route_items.includes(:venue).order(position: :asc)
     @venues = @route.venues.includes(:district)
     @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10)
+
+    Rails.logger.info "Route items loaded: #{@route_items.count}"
+
   end
 
   #GET /routes/new
