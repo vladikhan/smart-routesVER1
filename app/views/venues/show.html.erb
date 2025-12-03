@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,40 +8,16 @@
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   <%= stylesheet_link_tag "venues", "data-turbo-track": "reload" %>
-  
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <a href="/" class="logo">SmartRoutes</a>
+  <%= render 'pages/header' %>
 
-      <ul class="nav-links">
-        <li><%=link_to "ルート一覧", routes_path %></li>
-        <li><%= link_to "場所を探す", venues_path %></li>
-      <li><%= link_to "都市", cities_path %></li>
-      </ul>
-
-      <div class="auth-links">
-      <% if user_signed_in? %>
-        <%= form_with url: destroy_user_session_path, method: :delete, class: "inline-logout-form" do %>
-      <%= button_tag "ログアウト", type: "submit", class: "login-btn" %>
-    <% end %>
-  <% else %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
-  <% end %>
-  
-      </div>
-    </div>
-  </header>
-
-  <!-- Venue Header -->
   <div class="venue-detail-header">
     <div style="max-width: 1200px; width: 100%;">
       <h1 style="font-size: 36px; margin-bottom: 10px;"><%= @venue.name %></h1>
       <div style="display: flex; gap: 20px; align-items: center;">
         <div style="display: flex; align-items: center; gap: 5px;">
-          ⭐ <%= @venue.average_rating || 4.5 %> (125 レビュー)
+          ⭐ <%= @venue.average_rating || 4.5 %> (<%= @venue.reviews_count %> レビュー)
         </div>
         <div><%= @venue.price_range %></div>
         <div><%= @venue.cuisine_type %></div>
@@ -48,12 +25,9 @@
     </div>
   </div>
 
-  <!-- Main Content -->
   <div class="venue-detail-content">
     <div class="venue-detail-grid">
-      <!-- Left Column -->
       <div>
-        <!-- Photos -->
         <div class="venue-info-card">
           <h2 style="margin-bottom: 20px;">写真</h2>
           <div class="photo-grid">
@@ -64,7 +38,6 @@
           </div>
         </div>
 
-        <!-- Info -->
         <div class="venue-info-card">
           <h2 style="margin-bottom: 20px;">概要</h2>
           
@@ -80,7 +53,7 @@
           
           <div class="info-row">
             <div class="info-label">営業時間</div>
-            <div class="info-value"><%= @venue.business_hours %></div>
+            <div class="info-value"><%= @venue.business_hours || "未設定" %></div>
           </div>
           
           <% if @venue.phone %>
@@ -96,7 +69,6 @@
           </div>
         </div>
 
-        <!-- Reviews -->
         <div class="venue-info-card">
           <h2 style="margin-bottom: 20px;">レビュー</h2>
           
@@ -117,18 +89,12 @@
         </div>
       </div>
 
-      <!-- Right Sidebar -->
       <div class="sidebar">
-        <!-- Map -->
         <div class="venue-info-card">
           <h3 style="margin-bottom: 15px;">地図</h3>
-          <div class="map-preview">
-            <img src="https://via.placeholder.com/400x300/e0e0e0/666?text=Map" 
-                 style="width: 100%; height: 100%; border-radius: 12px;">
-          </div>
+          <div id="venue-map" style="width: 100%; height: 300px; border-radius: 12px; background: #e0e0e0;"></div>
         </div>
 
-        <!-- Routes -->
         <div class="venue-info-card">
           <h3 style="margin-bottom: 15px;">ルートに掲載 (<%= @routes.count %>)</h3>
           
@@ -152,7 +118,40 @@
     </div>
   </div>
 
-  <!-- Footer -->
-  <%= render 'layouts/footer' %>
+  <%= render 'pages/footer' %>
+
+  <script>
+    var API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
+    var venueLat = <%= @venue.latitude || @venue.geo_lat || 35.0116 %>;
+    var venueLng = <%= @venue.longitude || @venue.geo_lng || 135.7681 %>;
+    var venueName = '<%= j @venue.name %>';
+    var venueAddress = '<%= j @venue.address %>';
+
+    function initMap() {
+      var position = { lat: venueLat, lng: venueLng };
+      
+      var map = new google.maps.Map(document.getElementById('venue-map'), {
+        zoom: 15,
+        center: position,
+        mapTypeControl: true
+      });
+
+      var marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        title: venueName
+      });
+
+      var infoWindow = new google.maps.InfoWindow({
+        content: '<div style="padding: 10px;"><h4 style="margin: 0 0 5px 0;">' + venueName + '</h4><p style="margin: 0; color: #666; font-size: 13px;">' + venueAddress + '</p></div>'
+      });
+
+      marker.addListener('click', function() {
+        infoWindow.open(map, marker);
+      });
+    }
+  </script>
+  
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&language=ja"></script>
 </body>
 </html>
