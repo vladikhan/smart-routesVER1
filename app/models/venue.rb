@@ -12,12 +12,10 @@ class Venue < ApplicationRecord
   validates :venue_type, presence: true
   validates :description, length: { maximum: 1000 }
 
-  # Scopes
   scope :featured, -> { where(is_featured: true).order(featured_order: :asc) }
   scope :approved, -> { where(status: 'approved') }
   scope :popular, -> { order(popularity_score: :desc) }
 
-  # Default values
   after_initialize :set_defaults, if: :new_record?
 
   def set_defaults
@@ -30,14 +28,14 @@ class Venue < ApplicationRecord
     self.status ||= 'approved'
   end
 
-  # Алиасы для координат
+  # Координаты - алиасы для geo_lat/geo_lng
   def latitude
-    super.presence || geo_lat
+    read_attribute(:latitude).presence || geo_lat
   end
 
   def latitude=(value)
     self.geo_lat = value
-    super if has_attribute?(:latitude)
+    write_attribute(:latitude, value) if has_attribute?(:latitude)
   end
 
   def longitude
@@ -49,24 +47,20 @@ class Venue < ApplicationRecord
     write_attribute(:longitude, value) if has_attribute?(:longitude)
   end
 
-  # Get city through district
   def city
     district&.city
   end
 
-  # Average rating
   def calculate_average_rating
     avg = reviews.average(:total_score).to_f
     update_column(:average_rating, avg.round(1))
     avg
   end
 
-  # Increment view count
   def increment_view_count
     increment!(:view_count)
   end
 
-  # Check if user has bookmarked
   def bookmarked_by?(user)
     return false unless user
     bookmarks.exists?(user_id: user.id)
