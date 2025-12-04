@@ -76,6 +76,14 @@ class User < ApplicationRecord
  has_many :bookmarks, dependent: :destroy
  has_many :notifications, dependent: :destroy
 
+ #通知
+ has_many :notifications, dependent: :destroy
+ has_many :sent_notifications, class_name: 'Notification', foreign_key: :actor_id, dependent: :destroy
+
+ def unread_notifications_count
+	notifications.read.count
+ end
+
  # Avatar helper
  def avatar_url
 	avatar.present? ? avatar.url : "/images/default_avatar.png"

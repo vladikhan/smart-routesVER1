@@ -18,11 +18,14 @@ Rails.application.routes.draw do
 
   # Home
   get 'search', to: 'home#search'
+
+  
   
   # My Profile shortcuts
   get 'my_profile', to: 'users#my_profile'
   get 'profile', to: 'users#my_profile'
   get 'current_user', to: 'users#my_profile'
+  get 'logout_confirm', to: 'pages#logout_confirm'
   
   # Users
   resources :users, only: [:index, :show, :edit, :update]
@@ -39,4 +42,15 @@ Rails.application.routes.draw do
   resources :routes
   resources :venues   # ← new, show, edit, index → работают сами
   resources :cities, only: [:index, :show]
+  resources :users
+
+  # Notification routes
+  resources :notifications, only: [:index] do
+    member do
+      patch :mark_as_read
+    end
+    collection do
+      patch :mark_all_as_read
+    end
+  end
 end

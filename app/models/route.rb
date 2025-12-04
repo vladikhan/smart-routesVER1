@@ -14,12 +14,10 @@ class Route < ApplicationRecord
   # バリデーション
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, length: { maximum: 500 } 
-  validates :estimated_duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :estimated_cost, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  # validates :estimated_duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, optional: true
+  # validates :estimated_cost, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true, optional: true
 
-  validates :difficulty_level, inclusion: { in: %w[easy medium hard] }, allow_nil: true 
-
-  validates :difficulty_level, inclusion: { in: %w[easy medium hard 簡単 普通 難しい] }, allow_nil: true 
+  # validates :difficulty_level, inclusion: { in: %w[easy medium hard 簡単 普通 難しい] }, allow_nil: true 
   validates :user, presence: true
 
   #Default values

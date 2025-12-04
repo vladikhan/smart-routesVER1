@@ -296,3 +296,33 @@
 	color: #2296f3;
 	border-bottom-color: #2296f3;
 }
+
+/* Tag Checkboxes */
+.tag-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  margin: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.tag-checkbox:hover {
+  background: #e3f2fd;
+  border-color: #0288d1;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + span {
+  font-weight: 600;
+  color: #0288d1;
+}

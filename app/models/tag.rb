@@ -1,23 +1,33 @@
+#encoding: UTF-8
 class Tag < ApplicationRecord
-	has_many :entity_tags, dependent: :destroy
-	has_many :venues, through: :entity_tags, source: :entity, source_type: 'Venue'
-	has_many :routes, through: :entity_tags, source: :entity, source_type: 'Route'
-	
-	validates :parameter, presence: true, uniqueness: true, length: { maximum: 50 }
-	validates :parameter, format: {
-		with: /\A[a-z0-9_]+\z/,
-		message:  "小文字英数字とアンダースコアのみ使用可能です" 
-	}
+  has_many :entity_tags, dependent: :destroy
+  has_many :routes, through: :entity_tags, source: :entity, source_type: 'Route'
+  has_many :venues, through: :entity_tags, source: :entity, source_type: 'Venue'
 
-	# スコープ
-	scope :popular, -> {
-		joins(:entity_tags)
-			.group('tags.id')
-			.order('COUNT(entity_tags.id) DESC')
-	}
+  validates :parameter, presence: true, uniqueness: true
 
-	# メソッド
-	 def display_name
-		"##{parameter}"
-	 end
+  # Display name for forms and UI
+  def display_name
+    # Convert parameter to readable format
+    # Example: "ramen" -> "ラーメン", "culture" -> "文化"
+    case parameter
+    when 'ramen' then 'ラーメン'
+    when 'culture' then '文化'
+    when 'history' then '歴史'
+    when 'temple' then '寺院'
+    when 'shrine' then '神社'
+    when 'food' then 'グルメ'
+    when 'shopping' then 'ショッピング'
+    when 'nature' then '自然'
+    when 'nightlife' then 'ナイトライフ'
+    when 'cafe' then 'カフェ'
+    else
+      parameter.capitalize
+    end
+  end
+
+  # Alias for compatibility
+  def name
+    display_name
+  end
 end
