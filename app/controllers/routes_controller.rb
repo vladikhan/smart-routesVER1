@@ -1,4 +1,3 @@
-#encoding: UTF-8
 class RoutesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_route, only: [:show, :edit, :update, :destroy]
@@ -70,7 +69,6 @@ class RoutesController < ApplicationController
     @route = current_user.routes.build(route_params)
 
     if @route.save
-      # Create route items from Google Maps data
       create_route_items_from_google if params[:route_items].present?
       
       redirect_to @route, notice: '✓ ルートが正常に作成されました。'
@@ -121,7 +119,7 @@ class RoutesController < ApplicationController
       :difficulty_level, 
       :is_public,
       :city_id,
-      :tags
+      :tags  
     )
   end
 
@@ -135,7 +133,6 @@ class RoutesController < ApplicationController
     return unless params[:route_items].present?
     
     params[:route_items].each_with_index do |item_params, index|
-      # Если есть данные из Google Maps
       if item_params[:venue_name].present? && item_params[:venue_lat].present?
         venue = find_or_create_venue_from_google(item_params)
         
@@ -145,7 +142,6 @@ class RoutesController < ApplicationController
           duration_minutes: item_params[:duration_minutes].to_i || 60
         )
       elsif item_params[:venue_id].present?
-        # Или используем существующий venue
         @route.route_items.create!(
           venue_id: item_params[:venue_id],
           position: index + 1,
@@ -156,7 +152,6 @@ class RoutesController < ApplicationController
   end
 
   def find_or_create_venue_from_google(params)
-    # Поиск существующего venue по координатам (в радиусе ~10м)
     existing = Venue.where(
       'geo_lat BETWEEN ? AND ? AND geo_lng BETWEEN ? AND ?',
       params[:venue_lat].to_f - 0.0001,
@@ -167,11 +162,9 @@ class RoutesController < ApplicationController
 
     return existing if existing
 
-    # Найти ближайший district или использовать первый
     city = City.find_by(id: @route.city_id) || City.first
     district = city.districts.first
 
-    # Создать новый venue
     Venue.create!(
       name: params[:venue_name],
       description: "Added from Google Maps",
