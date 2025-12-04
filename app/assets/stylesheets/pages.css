@@ -312,6 +312,12 @@
 	font-weight: 700;
 }
 
+.btn-create {
+	padding: 60px 20px;
+	color: white;
+	text-align: center;
+}
+
 .btn-create-route-large {
 	background: #4dc9e6;
 	color: white;
@@ -324,9 +330,10 @@
 	align-items: center;
 	gap: 10px;
 	transition: all 0.3s ease;
-	box-shadow: 0 4px 12px rgb(2, 119, 189);
+	box-shadow: 0 4px 12px #077f8c;
 	border: none;
 	cursor: pointer;
+	text-align: center;
 }
 
 .btn-create-route-large:hover {
