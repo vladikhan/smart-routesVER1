@@ -85,10 +85,10 @@
                   <span>💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
                   <span>⏱️ <%= route.estimated_duration %>分</span>
                 </div>
-                <% if route.tags.present? %>
+                <% if route.tags.any? %>
                   <div class="route-card-tags">
-                    <% route.tags.split(',').first(2).each do |tag| %>
-                      <span class="tag-badge">#<%= tag.strip %></span>
+                    <% route.tags.first(3).each do |tag| %>
+                      <span class="tag-badge">#<%= tag.display_name %></span>
                     <% end %>
                   </div>
                 <% end %>
