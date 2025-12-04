@@ -10,9 +10,75 @@
 <body>
   <%= render 'pages/header' %>
   <%= render 'pages/hero' %>
-
   
-
+  
+  <!-- Filters -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <%= form_with url: routes_path, method: :get, local: true do |f| %>
+        <%= f.hidden_field :q, value: params[:q] %>
+        
+        <%= f.select :difficulty,
+            options_for_select([
+              ['すべての難易度', ''],
+              ['簡単', 'easy'],
+              ['普通', 'medium'],
+              ['難しい', 'hard']
+            ], params[:difficulty]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+        
+        <%= f.select :duration,
+            options_for_select([
+              ['すべての時間', ''],
+              ['短い (< 3時間)', 'short'],
+              ['普通 (3-6時間)', 'medium'],
+              ['長い (> 6時間)', 'long']
+            ], params[:duration]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+        
+        <%= f.select :cost,
+            options_for_select([
+              ['すべての予算', ''],
+              ['安い (< ¥3,000)', 'budget'],
+              ['普通 (¥3,000-8,000)', 'medium'],
+              ['高い (> ¥8,000)', 'expensive']
+            ], params[:cost]),
+            {},
+            class: "filter-select",
+            onchange: "this.form.submit()" %>
+      <% end %>
+      
+      <!-- Active Filters -->
+      <% if params[:difficulty].present? %>
+        <div class="filter-tag">
+          <%= params[:difficulty] %>
+          <%= link_to '×', routes_path(q: params[:q], duration: params[:duration], cost: params[:cost]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+      
+      <% if params[:duration].present? %>
+        <div class="filter-tag">
+          <%= params[:duration] %>
+          <%= link_to '×', routes_path(q: params[:q], difficulty: params[:difficulty], cost: params[:cost]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+      
+      <% if params[:cost].present? %>
+        <div class="filter-tag">
+          <%= params[:cost] %>
+          <%= link_to '×', routes_path(q: params[:q], difficulty: params[:difficulty], duration: params[:duration]),
+              class: "filter-tag-close" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+  
   <div style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
     <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">場所一覧</h1>
 

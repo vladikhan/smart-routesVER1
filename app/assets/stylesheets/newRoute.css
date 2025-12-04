@@ -351,7 +351,7 @@ body {
 .btn-cancel {
 	background: white;
 	color: #666;
-	border: 2px solid #ddd;
+	border: 1px solid #ddd;
 }
 
 .btn-cancel:hover {
@@ -360,13 +360,14 @@ body {
 
 .btn-submit {
 	background: #2296f3;
+	border: px solid #ddd;
 	color: white;
 }
 
 .btn-submit:hover {
 	background: #0277bd;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(2, 136, 209, 0.3);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0, 126, 223, 0.3);
 }
 
 @media (max-width: 768px) {
