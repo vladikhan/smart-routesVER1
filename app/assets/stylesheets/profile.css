@@ -543,6 +543,8 @@
 
 /* Form Actions */
 .form-actions {
+	flex-direction: row-reverse;
+	padding: 10px 300px;
 	display: flex;
 	gap: 15px;
 	margin-top: 30px;
@@ -632,10 +634,6 @@
 	.avatar-upload-section {
 		flex-direction: column;
 		text-align: center;
-	}
-
-	.form-actions {
-		flex-direction: column;
 	}
 
 	.content-card {

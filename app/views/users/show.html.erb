@@ -7,13 +7,14 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
-    <%= stylesheet_link_tag 'profile', media: 'all' %>
+  <%= stylesheet_link_tag 'profile', media: 'all' %>
 
   
   
 </head>
 <body>
   <%= render 'pages/header' %>
+  
 
   <!-- Profile Header -->
   <section class="profile-header">
@@ -77,6 +78,8 @@
         <div class="routes-grid">
           <% @routes.each do |route| %>
             <%= link_to route_path(route), class: "route-card" do %>
+
+
               <div class="route-card-image">🗺️</div>
               <div class="route-card-content">
                 <h3 class="route-card-title"><%= route.name %></h3>

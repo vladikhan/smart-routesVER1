@@ -59,9 +59,12 @@
         <button class="action-btn btn-like">❤️ いいね</button>
         <button class="action-btn btn-save">💾 保存</button>
         <button class="action-btn btn-share">📤 共有</button>
+
         <% if current_user == @route.user %>
-          <%= link_to "✏️ 編集", edit_route_path(@route), class: "action-btn" %>
+          <%= link_to edit_route_path(@route),  class: "action-btn btn-edit" do %>
+          編集
         <% end %>
+      <% end %>
       </div>
     </div>
   </section>
