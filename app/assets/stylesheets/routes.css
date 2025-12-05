@@ -108,7 +108,7 @@
 .btn-edit {
 	background: #dd5e98;
 	color: white;
-	box-shadow: 0 4px 12px #dd5e98;
+	box-shadow: 0 4px 12px #88beea;
 	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

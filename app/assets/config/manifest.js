@@ -10,3 +10,4 @@
 //= link editProfile.css
 //= link logout.css
 //= link newRoute.css
+//= link notifications.js
