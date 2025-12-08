@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>通知 - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'notifications', media: 'all' %>
+
+	
+
+</head>
+<body>
+	<%= render 'pages/header' %>
+	<div class="notifications-page">
+		<div class="notifications-page-header">
+			<h1 class="notification-pages-title">
+				<span>🔔</span>
+        通知
+			</h1>
+
+			<% if @notifications.any? && @notifications.where(is_read: false).exists? %>
+				<%= link_to "すべて既読にする", mark_all_as_read_notifications_path,
+				method: :patch,
+				class: "mark-all-read", 
+				style: "background: #0288d1; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; transition: all 0.3s;",
+				data: { confirm: "すべての通知を既読にしますか？" } %>
+			<% end %>
+		</div>
+
+		<% if @notifications.any? %>
+			<%= @notifications.each do |notification| %>
+				<%= link_to mark_as_read_notification_path(notification),
+						method: :patch,
+						class: "notification-full-card #{'unread' unless notification.is_read?}" do %>
+					<div style="font-size: 40px";><%= notification.icon %></div>
+					<div style="flex: 1;">
+							<div style="font-weight: 700; margin-bottom: 5px; color: #1a1a1a;">
+							<%= notification.message %>
+						</div>
+						<div style="font-size: 13px; color: #999;">
+							<%= time_ago_in_words(notification.created_at) %>前
+						</div>
+					</div>
+					<% unless notification.id_read? %>
+						<div style="width: 12px; height: 12px; background: #0288d1; border-radius: 50%; flex-shrink: 0;"></div>
+						<% end %>
+					<% end %>
+				<% end %>
+
+				<div style="margin-top: 30px;">
+					<%= paginate @notifications %>
+				</div>
+			<% else %>
+				<div class="empty-notifications">
+					<div class="empty-notifications-icon">🔔</div>
+					<h2 style="color: #666; margin-bottom: 10px;">通知はありません</h2>
+        <p style="color: #999;">新しい通知が届くとここに表示されます</p>
+				</div>
+				<% end %>
+		</div>
+
+	<%= render 'pages/footer' %>
+</body>
+</html>

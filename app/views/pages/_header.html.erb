@@ -12,56 +12,8 @@
       <div class="auth-links">
       <% if user_signed_in? %>
 
-      <%# Notification Droptown %>
-
-      <div class="notifications-dropdown">
-        <button class='page-nav-icon notifications-toggle' onclick="toggleNotifications(event)" id="notificationBell">
-          🔔
-          <% unread_count = current_user.unread_notifications_count %>
-          <% if unread_count > 0 %>
-            <span class="notifications-panel" id="notificationsPanel">
-              <div class="notifications-header">
-                <h3>t通知</h3>
-                <% if unread_count > 0 %>
-                <% link_to "すべて既読", mark_all_as_read_notifications_path,
-                method: :patch,
-                class: "mark-all-read",
-                remote: true,
-                data: { disable_with: "処理中..." } %>
-                <% end %>
-              </div>
-
-              <div class="notification-list" id="notificationsList">
-                <% notifications.each do |notification| %>
-                  <%= link_to mark_all_as_read_notifications_path(notification),
-                  method: :patch,
-                  class: "notification-item #{'unread' unless notification.is_read?}",
-                  data: { notification_id: notification.id } do %>
-                <div class="notification-icon"><%= notification.icon %></div>
-                <div class="notification-content">
-                  <div class="notification-message"><%= notification.message %></div>
-                  <div class="notification-time"><%=time_ago_in_words(notification.create_at) %>前</div>
-                </div>
-                <% unless notification.is_read? %>
-                  <div class="unread-dot"></div>
-                  <% end %>
-                <% end %>
-              <% end %>
-
-              <%= link_to "すべて見る", notifications_path, class: "view-all-notifications" %>
-            <% else %>
-              <div class="no-notifications">
-                <div style="font-size: 48px; margin-bottom: 10px;">🔔</div>
-                  <div>通知はありません</div>
-              </div>
-              <% end %>
-              </div>
-            </div>
-          </div>
-
-            </span>
-        </button>
-      </div>
+      
+      
 
       <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
         <% if current_user.avatar.present? %>

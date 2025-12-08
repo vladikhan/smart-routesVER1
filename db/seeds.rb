@@ -57,7 +57,7 @@ end
 puts "#{User.count}人のユーザーを作成しました。"
 
 users = User.all
-nil
+
 
 #================== 2. Cities & Districts =====================
 puts  "都市とエリアを作成中..."

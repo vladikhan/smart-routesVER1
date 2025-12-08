@@ -11,3 +11,4 @@
 //= link logout.css
 //= link newRoute.css
 //= link notifications.js
+//= link notifications.css
