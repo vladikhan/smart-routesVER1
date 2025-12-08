@@ -4,6 +4,14 @@ class Users::SessionsController < Devise::SessionsController
   # GET /login
   def new
     super
+
+protected
+
+def after_sign_in_path_for(resource)
+  # Set encrypted cookie for Action Cable
+  cookies.encrypted[:user_id] = resource.id
+  stored_location_for(resource) || root_path
+end
   end
 
   # POST /login

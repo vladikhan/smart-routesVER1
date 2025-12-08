@@ -65,4 +65,20 @@ class Notification < ApplicationRecord
     else 'コンテンツ'
     end
   end
+
+  def broadcast_notification
+    NotificationChannel.broadcast_to(
+      user,
+      {
+        notification: {
+          id: id, 
+          message: message,
+          icon: icon,
+          created_at: created_at,
+          is_read: is_read
+        },
+        unread_count: user.notifications.unread.count
+      }
+    )
+  end
 end
