@@ -1,8 +1,10 @@
 # encoding: UTF-8
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
-  skip_before_action :verify_authenticity_token, only: [:unread_count]
+  skip_before_action :verify_authenticity_token, only: [:unread_count, :mark_as_read, :mark_as_all_read]
 
+
+  
   def index
     @notifications = current_user.notifications
                                   .includes(:actor)

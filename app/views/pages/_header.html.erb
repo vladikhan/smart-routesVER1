@@ -9,11 +9,57 @@
         <li><%= link_to "ユーザー", users_path, title: "ユーザー" %></li>
       </ul>
 
-      <div class="auth-links">
       <% if user_signed_in? %>
 
+      <div class="notifications-dropdown">
+      <%# Notifications dropdown %>
+        <button class="page-nav-icon notification-toggle" onclick="toggleNotifications(event)" id="notificationBell">
+          🔔
+          <% unread_count = current_user.unread_notifications_count %>
+          <% if unread_count > 0 %>
+          <span class="notification-badge" id="notificationBadge"><%= unread_count %></span>
+          <% end %>
+        </button>
+
+        <div class="notifications-panel" id="notificationsPanel">
+          <div class="notifications-header">
+            <h3>通知</h3>
+            <% if unread_count > 0 %>
+              <button onclick="markAllAsRead(event)" class="mark-all-read">
+                すべて既読
+              </button>
+            <% end %>
+          </div>
+
+          <div class="notifications-list" id="notificationsList">
+            <% notifications = current_user.notifications.includes(:actor).order(created_at: :desc).limit(8)%>
+
+            <% if notifications.any? %>
+              <% notifications.each do |notification| %>
+              <a href="javascript:void(0)" 
+              onclick="markAsReadAndRedirect(<%= notification.id %>, event )"
+              class="notification-item <%= 'unread' unless notification.is_read? %>"
+              data-notification-id="<%= notification.id %>">
+              <div class="notification-icon"><%= notification.message %></div>
+              <div class="notification-time"><%= time_ago_in_words(notification.created_at) %>前</div>
+              <% unless notification.is_read? %>
+                <div class="unread-dot"></div>
+                <% end %>
+              </a>
+            <% end %>
+
+            <%= link_to "すべて見る", notifications_path, class: "view-all-notifications" %>
+            <% else %>
+              <div class="no-notification">
+                <div style="font-size: 48px; margin-bottom: 10px;">🔔</div>
+                <div>通知はありません</div>
+                <% end %>
+              </div>
+          </div>
+      </div>
       
-      
+      <div class="auth-links">
+
 
       <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
         <% if current_user.avatar.present? %>
@@ -263,4 +309,148 @@
     }
   }
 </style>
+
+<script>
+  function getCsrfToken() {
+    return document.querySelector('meta[name]="csrf-token"]').content;
+  }
+
+  function toggleNotifications(event) {
+    event.stopPropagation();
+    const panel = document.getElementById('notificationsPanel');
+    panel.classList.toggle('show');
+  }
+
+  async function markAsReadAndRedirect(notificationId, event) {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(`/notifications/${notificationId}/mark_as_read`, { 
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCsrfToken(),
+          'Accept': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        //Update UI
+        const item = event.currentTarget;
+        item.classList.remove('unread');
+        const dot = item.querySelector('.unread-dot');
+        if (dot) dot.remove();
+
+        //Update badge
+        updateNotificationBadge();
+
+        //Redirect after short delay
+        setTimeout(() {
+          window.location.href = data.redirect_url
+        }, 200);
+      }
+    } catch (error) {
+      console.error('Error', error);
+    }
+  }
+
+  async function markAllAsRead(event) {
+    event.preventDefault();
+
+    try {
+      const response = await fetch('/notificaitons/mark_all_as_read', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCsrfToken(),
+          'Accept': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        //Update all notification items
+        document.querySelectorAll('.notification-item.unread').forEach(item => {
+          item.classList.remove('remove');
+          const dot = item.querySelector('.unread-dot');
+          if (dot) dot.remove();
+        });
+
+        //Remove badge. 
+        const badge = document.getElementById('notificationBadge');
+        if (badge) badge.remove();
+        
+        //Hide mark all button
+        event.target.style.display = 'none';
+
+        showToast('すべて既読にしました');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showToast('エラーが発生しました', 'error');
+    }
+  }
+
+  async function updateNotificationBadge() {
+    try {
+      const response = await fetch('/notifications/unread_count', {
+        headers: {'Accept': 'applications/json' }
+      });
+      const data = await response.json();
+
+      const badge = document.getElementById('notificationBadge');
+      if (data.count > 0) {
+        if (badge) {
+          badge.textContent = data.count;
+        }
+      } else {
+        if (badge) badge.remove();
+      }
+    } catch (error) {
+      console.error('Error updating badge:', error);
+    }
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      top: 90px;
+      right: 20px;
+      background: ${type === 'success' ? '#4caf50' : '#f44336'};
+      color: white;
+      padding: 14px 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10000;
+      font-weight: 700;
+      animation: slideInRight 0.3s ease-out;
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'slideOutRight 0.3s ease-out';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  //Close when clicking outside
+  document.addEventListener('click', (event) => {
+    const dropdown = document.querySelector('.notification-dropdown');
+    const panel = document.getElementById('notificationsPanel');
+
+    if (dropdown && panel && !dropdown.contains(event.target)) {
+      panel.classList.remove('show');
+    }
+  });
+
+  //Poll for new notifications every 30 seconds
+  setInterval(updateNotificationBadge, 30000);
+</script>
+
 

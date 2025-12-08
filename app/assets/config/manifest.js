@@ -12,3 +12,4 @@
 //= link newRoute.css
 //= link notifications.js
 //= link notifications.css
+//= link editRoutes.css
