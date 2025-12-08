@@ -53,6 +53,7 @@ admin.save!              # <-- Сохраняем без ошибок
   user.skip_confirmation! # <-- Пропускаем отправку письма
   user.save!              # <-- Сохраняем без ошибок
 end
+  
 
 puts "#{User.count}人のユーザーを作成しました。"
 

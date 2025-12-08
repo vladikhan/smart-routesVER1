@@ -1,0 +1,21 @@
+.btn-create-route {
+	background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+	color: white;
+	padding: 8px 18px;
+	border-radius: 20px;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	transition: all 0.3s ease;
+	white-space: nowrap;
+	box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.btn-create-route:hover {
+	background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
