@@ -1,4 +1,3 @@
-# encoding: UTF-8
 class RoutesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_route, only: [:show, :edit, :update, :destroy]
@@ -8,18 +7,15 @@ class RoutesController < ApplicationController
                    .includes(:user, :city)
                    .order(created_at: :desc)
 
-    # Search filter
     if params[:q].present?
       @routes = @routes.where('name LIKE ? OR description LIKE ?',
                               "%#{params[:q]}%", "%#{params[:q]}%")
     end
 
-    # Difficulty filter
     if params[:difficulty].present?
       @routes = @routes.where(difficulty_level: params[:difficulty])
     end
 
-    # Duration filter
     if params[:duration].present?
       case params[:duration]
       when 'short'
@@ -31,7 +27,6 @@ class RoutesController < ApplicationController
       end
     end
 
-    # Cost filter
     if params[:cost].present?
       case params[:cost]
       when 'budget'
@@ -49,7 +44,7 @@ class RoutesController < ApplicationController
   def show
     @route.increment!(:view_count)
     @route_items = @route.route_items.includes(:venue).order(position: :asc)
-    @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10)
+    @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10) rescue []
   end
 
   def new
@@ -59,22 +54,21 @@ class RoutesController < ApplicationController
   end
 
   def create
-  # Handle tag_ids - remove empty strings
-  if params[:route][:tag_ids].present?
-    params[:route][:tag_ids] = params[:route][:tag_ids].reject(&:blank?)
-  end
-  
-  @route = current_user.routes.build(route_params)
+    if params[:route][:tag_ids].present?
+      params[:route][:tag_ids] = params[:route][:tag_ids].reject(&:blank?)
+    end
 
-  if @route.save
-    create_route_items_from_google if params[:route_items].present?
-    
-    redirect_to @route, notice: '✓ ルートが正常に作成されました。'
-  else
-    @cities = City.all
-    @venues = Venue.all
-    render :new, status: :unprocessable_entity
-  end
+    @route = current_user.routes.build(route_params)
+
+    if @route.save
+      create_route_items_from_google if params[:route_items].present?
+      
+      redirect_to @route, notice: '✓ ルートが正常に作成されました。'
+    else
+      @cities = City.all
+      @venues = Venue.all
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def edit
@@ -85,6 +79,10 @@ class RoutesController < ApplicationController
 
   def update
     authorize_owner!
+
+    if params[:route][:tag_ids].present?
+      params[:route][:tag_ids] = params[:route][:tag_ids].reject(&:blank?)
+    end
 
     if @route.update(route_params)
       update_route_items if params[:route_items].present?
@@ -109,16 +107,16 @@ class RoutesController < ApplicationController
   end
 
   def route_params
-  params.require(:route).permit(
-    :name, 
-    :description, 
-    :estimated_duration,
-    :estimated_cost, 
-    :difficulty_level, 
-    :is_public,
-    :city_id,
-    tag_ids: []  # Changed from :tags to tag_ids: []
-  )
+    params.require(:route).permit(
+      :name, 
+      :description, 
+      :estimated_duration,
+      :estimated_cost, 
+      :difficulty_level, 
+      :is_public,
+      :city_id,
+      tag_ids: []
+    )
   end
 
   def authorize_owner!
@@ -131,29 +129,45 @@ class RoutesController < ApplicationController
     return unless params[:route_items].present?
     
     params[:route_items].each_with_index do |item_params, index|
-      # Skip empty entries
+      #Skip empty entries
       next if item_params[:venue_name].blank?
       
+      begin
+
       if item_params[:venue_lat].present? && item_params[:venue_lng].present?
         venue = find_or_create_venue_from_google(item_params)
+
         
+        # FIXED: Add item_type field
+        @route.route_items.create!(
+          item: venue,
+          position: index + 1,
+          duration_minutes: item_params[:duration_minutes].to_i || 60,
+          venue_name: item_params[:venue_name],
+          venue_address: item_params[:venue_address],
+          item_type: 'venue'  
+        )
+      elsif item_params[:venue_id].present?
+        # Use existing venue
+        venue = Venue.find(item_params[:venue_id])
+
         @route.route_items.create!(
           venue: venue,
           position: index + 1,
-          duration_minutes: item_params[:duration_minutes].to_i || 60
-        )
-      elsif item_params[:venue_id].present?
-        @route.route_items.create!(
-          venue_id: item_params[:venue_id],
-          position: index + 1,
-          duration_minutes: item_params[:duration_minutes].to_i || 60
+          duration_minutes: item_params[:duration_minutes].to_i || 60,
+          venue_name: venue.name,
+          venue_address: venue.address,
+          item_type: 'venue'  
         )
       end
-    end
+      rescue => e
+        Rails.logger.error "Error creating route item: #{e.message}"
+        next
+      end
+  end 
   end
 
   def find_or_create_venue_from_google(params)
-    # Try to find existing venue near this location
     existing = Venue.where(
       'geo_lat BETWEEN ? AND ? AND geo_lng BETWEEN ? AND ?',
       params[:venue_lat].to_f - 0.0001,
@@ -164,7 +178,7 @@ class RoutesController < ApplicationController
 
     return existing if existing
 
-    # Create new venue
+    #Create new venue
     city = City.find_by(id: @route.city_id) || City.first
     district = city&.districts&.first
 

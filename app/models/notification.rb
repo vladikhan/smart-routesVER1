@@ -1,24 +1,23 @@
-# encoding: UTF-8
 class Notification < ApplicationRecord
-  belongs_to :user
-  belongs_to :actor, class_name: 'User', optional: true
-  belongs_to :entity, polymorphic: true, optional: true
+  belongs_to :user  # recipient
+  belongs_to :actor, class_name: 'User'
 
-  validates :notification_type, presence: true
-  validates :notification_type, inclusion: {
-    in: %w[follow like comment review message route_featured venue_approved]
+  validates :notification_type, presence: true, inclusion: { 
+    in: %w[follow like comment review route_shared] 
   }
-  # スコープ
+
   scope :unread, -> { where(is_read: false) }
   scope :read, -> { where(is_read: true) }
   scope :recent, -> { order(created_at: :desc) }
 
-  # メソッド
+  # Broadcast to user after creation
+  after_create_commit :broadcast_notification
+
   def mark_as_read!
     update(is_read: true) unless is_read?
   end
 
-  def unread_
+  def unread?
     !is_read?
   end
 
@@ -30,13 +29,13 @@ class Notification < ApplicationRecord
   def message
     case notification_type
     when 'route_shared'
-      '#{actor.username}さんがルートをシェアしました'
+      "#{actor.username}さんがルートをシェアしました"
     when 'like'
-      '#{actor.username}さんがあなたの#{entity_type_japanese}にいいねしました'
+      "#{actor.username}さんがあなたの#{entity_type_japanese}にいいねしました"
     when 'comment'
-      '#{actor.username}さんがコメントしました。'
+      "#{actor.username}さんがコメントしました"
     when 'review'
-       "#{actor.username}さんがレビューを投稿しました"
+      "#{actor.username}さんがレビューを投稿しました"
     when 'follow'
       "#{actor.username}さんがフォローしました"
     else
@@ -67,11 +66,12 @@ class Notification < ApplicationRecord
   end
 
   def broadcast_notification
+    # Broadcast to the user's notification channel
     NotificationChannel.broadcast_to(
       user,
       {
         notification: {
-          id: id, 
+          id: id,
           message: message,
           icon: icon,
           created_at: created_at,

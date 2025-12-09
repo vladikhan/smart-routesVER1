@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_12_05_091040) do
+ActiveRecord::Schema.define(version: 2025_12_08_085951) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,7 +212,7 @@ ActiveRecord::Schema.define(version: 2025_12_05_091040) do
 
   create_table "route_items", force: :cascade do |t|
     t.bigint "route_id", null: false
-    t.string "item_type", null: false
+    t.string "item_type", default: "venue"
     t.integer "item_id", null: false
     t.integer "position", null: false
     t.text "notes"
@@ -220,6 +220,10 @@ ActiveRecord::Schema.define(version: 2025_12_05_091040) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "venue_id"
     t.integer "duration_minutes"
+    t.string "venue_type"
+    t.string "venue_name"
+    t.string "venue_address"
+    t.datetime "visit_time"
     t.index ["item_type", "item_id"], name: "index_route_items_on_item_type_and_item_id"
     t.index ["route_id", "position"], name: "index_route_items_on_route_id_and_position", unique: true
     t.index ["route_id"], name: "index_route_items_on_route_id"

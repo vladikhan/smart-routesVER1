@@ -1,17 +1,7 @@
 class Users::SessionsController < Devise::SessionsController
-#before_action :configure_sign_in_params, only: [:create]
-
   # GET /login
   def new
     super
-
-protected
-
-def after_sign_in_path_for(resource)
-  # Set encrypted cookie for Action Cable
-  cookies.encrypted[:user_id] = resource.id
-  stored_location_for(resource) || root_path
-end
   end
 
   # POST /login
@@ -19,7 +9,7 @@ end
     super
   end
 
-  #DELETE /logout
+  # DELETE /logout
   def destroy
     signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
     yield if block_given?
@@ -27,6 +17,12 @@ end
   end
 
   protected
+
+  def after_sign_in_path_for(resource)
+    # Set encrypted cookie for Action Cable
+    cookies.encrypted[:user_id] = resource.id
+    stored_location_for(resource) || root_path
+  end
 
   def configure_sign_in_params
     devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
