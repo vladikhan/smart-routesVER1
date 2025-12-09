@@ -53,12 +53,11 @@ admin.save!              # <-- Сохраняем без ошибок
   user.skip_confirmation! # <-- Пропускаем отправку письма
   user.save!              # <-- Сохраняем без ошибок
 end
-  
 
 puts "#{User.count}人のユーザーを作成しました。"
 
 users = User.all
-
+nil
 
 #================== 2. Cities & Districts =====================
 puts  "都市とエリアを作成中..."
@@ -586,18 +585,19 @@ routes = routes_data.map.with_index do |data, idx|
 
   # создаём RouteItems
   venues_to_add.each_with_index do |venue_data, position|
-    venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
-    next unless venue
+  venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
+  next unless venue
 
-    puts "venue attributes keys: #{venue.attributes.keys}"
+  puts "venue attributes keys: #{venue.attributes.keys}"
 
-    RouteItem.create!(
-      route: route,
-      item: venue,
-      position: position + 1,
-      notes: "おすすめポイント: #{venue.description[0..50]}"
-    )
-  end
+  RouteItem.create!(
+    route: route,
+    item: venue,                # ← ПОЛИМОРФНЫЙ
+    item_type: "Venue",         # ← ВАЛИДНЫЙ ТИП
+    position: position + 1,
+    notes: "おすすめポイント: #{venue.description[0..50]}"
+  )
+end
 
   # создаём теги
   tag_names.each do |tag_name|
@@ -754,16 +754,19 @@ puts "#{DmRoom.count}件のDMルーム、#{DmMessage.count}件のメッセージ
 # ==================== 13. Notifications ====================
 puts "通知を作成中..."
 
-users.first(15).each do |user|
-	rand(5..12).times do
-		Notification.create!(
-			user: user,
-			actor: users.sample,
-			notification_type: ['follow', 'like', 'comment', 'review'].sample,
-			entity: [all_venues, routes, Review.all].flatten.sample,
-			is_read: [true, false].sample
-		)
-	end
+users.first(15).each do |u|
+  rand(5..12).times do
+    notifiable = [all_venues, routes, Review.all].flatten.sample
+
+    Notification.create!(
+      user: u,
+      actor: users.sample,
+      notification_type: %w[follow like comment review].sample,
+      entity_type: notifiable.class.name,
+      entity_id: notifiable.id,
+      is_read: [true, false].sample
+    )
+  end
 end
 
 puts "#{Notification.count}件の通知を作成しました"

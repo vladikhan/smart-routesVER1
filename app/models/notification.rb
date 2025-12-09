@@ -1,6 +1,8 @@
 class Notification < ApplicationRecord
   belongs_to :user  # recipient
   belongs_to :actor, class_name: 'User'
+ 
+
 
   validates :notification_type, presence: true, inclusion: { 
     in: %w[follow like comment review route_shared] 
@@ -15,6 +17,11 @@ class Notification < ApplicationRecord
 
   def mark_as_read!
     update(is_read: true) unless is_read?
+  end
+
+  def notifiable
+    return nil unless entity_type && entity_id
+    entity_type.constantize.find_by(id: entity_id)
   end
 
   def unread?
