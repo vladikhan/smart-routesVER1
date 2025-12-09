@@ -1,80 +1,110 @@
-# frozen_string_literal: true
-# -*- encoding: utf-8 -*-
-
+# Encoding: UTF-8
 class UsersController < ApplicationController
+
   before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_user, only: [:show]
-  before_action :authorize_user!, only: [:edit, :update]
 
-  # GET /users - список пользователей
+  before_action :set_user, only: [:show, :edit, :update]
+
   def index
-    @users = User.where(confirmed_at: nil).order(created_at: :desc).page(params[:page]).per(20)
-  end
 
-  # GET /my_profile - редирект на профиль текущего пользователя
-  def my_profile
-    if user_signed_in?
-      redirect_to user_path(current_user)
-    else
-      redirect_to login_path, alert: 'ログインしてください。'
-    end
-  end
+    @users = User.order(created_at: :desc)
 
-  # GET /users/:id
-  def show
-    @routes = @user.routes.where(is_public: true).order(created_at: :desc).limit(6)
-    @reviews = @user.reviews.includes(:reviewable).order(created_at: :desc).limit(5)
-  end
-
-  # GET /users/:id/edit
-  def edit
-    @user = current_user
-  end
-
-  # PATCH /users/:id
-  def update
-    @user = current_user
     
-    if @user.update(user_params)
-      respond_to do |format|
-        format.html {
-          redirect_to user_path(@user), notice: 'プロフィールが更新されました111!'
-        }
-        format.json {
-          render json: {
-            success: true,
-            message: 'プロフィール写真が更新されました！',
-            avatar_url: @user.avatar_url
-          }
-        }
-      end
-    else
-      respond_to do |format|
-        format.html { render :edit }
-        format.json {
-          render json: {
-            success: false,
-            message: '更新に失敗しました',
-            errors: @user.errors.full_messages
-          }, status: :unprocessable_entity
-        }
-      end
+
+    # Search filter
+
+    if params[:q].present?
+
+      @users = @users.where('username LIKE ? OR bio LIKE ?', 
+
+                            "%#{params[:q]}%", "%#{params[:q]}%")
+
     end
+
+    
+
+    @users = @users.page(params[:page]).per(20)
+
+  end
+
+  def show
+    @routes = @user.routes.where(is_public: true)
+                          .order(created_at: :desc)
+                          .limit(6)
+
+    @reviews = @user.reviews
+                    .includes(:reviewable)
+                    .order(created_at: :desc)
+                    .limit(5)
+  end
+
+  def my_profile
+
+    redirect_to user_path(current_user)
+
+  end
+
+  def edit
+
+    authorize_user!
+
+  end
+
+  def update
+
+    authorize_user!
+
+    
+
+    if @user.update(user_params)
+
+      redirect_to @user, notice: 'プロフィールが更新されました。'
+
+    else
+
+      render :edit, status: :unprocessable_entity
+
+    end
+
   end
 
   private
 
   def set_user
-    @user = User.find(params[:id])
-  end
 
-  def authorize_user!
-    unless current_user == User.find(params[:id])
-      redirect_to root_path, alert: 'アクセスが拒否されました。'
-    end
+    @user = User.find(params[:id])
+
   end
 
   def user_params
-    params.require(:user).permit(:username, :bio, :location, :avatar, :remove_avatar, :birthday, :gender)
+
+    params.require(:user).permit(
+
+      :username,
+
+      :bio,
+
+      :location,
+
+      :budget_min,
+
+      :budget_max,
+
+      :avatar
+
+    )
+
   end
+
+  def authorize_user!
+
+    unless @user == current_user || current_user&.is_admin?
+
+      redirect_to root_path, alert: 'アクセスが拒否されました。'
+
+    end
+
+  end
+
 end
+
