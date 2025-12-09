@@ -41,34 +41,33 @@ class RoutesController < ApplicationController
     @routes = @routes.page(params[:page]).per(15)
   end
 
-  def show
-    @route.increment!(:view_count)
+  
+def show
+
+  @route.increment!(:view_count)
+
+  
+
+  # Try to eager load with 'venue' first, fall back to without includes if it fails
+
+  begin
+
     @route_items = @route.route_items.includes(:venue).order(position: :asc)
-    @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10) rescue []
+
+  rescue ActiveRecord::ConfigurationError
+
+    # If 'venue' association doesn't exist, load without includes
+
+    @route_items = @route.route_items.order(position: :asc)
+
   end
 
-  def new
-    @route = current_user.routes.build
-    @cities = City.all
-    @venues = Venue.all
-  end
+  
 
-  def create
-    if params[:route][:tag_ids].present?
-      params[:route][:tag_ids] = params[:route][:tag_ids].reject(&:blank?)
-    end
+  @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10) rescue []
 
-    @route = current_user.routes.build(route_params)
+end
 
-    if @route.save
-      create_route_items_from_google if params[:route_items].present?
-      
-      redirect_to @route, notice: '✓ ルートが正常に作成されました。'
-    else
-      @cities = City.all
-      @venues = Venue.all
-      render :new, status: :unprocessable_entity
-    end
   end
 
   def edit
@@ -198,4 +197,3 @@ class RoutesController < ApplicationController
     @route.route_items.destroy_all
     create_route_items_from_google
   end
-end

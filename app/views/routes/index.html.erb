@@ -95,7 +95,7 @@
           <div class="route-venues-preview">
             <% route.route_items.limit(4).each do |item| %>
               <span class="venue-preview-tag">
-                <%= item.item.name %>
+                <%= item.venue&.name || item.venue_name || "場所" %>
               </span>
             <% end %>
             <% if route.route_items.count > 4 %>

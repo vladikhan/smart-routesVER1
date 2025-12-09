@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,16 +31,18 @@
         
         <div class="route-stats">
           <div class="stat-item">👁️ <%= @route.view_count || 0 %></div>
-          <div class="stat-item">❤️ <%= @route.likes_count || 12 %></div>
-          <div class="stat-item">💾 <%= @route.bookmarks_count || 5 %></div>
+          <div class="stat-item">❤️ <%= @route.likes_count || 0 %></div>
+          <div class="stat-item">💾 <%= @route.bookmarks_count || 0 %></div>
         </div>
       </div>
       
       <div class="route-title-section">
         <h1><%= @route.name %></h1>
-        <p style="font-size: 18px; opacity: 0.9; margin-bottom: 20px;">
-          <%= @route.description %>
-        </p>
+        <% if @route.description.present? %>
+          <p style="font-size: 18px; opacity: 0.9; margin-bottom: 20px;">
+            <%= @route.description %>
+          </p>
+        <% end %>
         
         <div class="route-quick-info">
           <% if @route.difficulty_level.present? %>
@@ -49,8 +52,12 @@
               </span>
             </div>
           <% end %>
-          <div class="quick-info-item">⏱️ <%= @route.estimated_duration %>分</div>
-          <div class="quick-info-item">💰 約¥<%= number_with_delimiter(@route.estimated_cost) %></div>
+          <% if @route.estimated_duration.present? && @route.estimated_duration > 0 %>
+            <div class="quick-info-item">⏱️ <%= @route.estimated_duration %>分</div>
+          <% end %>
+          <% if @route.estimated_cost.present? && @route.estimated_cost > 0 %>
+            <div class="quick-info-item">💰 約¥<%= number_with_delimiter(@route.estimated_cost) %></div>
+          <% end %>
           <div class="quick-info-item">📍 <%= @route_items.count %>場所</div>
         </div>
       </div>
@@ -60,11 +67,11 @@
         <button class="action-btn btn-save">💾 保存</button>
         <button class="action-btn btn-share">📤 共有</button>
 
-        <% if current_user == @route.user %>
-          <%= link_to edit_route_path(@route),  class: "action-btn btn-edit" do %>
-          編集
+        <% if user_signed_in? && current_user == @route.user %>
+          <%= link_to edit_route_path(@route), class: "action-btn btn-edit" do %>
+            ✏️ 編集
+          <% end %>
         <% end %>
-      <% end %>
       </div>
     </div>
   </section>
@@ -75,30 +82,55 @@
         <div class="content-card">
           <h2 class="section-title">📍 ルート詳細 (<%= @route_items.count %>場所)</h2>
           
-          <% @route_items.each_with_index do |item, index| %>
-            <%= link_to venue_path(item.venue), style: "text-decoration: none; color: inherit;" do %>
-              <div class="venue-list-item">
-                <div class="venue-number"><%= index + 1 %></div>
-                <div class="venue-info">
-                  <h4><%= item.venue.name %></h4>
-                  <p><%= truncate(item.venue.description, length: 100) %></p>
-                  <div class="venue-tags-inline">
-                    <span class="tag-inline">⏱️ <%= item.duration_minutes %>分</span>
-                    <% if item.venue.cuisine_type.present? %>
-                      <span class="tag-inline"><%= item.venue.cuisine_type %></span>
-                    <% end %>
-                    <% if item.venue.price_range.present? %>
-                      <span class="tag-inline"><%= item.venue.price_range %></span>
-                    <% end %>
+          <% if @route_items.any? %>
+            <% @route_items.each_with_index do |route_item, index| %>
+              <% 
+                # Handle both 'venue' and 'item' associations
+                venue = route_item.respond_to?(:venue) ? route_item.venue : (route_item.respond_to?(:item) ? route_item.item : nil)
+              %>
+              
+              <% if venue.present? %>
+                <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>
+                  <div class="venue-list-item">
+                    <div class="venue-number"><%= index + 1 %></div>
+                    <div class="venue-info">
+                      <h4><%= venue.name %></h4>
+                      <p><%= truncate(venue.description, length: 100) if venue.description.present? %></p>
+                      <div class="venue-tags-inline">
+                        <span class="tag-inline">⏱️ <%= route_item.duration_minutes %>分</span>
+                        <% if venue.cuisine_type.present? %>
+                          <span class="tag-inline"><%= venue.cuisine_type %></span>
+                        <% end %>
+                        <% if venue.price_range.present? %>
+                          <span class="tag-inline"><%= venue.price_range %></span>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="venue-list-item" style="opacity: 0.7;">
+                  <div class="venue-number"><%= index + 1 %></div>
+                  <div class="venue-info">
+                    <h4><%= route_item.venue_name || "場所" %></h4>
+                    <p><%= route_item.venue_address if route_item.venue_address.present? %></p>
+                    <div class="venue-tags-inline">
+                      <span class="tag-inline">⏱️ <%= route_item.duration_minutes %>分</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              <% end %>
             <% end %>
+          <% else %>
+            <div style="text-align: center; padding: 60px 20px; color: #999;">
+              <div style="font-size: 64px; margin-bottom: 15px;">📍</div>
+              <p>このルートにはまだ場所が追加されていません</p>
+            </div>
           <% end %>
         </div>
 
         <div class="content-card">
-          <h2 class="section-title">マップ</h2>
+          <h2 class="section-title">🗺️ マップ</h2>
           <div id="map" style="width: 100%; height: 400px; border-radius: 8px; background: #e0e0e0;"></div>
         </div>
 
@@ -124,7 +156,13 @@
 
       <div class="sidebar">
         <div class="content-card author-card">
-          <div class="author-avatar-large">👤</div>
+          <div class="author-avatar-large">
+            <% if @route.user.avatar.present? %>
+              <%= image_tag @route.user.avatar.thumb.url %>
+            <% else %>
+              👤
+            <% end %>
+          </div>
           <h3 style="margin-bottom: 5px;">@<%= @route.user.username %></h3>
           <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
             <%= @route.user.bio || "旅行が大好きです！" %>
@@ -132,33 +170,57 @@
           
           <div style="display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
             <div style="text-align: center;">
-              <div style="font-weight: 700; font-size: 20px;">12</div>
-              <div style="color: #666; font-size: 12px;">フォロー</div>
+              <div style="font-weight: 700; font-size: 20px;"><%= @route.user.routes.count %></div>
+              <div style="color: #666; font-size: 12px;">ルート</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-weight: 700; font-size: 20px;">95</div>
+              <div style="font-weight: 700; font-size: 20px;">0</div>
               <div style="color: #666; font-size: 12px;">フォロワー</div>
             </div>
           </div>
           
-          <button class="follow-btn">フォロー</button>
+          <% unless user_signed_in? && current_user == @route.user %>
+            <button class="follow-btn">フォロー</button>
+          <% end %>
         </div>
+
+        <% if @route.tags.any? %>
+          <div class="content-card">
+            <h3 style="margin-bottom: 15px; font-size: 16px;">🏷️ タグ</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <% @route.tags.each do |tag| %>
+                <span style="background: #e3f2fd; color: #0277bd; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">
+                  #<%= tag.display_name %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
 
         <div class="content-card">
           <h3 style="margin-bottom: 15px; font-size: 16px;">似ているルート</h3>
           
-          <% Route.where(is_public: true).where.not(id: @route.id).limit(3).each do |similar_route| %>
-            <%= link_to route_path(similar_route), style: "text-decoration: none;" do %>
-              <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
-                <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #333;">
-                  <%= truncate(similar_route.name, length: 40) %>
-                </h4>
-                <small style="color: #666;">
-                  ⏱️ <%= similar_route.estimated_duration %>分 • 
-                  💰 ¥<%= number_with_delimiter(similar_route.estimated_cost) %>
-                </small>
-              </div>
+          <% similar_routes = Route.where(is_public: true).where.not(id: @route.id).limit(3) %>
+          <% if similar_routes.any? %>
+            <% similar_routes.each do |similar_route| %>
+              <%= link_to route_path(similar_route), style: "text-decoration: none;" do %>
+                <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; transition: all 0.3s;">
+                  <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #333;">
+                    <%= truncate(similar_route.name, length: 40) %>
+                  </h4>
+                  <small style="color: #666;">
+                    <% if similar_route.estimated_duration.present? && similar_route.estimated_duration > 0 %>
+                      ⏱️ <%= similar_route.estimated_duration %>分
+                    <% end %>
+                    <% if similar_route.estimated_cost.present? && similar_route.estimated_cost > 0 %>
+                      • 💰 ¥<%= number_with_delimiter(similar_route.estimated_cost) %>
+                    <% end %>
+                  </small>
+                </div>
+              <% end %>
             <% end %>
+          <% else %>
+            <p style="color: #999; font-size: 13px;">関連するルートがありません</p>
           <% end %>
         </div>
       </div>
@@ -168,45 +230,63 @@
   <%= render 'pages/footer' %>
 
   <script>
-    var API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
-    var routeItems = <%= raw @route_items.map { |item| 
-      {
-        name: item.venue.name,
-        lat: item.venue.latitude&.to_f,
-        lng: item.venue.longitude&.to_f,
-        address: item.venue.address
-      }
-    }.to_json %>;
+    const API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
+    
+    // Build route items data - handle both venue and item associations
+    const routeItems = [
+      <% @route_items.each do |route_item| %>
+        <% 
+          venue = route_item.respond_to?(:venue) ? route_item.venue : (route_item.respond_to?(:item) ? route_item.item : nil)
+        %>
+        <% if venue.present? && (venue.geo_lat.present? || (venue.respond_to?(:latitude) && venue.latitude.present?)) %>
+          {
+            name: <%= raw venue.name.to_json %>,
+            lat: <%= venue.geo_lat || (venue.respond_to?(:latitude) ? venue.latitude : 0) %>,
+            lng: <%= venue.geo_lng || (venue.respond_to?(:longitude) ? venue.longitude : 0) %>,
+            address: <%= raw (venue.address || '').to_json %>
+          },
+        <% end %>
+      <% end %>
+    ];
 
     function initMap() {
-      console.log('initMap called');
-      console.log('Route items:', routeItems);
+      console.log('🗺️ initMap called');
+      console.log('📊 Route items:', routeItems);
       
-      var validItems = routeItems.filter(function(item) {
-        return item.lat && item.lng;
+      const validItems = routeItems.filter(item => {
+        return item.lat && item.lng && !isNaN(item.lat) && !isNaN(item.lng);
       });
       
-      console.log('Valid items:', validItems.length);
+      console.log('✓ Valid items:', validItems.length);
 
       if (validItems.length === 0) {
         document.getElementById('map').innerHTML = 
-          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #fff3cd; color: #856404;"><div style="text-align: center;"><div style="font-size: 48px; margin-bottom: 10px;">📍</div><div>位置情報が登録されていません</div></div></div>';
+          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #fff3cd; color: #856404; border-radius: 8px;">' +
+          '<div style="text-align: center;">' +
+          '<div style="font-size: 48px; margin-bottom: 10px;">📍</div>' +
+          '<div style="font-weight: 600;">位置情報が登録されていません</div>' +
+          '<div style="font-size: 13px; margin-top: 5px;">ルート編集で場所を追加してください</div>' +
+          '</div></div>';
         return;
       }
 
-      var center = { lat: validItems[0].lat, lng: validItems[0].lng };
+      const center = { lat: validItems[0].lat, lng: validItems[0].lng };
       
-      var map = new google.maps.Map(document.getElementById('map'), {
+      const map = new google.maps.Map(document.getElementById('map'), {
         zoom: 13,
-        center: center
+        center: center,
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true
       });
 
-      var bounds = new google.maps.LatLngBounds();
+      const bounds = new google.maps.LatLngBounds();
+      const markers = [];
       
-      validItems.forEach(function(item, index) {
-        var position = { lat: item.lat, lng: item.lng };
+      validItems.forEach((item, index) => {
+        const position = { lat: item.lat, lng: item.lng };
         
-        var marker = new google.maps.Marker({
+        const marker = new google.maps.Marker({
           position: position,
           map: map,
           label: {
@@ -225,22 +305,87 @@
           }
         });
 
-        var infoWindow = new google.maps.InfoWindow({
-          content: '<div style="padding: 10px;"><h4 style="margin: 0 0 5px 0;">' + item.name + '</h4><p style="margin: 0; color: #666; font-size: 13px;">' + (item.address || '') + '</p></div>'
+        const infoWindow = new google.maps.InfoWindow({
+          content: '<div style="padding: 10px;">' +
+                   '<h4 style="margin: 0 0 5px 0; font-size: 15px;">' + item.name + '</h4>' +
+                   '<p style="margin: 0; color: #666; font-size: 13px;">' + (item.address || '') + '</p>' +
+                   '</div>'
         });
 
-        marker.addListener('click', function() {
+        marker.addListener('click', () => {
+          markers.forEach(m => {
+            if (m.infoWindow) m.infoWindow.close();
+          });
           infoWindow.open(map, marker);
         });
 
+        marker.infoWindow = infoWindow;
+        markers.push(marker);
         bounds.extend(position);
       });
 
-      map.fitBounds(bounds);
-      console.log('Map initialized');
+      // Draw route line
+      if (validItems.length > 1) {
+        const routePath = new google.maps.Polyline({
+          path: validItems.map(item => ({ lat: item.lat, lng: item.lng })),
+          geodesic: true,
+          strokeColor: '#0288d1',
+          strokeOpacity: 0.8,
+          strokeWeight: 4
+        });
+        routePath.setMap(map);
+      }
+
+      if (validItems.length > 1) {
+        map.fitBounds(bounds);
+      }
+      
+      console.log('✓ Map initialized with', validItems.length, 'markers');
+    }
+
+    // Load Google Maps dynamically
+    function loadGoogleMaps() {
+      if (!API_KEY) {
+        console.error('❌ Google Maps API key not set');
+        document.getElementById('map').innerHTML = 
+          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #ffebee; color: #c62828; border-radius: 8px;">' +
+          '<div style="text-align: center;">' +
+          '<div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>' +
+          '<div style="font-weight: 600;">Google Maps APIキーが設定されていません</div>' +
+          '</div></div>';
+        return;
+      }
+
+      if (window.google && window.google.maps) {
+        console.log('✓ Google Maps already loaded, initializing...');
+        initMap();
+        return;
+      }
+
+      console.log('📥 Loading Google Maps script...');
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&language=ja`;
+      script.async = true;
+      script.defer = true;
+      script.onerror = () => {
+        console.error('❌ Failed to load Google Maps');
+        document.getElementById('map').innerHTML = 
+          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #ffebee; color: #c62828; border-radius: 8px;">' +
+          '<div style="text-align: center;">' +
+          '<div style="font-size: 48px; margin-bottom: 10px;">❌</div>' +
+          '<div style="font-weight: 600;">Google Mapsの読み込みに失敗しました</div>' +
+          '</div></div>';
+      };
+      
+      window.initMap = initMap;
+      document.head.appendChild(script);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+    } else {
+      loadGoogleMaps();
     }
   </script>
-  
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap&libraries=places&language=ja"></script>
 </body>
 </html>

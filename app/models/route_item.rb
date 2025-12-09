@@ -1,24 +1,33 @@
+
 class RouteItem < ApplicationRecord
+
   belongs_to :route
-  belongs_to :item, polymorphic: true
+
+  belongs_to :venue, optional: true
+
+  
+
+  # If the association is actually called 'item', alias it
+
+  alias_method :item, :venue if method_defined?(:venue)
 
   validates :position, presence: true
 
-  validates :duration_minutes,
-            numericality: { greater_than: 0 },
-            allow_nil: true
+  validates :duration_minutes, numericality: { greater_than: 0 }, allow_nil: true
 
-  validates :item_type,
-            inclusion: {
-              in: %w[Venue Activity Restaurant Cafe Landmark Market Attraction Custom],
-              message: "%{value} is not a valid item type"
-            }
+  validates :item_type, presence: true, inclusion: { in: %w[venue activity break custom] }
 
-  before_validation :set_default_item_type
+  after_initialize :set_default_item_type, if: :new_record?
+
+  default_scope { order(position: :asc) }
 
   private
 
   def set_default_item_type
-    self.item_type ||= item.class.name if item
+
+    self.item_type ||= 'venue'
+
   end
+
 end
+
