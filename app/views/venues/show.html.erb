@@ -138,10 +138,17 @@
   ];
 
   // Fallback center
+  <% if @route.present? %>
   const defaultCenter = {
-    lat: <%= @route.geo_lat || 35.0116 %>,
-    lng: <%= @route.geo_lng || 135.7681 %>
+    lat: <%= @route.geo_lat %>,
+    lng: <%= @route.geo_lng %>
   };
+<% else %>
+  const defaultCenter = {
+    lat: 35.0116,
+    lng: 135.7681
+  };
+<% end %>
 
   const validItems = routeItems.filter(i => i.lat && i.lng);
 
@@ -157,7 +164,7 @@
       ? { lat: validItems[0].lat, lng: validItems[0].lng }
       : defaultCenter;
 
-    const map = new google.maps.Map(document.getElementById("map"), {
+    const map = new google.maps.Map(document.getElementById("venue-map"), {
       zoom: validItems.length > 0 ? 13 : 12,
       center,
     });
@@ -213,7 +220,7 @@
 
   function loadGoogleMaps() {
     if (!MAPS_KEY) {
-      document.getElementById("map").innerHTML =
+      document.getElementById("venue-map").innerHTML =
         "<div style='padding:20px;text-align:center;color:red;'>Google Maps APIキーがありません</div>";
       return;
     }

@@ -1,4 +1,3 @@
-
 class VenuesController < ApplicationController
   before_action :set_venue, only: [:show]
 
@@ -9,7 +8,6 @@ class VenuesController < ApplicationController
                    .page(params[:page])
                    .per(12)
 
-    # Фильтры
     @venues = @venues.where(district_id: params[:district_id]) if params[:district_id].present?
     @venues = @venues.where(venue_type: params[:venue_type]) if params[:venue_type].present?
     @venues = @venues.where(cuisine_type: params[:cuisine_type]) if params[:cuisine_type].present?
@@ -18,9 +16,21 @@ class VenuesController < ApplicationController
 
   def show
     @venue.increment_view_count
-    @reviews = @venue.reviews.includes(:user).order(created_at: :desc).limit(10)
+
+    @route = @venue.routes.joins(:route_items)
+                          .order("route_items.position ASC")
+                          .first
+
+    # Если нет маршрута → пустой массив
+    @route_items = @route ? @route.route_items.includes(:venue, :item) : []
+
+    @reviews = @route ? @route.reviews.includes(:user).order(created_at: :desc).limit(10) : []
+
     @routes = @venue.routes.where(is_public: true).limit(5)
   end
+
+
+
 
   private
 
