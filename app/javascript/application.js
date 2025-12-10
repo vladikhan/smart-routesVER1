@@ -1,4 +1,5 @@
 // Configure your import map in config/importmap.rb
-import "@hotwired/turbo-rails"
-import "./controllers"
-import "./channels"
+import '@hotwired/turbo-rails'
+import './channels'
+import './controllers'
+import './notifications'

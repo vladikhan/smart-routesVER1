@@ -236,6 +236,7 @@
     const routeItems = [
       <% @route_items.each do |route_item| %>
         <% 
+          # Ваш оригинальный код для создания массива routeItems
           venue = route_item.respond_to?(:venue) ? route_item.venue : (route_item.respond_to?(:item) ? route_item.item : nil)
         %>
         <% if venue.present? && (venue.geo_lat.present? || (venue.respond_to?(:latitude) && venue.latitude.present?)) %>
@@ -248,7 +249,6 @@
         <% end %>
       <% end %>
     ];
-
     function initMap() {
       console.log('🗺️ initMap called');
       console.log('📊 Route items:', routeItems);

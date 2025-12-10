@@ -1,4 +1,4 @@
-//Notification System
+// Notification System
 class NotificationManager {
 	constructor() {
 		this.badge = document.getElementById('notificationBadge')
