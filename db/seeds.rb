@@ -592,8 +592,8 @@ routes = routes_data.map.with_index do |data, idx|
 
   RouteItem.create!(
     route: route,
-    item: venue,                # ← ПОЛИМОРФНЫЙ
-    item_type: "Venue",         # ← ВАЛИДНЫЙ ТИП
+    item_id: venue.id,                # ← ПОЛИМОРФНЫЙ
+    item_type: "venue",         # ← ВАЛИДНЫЙ ТИП
     position: position + 1,
     notes: "おすすめポイント: #{venue.description[0..50]}"
   )
