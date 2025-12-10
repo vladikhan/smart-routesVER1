@@ -233,159 +233,152 @@
     const API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
     
     // Build route items data - handle both venue and item associations
-    const routeItems = [
-      <% @route_items.each do |route_item| %>
-        <% 
-          # Ваш оригинальный код для создания массива routeItems
-          venue = route_item.respond_to?(:venue) ? route_item.venue : (route_item.respond_to?(:item) ? route_item.item : nil)
-        %>
-        <% if venue.present? && (venue.geo_lat.present? || (venue.respond_to?(:latitude) && venue.latitude.present?)) %>
-          {
-            name: <%= raw venue.name.to_json %>,
-            lat: <%= venue.geo_lat || (venue.respond_to?(:latitude) ? venue.latitude : 0) %>,
-            lng: <%= venue.geo_lng || (venue.respond_to?(:longitude) ? venue.longitude : 0) %>,
-            address: <%= raw (venue.address || '').to_json %>
-          },
-        <% end %>
-      <% end %>
-    ];
-    function initMap() {
-      console.log('🗺️ initMap called');
-      console.log('📊 Route items:', routeItems);
-      
-      const validItems = routeItems.filter(item => {
-        return item.lat && item.lng && !isNaN(item.lat) && !isNaN(item.lng);
-      });
-      
-      console.log('✓ Valid items:', validItems.length);
+   // =======================
+// 🗺️ ROUTE ITEMS DATA
+// =======================
+const routeItems = [
+  <% @route_items.each do |route_item| %>
+    <% venue = route_item.try(:venue) || route_item.try(:item) %>
+    <% if venue.present? && (venue.geo_lat.present? || venue.try(:latitude).present?) %>
+      {
+        name: <%= raw venue.name.to_json %>,
+        lat: <%= venue.geo_lat || venue.try(:latitude) %>,
+        lng: <%= venue.geo_lng || venue.try(:longitude) %>,
+        address: <%= raw (venue.address || '').to_json %>
+      },
+    <% end %>
+  <% end %>
+];
 
-      if (validItems.length === 0) {
-        document.getElementById('map').innerHTML = 
-          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #fff3cd; color: #856404; border-radius: 8px;">' +
-          '<div style="text-align: center;">' +
-          '<div style="font-size: 48px; margin-bottom: 10px;">📍</div>' +
-          '<div style="font-weight: 600;">位置情報が登録されていません</div>' +
-          '<div style="font-size: 13px; margin-top: 5px;">ルート編集で場所を追加してください</div>' +
-          '</div></div>';
-        return;
-      }
+// =======================
+// 🗼 FALLBACK CENTER
+// =======================
+const defaultCenter = {
+  lat: <%= @route.geo_lat || 35.0116 %>,  // Kyoto fallback
+  lng: <%= @route.geo_lng || 135.7681 %>  // Kyoto fallback
+};
 
-      const center = { lat: validItems[0].lat, lng: validItems[0].lng };
-      
-      const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 13,
-        center: center,
-        mapTypeControl: true,
-        streetViewControl: true,
-        fullscreenControl: true
-      });
+// Filter valid coordinates
+const validItems = routeItems.filter(item =>
+  item.lat && item.lng && !isNaN(item.lat) && !isNaN(item.lng)
+);
 
-      const bounds = new google.maps.LatLngBounds();
-      const markers = [];
-      
-      validItems.forEach((item, index) => {
-        const position = { lat: item.lat, lng: item.lng };
-        
-        const marker = new google.maps.Marker({
-          position: position,
-          map: map,
-          label: {
-            text: String(index + 1),
-            color: 'white',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          },
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: '#0288d1',
-            fillOpacity: 1,
-            strokeColor: 'white',
-            strokeWeight: 3,
-            scale: 20
-          }
-        });
+// =======================
+// 🗺️ INIT MAP FUNCTION
+// =======================
+function initMap() {
+  console.log("🗺️ initMap started");
+  console.log("Total items:", routeItems.length);
+  console.log("Valid items:", validItems.length);
 
-        const infoWindow = new google.maps.InfoWindow({
-          content: '<div style="padding: 10px;">' +
-                   '<h4 style="margin: 0 0 5px 0; font-size: 15px;">' + item.name + '</h4>' +
-                   '<p style="margin: 0; color: #666; font-size: 13px;">' + (item.address || '') + '</p>' +
-                   '</div>'
-        });
+  // Если НЕТ ни одной точки → центр на маршрут или Киото
+  const centerPoint = validItems.length > 0
+    ? { lat: validItems[0].lat, lng: validItems[0].lng }
+    : defaultCenter;
 
-        marker.addListener('click', () => {
-          markers.forEach(m => {
-            if (m.infoWindow) m.infoWindow.close();
-          });
-          infoWindow.open(map, marker);
-        });
+  // Создаем карту
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: validItems.length > 0 ? 13 : 12,
+    center: centerPoint,
+    mapTypeControl: true,
+    streetViewControl: true,
+    fullscreenControl: true,
+  });
 
-        marker.infoWindow = infoWindow;
-        markers.push(marker);
-        bounds.extend(position);
-      });
+  // Если нет точек — просто карта, без маркеров
+  if (validItems.length === 0) {
+    console.warn("⚠️ No coords. Map loaded with fallback center:", centerPoint);
+    return;
+  }
 
-      // Draw route line
-      if (validItems.length > 1) {
-        const routePath = new google.maps.Polyline({
-          path: validItems.map(item => ({ lat: item.lat, lng: item.lng })),
-          geodesic: true,
-          strokeColor: '#0288d1',
-          strokeOpacity: 0.8,
-          strokeWeight: 4
-        });
-        routePath.setMap(map);
-      }
+  // === Маркеры ===
+  const bounds = new google.maps.LatLngBounds();
+  const markers = [];
 
-      if (validItems.length > 1) {
-        map.fitBounds(bounds);
-      }
-      
-      console.log('✓ Map initialized with', validItems.length, 'markers');
-    }
+  validItems.forEach((item, index) => {
+    const position = { lat: item.lat, lng: item.lng };
 
-    // Load Google Maps dynamically
-    function loadGoogleMaps() {
-      if (!API_KEY) {
-        console.error('❌ Google Maps API key not set');
-        document.getElementById('map').innerHTML = 
-          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #ffebee; color: #c62828; border-radius: 8px;">' +
-          '<div style="text-align: center;">' +
-          '<div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>' +
-          '<div style="font-weight: 600;">Google Maps APIキーが設定されていません</div>' +
-          '</div></div>';
-        return;
-      }
+    const marker = new google.maps.Marker({
+      position,
+      map,
+      label: {
+        text: `${index + 1}`,
+        color: "white",
+        fontSize: "14px",
+        fontWeight: "bold"
+      },
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: "#0288d1",
+        fillOpacity: 1,
+        strokeColor: "white",
+        strokeWeight: 3,
+        scale: 20,
+      },
+    });
 
-      if (window.google && window.google.maps) {
-        console.log('✓ Google Maps already loaded, initializing...');
-        initMap();
-        return;
-      }
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="padding: 10px;">
+          <h4 style="margin: 0; font-size: 15px;">${item.name}</h4>
+          <p style="margin: 5px 0 0; color: #666; font-size: 13px;">${item.address || ""}</p>
+        </div>
+      `
+    });
 
-      console.log('📥 Loading Google Maps script...');
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&language=ja`;
-      script.async = true;
-      script.defer = true;
-      script.onerror = () => {
-        console.error('❌ Failed to load Google Maps');
-        document.getElementById('map').innerHTML = 
-          '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #ffebee; color: #c62828; border-radius: 8px;">' +
-          '<div style="text-align: center;">' +
-          '<div style="font-size: 48px; margin-bottom: 10px;">❌</div>' +
-          '<div style="font-weight: 600;">Google Mapsの読み込みに失敗しました</div>' +
-          '</div></div>';
-      };
-      
-      window.initMap = initMap;
-      document.head.appendChild(script);
-    }
+    marker.addListener("click", () => {
+      markers.forEach(m => m.infoWindow?.close());
+      infoWindow.open(map, marker);
+    });
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadGoogleMaps);
-    } else {
-      loadGoogleMaps();
-    }
+    marker.infoWindow = infoWindow;
+    markers.push(marker);
+    bounds.extend(position);
+  });
+
+  // Линия маршрута
+  if (validItems.length > 1) {
+    new google.maps.Polyline({
+      path: validItems.map(item => ({ lat: item.lat, lng: item.lng })),
+      map,
+      strokeColor: "#0288d1",
+      strokeOpacity: 0.8,
+      strokeWeight: 4,
+    });
+    map.fitBounds(bounds);
+  }
+}
+
+// =======================
+// 🔌 GOOGLE MAPS LOADER
+// =======================
+
+function loadGoogleMaps() {
+  if (!API_KEY) {
+    console.error("❌ No API key!");
+    document.getElementById("map").innerHTML =
+      '<div style="padding:20px;text-align:center;color:#b71c1c;">Google Maps APIキーがありません</div>';
+    return;
+  }
+
+  if (window.google && window.google.maps) {
+    initMap();
+    return;
+  }
+
+  console.log("📥 Loading Google Maps...");
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&language=ja`;
+  script.async = true;
+  script.defer = true;
+  window.initMap = initMap;
+  document.head.appendChild(script);
+}
+
+document.readyState === "loading"
+  ? document.addEventListener("DOMContentLoaded", loadGoogleMaps)
+  : loadGoogleMaps();
+
   </script>
 </body>
 </html>

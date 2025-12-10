@@ -44,6 +44,30 @@ class Route < ApplicationRecord
     bookmarks.exists?(user_id: user.id)
   end
 
+  geocoded_by :name
+after_validation :geocode, if: ->(route){ route.name_changed? }
+
+
+  # Координаты маршрута — алиасы для geo_lat / geo_lng
+def latitude
+  respond_to?(:latitude) && read_attribute(:latitude).presence || geo_lat
+end
+
+def latitude=(value)
+  self.geo_lat = value
+  write_attribute(:latitude, value) if respond_to?(:latitude)
+end
+
+def longitude
+  respond_to?(:longitude) && read_attribute(:longitude).presence || geo_lng
+end
+
+def longitude=(value)
+  self.geo_lng = value
+  write_attribute(:longitude, value) if respond_to?(:longitude)
+end
+
+
   # スコープ
   scope :public_routes, -> { where(is_public: true, is_deleted: false) }
   scope :featured, -> { where(is_featured: true).order(featured_order: :asc) }

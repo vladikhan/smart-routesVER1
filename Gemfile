@@ -85,3 +85,6 @@ gem "bootstrap", "~> 5.3"
 gem "jsbundling-rails", "~> 1.3"
 
 gem 'dotenv-rails', '~> 3.1.8'
+
+gem 'geocoder'
+
