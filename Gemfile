@@ -91,3 +91,7 @@ gem 'geocoder', '~> 1.8'
 gem 'csv', '~> 3.3'
 
 
+
+group :test do
+  gem 'rails-controller-testing'
+end

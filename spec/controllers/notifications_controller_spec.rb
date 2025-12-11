@@ -1,49 +1,60 @@
-# Encoding: UTF-8
 require 'rails_helper'
 
 RSpec.describe NotificationsController, type: :controller do
   let(:user) { create(:user) }
-  let(:notification) { create(:notification, user: user) }
+  let(:actor) { create(:user, username: 'actor', email: 'actor@example.com') }
+  let!(:notification) { create(:notification, user: user, actor: actor) }
   
   before { sign_in user }
   
   describe 'GET #index' do
-    let!(:notifications) { create_list(:notification, 5, user: user) }
+    let!(:notifications) do
+      3.times.map do |i|
+        create(:notification, 
+               user: user, 
+               actor: actor,
+               notification_type: ['like', 'follow', 'comment'].sample)
+      end
+    end
     
     it 'ユーザーの通知を返す' do
       get :index
-      expect(assigns(:notifications)).to match_array(notifications)
+      expect(assigns(:notifications)).to match_array(user.notifications)
     end
   end
   
   describe 'GET #unread_count' do
     before do
-      create_list(:notification, 3, user: user)
-      create_list(:notification, 2,:read, user: user)
+      3.times do
+        create(:notification, user: user, actor: actor, is_read: false)
+      end
+      2.times do
+        create(:notification, user: user, actor: actor, is_read: true)
+      end
     end
     
     it '未読数を返す' do
       get :unread_count, format: :json
-      json = JSON.parse(response.body)
-      expect(json['count']).to eq(3)
+      expect(JSON.parse(response.body)['count']).to eq(3)
     end
   end
   
   describe 'PATCH #mark_as_read' do
     it '通知を既読にする' do
       patch :mark_as_read, params: { id: notification.id }, format: :json
-      expect(notification.reload.is_read).to be true
+      notification.reload
+      expect(notification.is_read).to be true
     end
   end
   
   describe 'PATCH #mark_all_as_read' do
     before do
-      create_list(:notification, 3, user: user)
+      3.times { create(:notification, user: user, actor: actor, is_read: false) }
     end
     
     it 'すべての通知を既読にする' do
       patch :mark_all_as_read, format: :json
-      expect(user.notifications.unread.count).to eq(0)
+      expect(user.notifications.where(is_read: false).count).to eq(0)
     end
   end
 end

@@ -63,7 +63,7 @@ class User < ApplicationRecord
 	has_many :owned_venues, through: :place_owners, source: :venue
 
 	# バリデーション
-	validates :username, presence: true, uniqueness: true, length: { minimum:3, maximum: 30 }
+	validates :username, presence: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 20 }
 	validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 	validates :password, length: { minimum: 8 }, if: -> { new_record? || password.present? }
 	validates :bio, length: { maximum: 500 }
@@ -81,7 +81,7 @@ class User < ApplicationRecord
  has_many :sent_notifications, class_name: 'Notification', foreign_key: :actor_id, dependent: :destroy
 
  def unread_notifications_count
-	notifications.read.count
+	notifications.unread.count
  end
 
  # Avatar helper

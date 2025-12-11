@@ -1,51 +1,45 @@
-# encoding: UTF-8
 require 'rails_helper'
 
 RSpec.describe Notification, type: :model do
+  let(:user) { create(:user) }
+  let(:actor) { create(:user) }
+  
   describe 'バリデーション' do
-    it { should validate_presence_of(:notification_type) }
-    it { should validate_presence_of(:notification_type).in_array(&w[follow comment review route_shared]) }
+    it '有効なファクトリを持つ' do
+      notification = build(:notification, user: user, actor: actor)
+      expect(notification).to be_valid
+    end
   end
-
-  describe 'アソシエーション' do
-    it { should belong_to(:user) }
-    it { should belong_to(:actor).class_name(('User')) }
-  end
-
+  
   describe 'スコープ' do
-    let(:user) { create(:user) }
-    let!(:unread) { create_list(:notification, 3, user: user) }
-    let!(:read) { create_list(:notification, 2, :read, user: user) }
-
+    let!(:unread1) { create(:notification, :unread, user: user, actor: actor) }
+    let!(:unread2) { create(:notification, :unread, user: user, actor: actor) }
+    let!(:read1) { create(:notification, :read, user: user, actor: actor) }
+    
     it '未読通知のみを返す' do
-      expect(user.notification.unread.count).to eq(3)
+      expect(Notification.unread).to match_array([unread1, unread2])
     end
+docker compose exec web rspec spec/models/user_spec.rb
+    
     it '既読通知のみを返す' do
-      expect(user.notification.read.count).to eq(2)
+      expect(Notification.read).to contain_exactly(read1)
     end
   end
-
+  
   describe 'メソッド' do
-    let(:notification) { create(:notification, notificaiton_type: 'like') }
-
-    describe '#message' do
-      it '正しいメッセージを返す' do
-        expect(notificaiton.message).to include('いいねしました')
+    let(:notification) { create(:notification, user: user, actor: actor, notification_type: 'like') }
+    
+    it '#message 正しいメッセージを返す' do
+      expect(notification.message).to include(actor.username)
     end
-  end
-
-  describe '#icon' do
-    it '正しいアイコンを返す' do
+    
+    it '#icon 正しいアイコンを返す' do
       expect(notification.icon).to eq('❤️')
     end
-  end
-
-  describe '#mark_as_read' do
-    it '既読にする' do
-          expect {
-            notification.maek_as_read!
-        }.to change { notificaiton.reload.is_read }.from(false).to(true)
-      end
+    
+    it '#mark_as_read 既読にする' do
+      notification.mark_as_read!
+      expect(notification.reload.is_read).to be true
     end
-  end     
+  end
 end

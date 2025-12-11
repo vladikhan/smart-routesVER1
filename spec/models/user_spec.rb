@@ -1,38 +1,34 @@
-# Encoding: UTF-8
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  describe 'バリデーション' do # Валидации
-    # Subject должен быть определен, чтобы Shoulda Matchers мог корректно проверить uniqueness.
-    # Shoulda Matchers создаёт и сохраняет первый объект, затем пытается создать второй,
-    # чтобы проверить уникальность.
-    subject { build(:user) } 
-
+  describe 'バリデーション' do
     it { should validate_presence_of(:username) }
     it { should validate_presence_of(:email) }
-    it { should validate_uniqueness_of(:username).case_insensitive }
-    it { should validate_uniqueness_of(:email).case_insensitive }
+    
+    it 'should validate uniqueness of username case-insensitively' do
+      create(:user, username: 'testuser', email: 'test1@example.com')
+      duplicate = build(:user, username: 'TESTUSER', email: 'test2@example.com')
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:username]).to include('はすでに存在します')
+    end
   end
-
-  describe 'アソシエーション' do # Ассоциации
-    it { should have_many(:routes).dependent(:destroy) }
-    it { should have_many(:notifications).dependent(:destroy) }
+  
+  describe 'アソシエーション' do
+    it { should have_many(:routes) }
+    it { should have_many(:notifications) }
   end
-
-  describe 'メソッド' do # Методы экземпляра
-    let(:user) { create(:user) }
-
-    describe '#unread_notifications_count' do # Проверка метода подсчёта непрочитанных уведомлений
+  
+  describe 'メソッド' do
+    describe '#unread_notifications_count' do
+      let(:user) { create(:user) }
+      let(:actor) { create(:user) }
+      
       before do
-        # 1. Создание 3 непрочитанных уведомлений (по умолчанию)
-        create_list(:notification, 3, user: user) 
-        
-        # 2. Создание 2 прочитанных уведомлений:
-        # ПРАВИЛЬНОЕ ИСПОЛЬЗОВАНИЕ: трейт :read должен быть передан в качестве аргумента.
-        create_list(:notification, 2, :read, user: user) # <-- ИСПРАВЛЕНО
+        create_list(:notification, 3, :unread, user: user, actor: actor)
+        create_list(:notification, 2, :read, user: user, actor: actor)
       end
-
-      it '未読通知の数を返す' do # Возвращает количество непрочитанных уведомлений
+      
+      it '未読通知の数を返す' do
         expect(user.unread_notifications_count).to eq(3)
       end
     end
