@@ -1,25 +1,31 @@
 FactoryBot.define do
   factory :user do
-    username { "MyString" }
-    email { "MyString" }
-    password_digest { "MyString" }
-    bio { "MyText" }
-    image_url { "MyString" }
-    location { "MyString" }
-    budget_min { "MyString" }
-    budget_max { 1 }
-    is_admin { false }
-    is_banned { false }
-    banned_at { "2025-10-24 11:04:15" }
-    banned_by { 1 }
-    ban_reason { "MyText" }
-    email_verified { false }
-    phone { "MyString" }
-    is_online { false }
-    last_seen_at { "2025-10-24 11:04:15" }
-    langauge { "MyString" }
-    timezone { "MyString" }
-    date_format { "MyString" }
-    username_last_changed_at { "2025-10-24 11:04:15" }
+    sequence(:username) { |n| "user#{n}" }
+    sequence(:email) { |n| "user#{n}@example.com" }
+    password { 'password123' }
+    password_confirmation { 'password123' }
+    bio { Faker::Lorem.sentence }
+    location { Faker::Address.city }
+    budget_min { 1000 }
+    budget_max { 10000 }
+    email_verified { true }
+    
+    before(:create) do |user|
+      user.skip_confirmation_notification!
+    end
+
+    trait :admin do
+      is_admin { true }
+    end
+
+    trait :confirmed do
+      after(:create) do |user|
+        user.confirm # Подтверждаем пользователя вручную без отправки письма
+      end
+    end
+    
+    trait :with_avatar do
+      
+    end
   end
 end

@@ -2,7 +2,7 @@ class PopularityMetric < ApplicationRecord
 
 	belongs_to :entity, polymorphic: true
 
-	validates: entity_type, uniqueness: { scope: entity_id }
+	validates:entity_type, uniqueness: { scope: :entity_id }
 
 	#人気スコア計算メソッド
 	def calculate_popularity_score

@@ -1,9 +1,12 @@
 FactoryBot.define do
   factory :city do
-    name { "MyString" }
-    name_en { "MyString" }
-    region { "MyString" }
-    description { "MyText" }
-    image_url { "MyString" }
+    name { Faker::Address.city }
+    name_en { Faker::Address.city }
+    
+    trait :with_districts do
+      after(:create) do |city|
+        create_list(:district, 3, city: city)
+      end
+    end
   end
 end

@@ -29,9 +29,10 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'devise'
   gem 'devise-i18n'
-  gem 'faker'
-  
-
+  gem 'faker', '~> 3.2'
+  gem 'shoulda-matchers', '~> 5.3'
+  gem 'database_cleaner-active_record', '~>2.1'
+  gem 'simplecov', require: false  
 end
 
 
@@ -50,9 +51,9 @@ end
 
 group :test do
   gem 'capybara', '~> 3.40'
+  gem 'selenium-webdriver', '~> 4.10'
+  gem 'webdrivers', '~>5.2'
   gem 'cuprite', '~> 0.13'
-  gem 'database_cleaner-active_record'
-  gem 'database_cleaner-core'
 end
 
 

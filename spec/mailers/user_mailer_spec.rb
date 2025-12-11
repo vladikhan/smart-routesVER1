@@ -1,11 +1,11 @@
 require "rails_helper"
 
 RSpec.describe UserMailer, type: :mailer do
-  describe "veridication_code_email" do
-    let(:mail) { UserMailer.veridication_code_email }
+  describe "verification_code_email" do
+    let(:mail) { UserMailer.verification_code_email }
 
     it "renders the headers" do
-      expect(mail.subject).to eq("Veridication code email")
+      expect(mail.subject).to eq("Verification code email")
       expect(mail.to).to eq(["to@example.org"])
       expect(mail.from).to eq(["from@example.com"])
     end

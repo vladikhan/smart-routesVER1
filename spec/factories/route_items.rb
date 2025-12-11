@@ -1,9 +1,12 @@
 FactoryBot.define do
   factory :route_item do
-    route { nil }
-    item_type { "MyString" }
-    item_id { 1 }
+    association :route
+    association :venue
+    
     position { 1 }
-    notes { "MyText" }
+    duration_minutes { 60 }
+    venue_name { Faker::Restaurant.name }
+    venue_address { Faker::Address.full_address }
+    item_type { 'venue' }
   end
 end
