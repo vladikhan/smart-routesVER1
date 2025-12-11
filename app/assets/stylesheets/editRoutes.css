@@ -38,6 +38,12 @@ body {
 	color: #222;
 }
 
+/* TITLE */
+.edit-title {
+	font-size: 32px;
+	font-weight: 800;
+	margin-bottom: 35px;
+}
 /* ==== FORM ELEMENTS ==== */
 
 .form-group {

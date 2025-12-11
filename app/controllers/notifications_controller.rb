@@ -1,10 +1,7 @@
-# encoding: UTF-8
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
-  skip_before_action :verify_authenticity_token, only: [:unread_count, :mark_as_read, :mark_as_all_read]
+  skip_before_action :verify_authenticity_token, only: [:mark_as_read, :mark_all_as_read, :unread_count]
 
-
-  
   def index
     @notifications = current_user.notifications
                                   .includes(:actor)
@@ -14,45 +11,32 @@ class NotificationsController < ApplicationController
   end
 
   def unread_count
-    count = current_user.notifications.where(is_read: false).count
-    
-    respond_to do |format|
-      format.json { render json: { count: count, success: true } }
-    end
+    count = current_user.notifications.unread.count
+    render json: { count: count, success: true }
   end
 
   def mark_as_read
     notification = current_user.notifications.find(params[:id])
-    notification.update(is_read: true)
+    notification.mark_as_read!
     
-    redirect_to notification_target_path(notification)
+    respond_to do |format|
+      format.html { redirect_to notification.target_url }
+      format.json { 
+        render json: { 
+          success: true, 
+          redirect_url: notification.target_url,
+          unread_count: current_user.unread_notifications_count
+        } 
+      }
+    end
   end
 
   def mark_all_as_read
-    current_user.notifications.where(is_read: false).update_all(is_read: true)
+    current_user.notifications.unread.update_all(is_read: true, read_at: Time.current)
     
     respond_to do |format|
       format.html { redirect_back(fallback_location: notifications_path, notice: 'すべて既読にしました') }
-      format.js   { head :ok }
-      format.json { render json: { success: true, message: 'すべて既読にしました' } }
+      format.json { render json: { success: true, message: 'すべて既読にしました', unread_count: 0 } }
     end
-  end
-
-  private
-
-  def notification_target_path(notification)
-    notifiable = notification.notifiable
-    return root_path unless notifiable
-
-    case notifiable
-    when Route then route_path(notifiable)
-    when Venue then venue_path(notifiable)
-    when Review
-      notifiable.reviewable.is_a?(Route) ? route_path(notifiable.reviewable) : root_path
-    when User then user_path(notifiable)
-    else root_path
-    end
-  rescue ActiveRecord::RecordNotFound
-    root_path
   end
 end
