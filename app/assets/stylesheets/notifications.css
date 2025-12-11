@@ -1,10 +1,10 @@
 .notifications-page {
 	max-width: 800px;
-	margin: 30px auto;
+	margin: 40px auto;
 	padding: 0 20px;
 }
 
-.notifications-page-header {
+.page-header-section {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -15,7 +15,7 @@
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-.notifications-page-title {
+.page-title {
 	font-size: 28px;
 	font-weight: 800;
 	color: #1a1a1a;
@@ -24,7 +24,7 @@
 	gap: 12px;
 }
 
-.notification-full-card {
+.notification-card {
 	background: white;
 	border-radius: 16px;
 	padding: 20px;
@@ -32,24 +32,45 @@
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 	display: flex;
 	gap: 15px;
-	align-items: center;
-	text-decoration: none;
-	color: inherit;
+	align-items: flex-start;
+	cursor: pointer;
 	transition: all 0.3s;
 	border-left: 4px solid transparent;
+	text-decoration: none;
+	color: inherit;
 }
 
-.notification-full-card:hover {
+.notification-card:hover {
 	transform: translateX(5px);
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
-.notification-full-card.unread {
+.notification-card.unread {
 	background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
 	border-left-color: #0288d1;
 }
 
-.empty-notifications {
+.notification-icon-large {
+	font-size: 40px;
+	flex-shrink: 0;
+}
+
+.notification-body {
+	flex: 1;
+}
+
+.notification-message {
+	font-weight: 700;
+	margin-bottom: 5px;
+	color: #1a1a1a;
+}
+
+.notification-time {
+	font-size: 13px;
+	color: #999;
+}
+
+.empty-state {
 	text-align: center;
 	padding: 80px 20px;
 	background: white;
@@ -57,7 +78,7 @@
 	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-.empty-notifications-icon {
+.empty-icon {
 	font-size: 80px;
 	margin-bottom: 20px;
 	filter: grayscale(50%);

@@ -1,3 +1,4 @@
+# Encoding: utf-8
 class RoutesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_route, only: [:show, :edit, :update, :destroy]
@@ -46,7 +47,7 @@ class RoutesController < ApplicationController
 
     if @route.save
       create_route_items_from_google if params[:route_items].present?
-      redirect_to @route, notice: '✓ ルートが正常に作成されました。'
+      redirect_to @route, notice: "🎉 ルート「#{@route.name}」が作成されました！"
     else
       @cities = City.all
       @venues = Venue.all
@@ -69,7 +70,7 @@ class RoutesController < ApplicationController
 
     if @route.update(route_params)
       update_route_items if params[:route_items].present?
-      redirect_to @route, notice: '✓ ルートが更新されました。'
+      redirect_to @route, notice: "ルート「#{@route.name}」が更新されました！"
     else
       @cities = City.all
       @venues = Venue.all
@@ -80,7 +81,7 @@ class RoutesController < ApplicationController
   def destroy
     authorize_owner!
     @route.destroy
-    redirect_to routes_path, notice: 'ルートが削除されました。'
+    redirect_to routes_path, notice: "ルートが削除されました"
   end
 
   private

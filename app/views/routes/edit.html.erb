@@ -15,11 +15,28 @@
 <body>
   <%= render 'pages/header' %>
 
+
+  
+
+  <%# Flash Messages with Animation %>
+  <% if notice %>
+  <div class="flash-message flash-notice">
+    <%= notice %>
+  </div> 
+  <% end %>
+
+  <% if alert %>
+  <div class="flash-message flash-alert">
+    <%= alert %>
+  </div>
+  <% end %>
+
   <div class="edit-container">
     <div class="edit-header">
       <h1 class="edit-title">✏️ ルート編集</h1>
     </div>
 
+  
     <%= form_with model: @route, local: true do |f| %>
       <!-- Basic Info -->
       <div class="form-section">
@@ -137,6 +154,8 @@
           class: "btn-delete" %>
     </div>
   </div>
+
+
 
   <script>
     const API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';

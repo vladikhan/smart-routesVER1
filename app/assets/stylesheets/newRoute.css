@@ -141,6 +141,7 @@ body {
 
 .spot-number {
 	position: absolute;
+	font-size: 12px;
 	top: 5px;
 	left: 5px;
 	width: 15px;

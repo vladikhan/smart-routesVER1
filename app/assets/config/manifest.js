@@ -14,3 +14,4 @@
 //= link notifications.js
 //= link notifications.css
 //= link editRoutes.css
+//= link flashMessages.css

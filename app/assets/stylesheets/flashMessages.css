@@ -1,0 +1,48 @@
+/* Flash Messages */
+.flash-message {
+	position: fixed;
+	top: 90px;
+	right: 20px;
+	padding: 16px 24px;
+	border-radius: 12px;
+	font-weight: 600;
+	z-index: 10000;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+	animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	max-width: 400px;
+}
+
+.flash-notice {
+	background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+	color: white;
+}
+
+.flash-alert {
+	background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+	color: white;
+}
+
+@keyframes slideInRight {
+	from {
+		transform: translateX(400px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+/* Auto-hide flash messages */
+.flash-message {
+	animation:
+		slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+		slideOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) 3.6s;
+}
+
+@keyframes slideOutRight {
+	to {
+		transform: translateX(400px);
+		opacity: 0;
+	}
+}
