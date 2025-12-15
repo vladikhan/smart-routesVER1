@@ -1,33 +1,23 @@
-
 class RouteItem < ApplicationRecord
-
   belongs_to :route
-
   belongs_to :venue, optional: true
-
   
-
-  # If the association is actually called 'item', alias it
-
-  alias_method :item, :venue if method_defined?(:venue)
-
-  validates :position, presence: true
-
-  validates :duration_minutes, numericality: { greater_than: 0 }, allow_nil: true
-
-  validates :item_type, presence: true, inclusion: { in: %w[venue activity break custom] }
-
-  after_initialize :set_default_item_type, if: :new_record?
-
-  default_scope { order(position: :asc) }
-
-  private
-
-  def set_default_item_type
-
-    self.item_type ||= 'venue'
-
+  validates :route, presence: true
+  validates :order_index, presence: true, 
+            numericality: { greater_than_or_equal_to: 0 }
+  
+  scope :ordered, -> { order(:order_index) }
+  
+  # Если venue не указан, можно использовать прямые координаты
+  def latitude
+    super || venue&.latitude
   end
-
+  
+  def longitude
+    super || venue&.longitude
+  end
+  
+  def display_name
+    venue&.name || name || "Location #{order_index + 1}"
+  end
 end
-

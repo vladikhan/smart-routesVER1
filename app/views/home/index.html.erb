@@ -1,0 +1,37 @@
+<div class="container">
+  <h1>ルート検索</h1>
+  
+  <%= form_with url: search_path, method: :get, local: true do |f| %>
+    <%= f.text_field :q, placeholder: "都市名・タグ・予算で検索", class: "form-control" %>
+    <%= f.submit "検索", class: "btn btn-primary" %>
+  <% end %>
+
+  <% if @search_results&.any? %>
+    <h2>検索結果</h2>
+    <div class="routes">
+      <% @search_results.each do |route| %>
+        <div class="route-card">
+          <%= link_to route.name, route_path(route) %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <h2>トレンドルート</h2>
+  <div class="trending-routes">
+    <% @trending_routes.each do |route| %>
+      <div class="route-card">
+        <%= link_to route.name, route_path(route) %>
+      </div>
+    <% end %>
+  </div>
+
+  <h2>新着ルート</h2>
+  <div class="recent-routes">
+    <% @recent_routes.each do |route| %>
+      <div class="route-card">
+        <%= link_to route.name, route_path(route) %>
+      </div>
+    <% end %>
+  </div>
+</div>

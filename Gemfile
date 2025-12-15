@@ -54,7 +54,10 @@ group :test do
   gem 'selenium-webdriver', '~> 4.10'
   gem 'webdrivers', '~>5.2'
   gem 'cuprite', '~> 0.13'
+  gem 'rails-controller-testing'
 end
+
+
 
 
 gem 'redis', '~>5.0'
@@ -92,6 +95,3 @@ gem 'csv', '~> 3.3'
 
 
 
-group :test do
-  gem 'rails-controller-testing'
-end

@@ -8,7 +8,7 @@ FactoryBot.define do
     description { Faker::Lorem.paragraph }
     price_range { "MyString" }
     geo_lat { Faker::Address.latitude }
-    geo_lng { Fakse::Address.longitude }
+    geo_lng { Faker::Address.longitude }
     
     status { 'approved' }
     

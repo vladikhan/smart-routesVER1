@@ -9,38 +9,49 @@ RSpec.describe RoutesController, type: :controller do
     let!(:public_route) { create(:route, is_public: true, city: city, user: user) }
     let!(:private_route) { create(:route, is_public: false, city: city, user: user) }
     
-    it '公開ルートのみを返す' do
+    it 'публичные маршруты отображаются' do
       get :index
       expect(assigns(:routes)).to include(public_route)
       expect(assigns(:routes)).not_to include(private_route)
     end
     
-    it 'ステータス200を返す' do
+    it 'возвращает статус 200' do
       get :index
       expect(response).to have_http_status(:success)
     end
   end
   
   describe 'GET #show' do
-    it 'ルートを表示する' do
-      get :show, params: { id: route.id }
+    before { get :show, params: { id: route.id } }
+    
+    it 'отображает маршрут' do
       expect(assigns(:route)).to eq(route)
       expect(response).to have_http_status(:success)
     end
   end
   
   describe 'GET #new' do
-    context 'ログインユーザー' do
-      before { sign_in user }
-      
-      it '新規作成ページを表示する' do
+    context 'авторизованный пользователь' do
+      before do
+        sign_in user
         get :new
+      end
+      
+      it 'показывает страницу создания' do
         expect(response).to have_http_status(:success)
+      end
+      
+      it 'загружает города' do
+        expect(assigns(:cities)).to be_present
+      end
+      
+      it 'загружает места' do
+        expect(assigns(:venues)).to be_present
       end
     end
     
-    context '未ログインユーザー' do
-      it 'ログインページにリダイレクトする' do
+    context 'неавторизованный пользователь' do
+      it 'перенаправляет на логин' do
         get :new
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -50,69 +61,154 @@ RSpec.describe RoutesController, type: :controller do
   describe 'POST #create' do
     let(:valid_attributes) do
       {
-        name: 'テストルート',
-        description: 'テスト説明',
+        name: 'Тестовый маршрут',
+        description: 'Описание',
         city_id: city.id,
+        estimated_duration: 300,
+        estimated_cost: 5000,
         is_public: true
       }
     end
     
-    context '有効な属性の場合' do
+    context 'с валидными атрибутами' do
       before { sign_in user }
       
-      it 'ルートを作成する' do
+      it 'создает маршрут' do
         expect {
           post :create, params: { route: valid_attributes }
         }.to change(Route, :count).by(1)
       end
       
-      it 'ルート詳細ページにリダイレクトする' do
+      it 'перенаправляет на страницу маршрута' do
         post :create, params: { route: valid_attributes }
         expect(response).to redirect_to(Route.last)
       end
       
-      it 'フラッシュメッセージを表示する' do
+      it 'показывает сообщение' do
         post :create, params: { route: valid_attributes }
         expect(flash[:notice]).to be_present
+      end
+    end
+    
+    context 'без аутентификации' do
+      it 'перенаправляет на логин' do
+        post :create, params: { route: valid_attributes }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+  
+  describe 'GET #edit' do
+    context 'владелец маршрута' do
+      before do
+        sign_in user
+        get :edit, params: { id: route.id }
+      end
+      
+      it 'показывает страницу редактирования' do
+        expect(response).to have_http_status(:success)
+      end
+      
+      it 'загружает список городов' do
+        expect(assigns(:cities)).to be_present
+      end
+      
+      it 'загружает список мест' do
+        expect(assigns(:venues)).to be_present
+      end
+    end
+    
+    context 'другой пользователь' do
+      let(:other_user) { create(:user) }
+      
+      before do
+        sign_in other_user
+        get :edit, params: { id: route.id }
+      end
+      
+      it 'запрещает доступ' do
+        expect(response).to redirect_to(routes_path)
+        expect(flash[:alert]).to be_present
+      end
+    end
+    
+    context 'без аутентификации' do
+      it 'перенаправляет на логин' do
+        get :edit, params: { id: route.id }
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
   end
   
   describe 'PATCH #update' do
-    context 'オーナーの場合' do
+    context 'владелец маршрута' do
       before { sign_in user }
       
-      it 'ルートを更新する' do
-        patch :update, params: { id: route.id, route: { name: '更新後' } }
+      it 'обновляет маршрут' do
+        patch :update, params: { 
+          id: route.id, 
+          route: { name: 'Обновленное название' } 
+        }
         route.reload
-        expect(route.name).to eq('更新後')
+        expect(route.name).to eq('Обновленное название')
+      end
+      
+      it 'перенаправляет на маршрут' do
+        patch :update, params: {
+          id: route.id,
+          route: { name: 'Обновлено' }
+        }
+        expect(response).to redirect_to(route)
       end
     end
     
-    context '他のユーザーの場合' do
+    context 'другой пользователь' do
       let(:other_user) { create(:user) }
+      
       before { sign_in other_user }
       
-      it 'アクセスを拒否する' do
-        patch :update, params: { id: route.id, route: { name: '更新後' } }
+      it 'запрещает доступ' do
+        patch :update, params: { 
+          id: route.id, 
+          route: { name: 'Обновлено' } 
+        }
         expect(response).to redirect_to(routes_path)
+      end
+    end
+    
+    context 'без аутентификации' do
+      it 'перенаправляет на логин' do
+        patch :update, params: { 
+          id: route.id, 
+          route: { name: 'Обновлено' } 
+        }
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
   end
   
   describe 'DELETE #destroy' do
-    before { sign_in user }
-    
-    it 'ルートを削除する' do
-      route_to_delete = create(:route, user: user, city: city)
-      expect {
-        delete :destroy, params: { id: route_to_delete.id }
-      }.to change(Route, :count).by(-1)
+    context 'владелец маршрута' do
+      before { sign_in user }
+      
+      it 'удаляет маршрут' do
+        route_to_delete = create(:route, user: user, city: city)
+        expect {
+          delete :destroy, params: { id: route_to_delete.id }
+        }.to change(Route, :count).by(-1)
+      end
+      
+      it 'перенаправляет на список маршрутов' do
+        delete :destroy, params: { id: route.id }
+        expect(response).to redirect_to(routes_path)
+      end
     end
     
-    it 'ルート一覧にリダイレクトする' do
-      delete :destroy, params: { id: route.id }
-      expect(response).to redirect_to(routes_path)
+    context 'без аутентификации' do
+      it 'перенаправляет на логин' do
+        delete :destroy, params: { id: route.id }
+        expect(response).to redirect_to(new_user_session_path)
+      end
     end
   end
 end

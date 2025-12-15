@@ -1,184 +1,205 @@
-# Encoding: utf-8
+
 class RoutesController < ApplicationController
+
   before_action :authenticate_user!, except: [:index, :show]
+
   before_action :set_route, only: [:show, :edit, :update, :destroy]
 
+  before_action :authorize_owner!, only: [:edit, :update, :destroy]
+
+  
+
   def index
+
     @routes = Route.where(is_public: true)
-                   .includes(:user, :city)
+                   .includes(:user, :city, :tags)
                    .order(created_at: :desc)
+                   .page(params[:page])
+                   .per(20)
 
-    if params[:q].present?
-      @routes = @routes.where('name LIKE ? OR description LIKE ?',
-                              "%#{params[:q]}%", "%#{params[:q]}%")
-    end
-
-    if params[:difficulty].present?
-      @routes = @routes.where(difficulty_level: params[:difficulty])
-    end
-
-    @routes = @routes.page(params[:page]).per(15)
   end
+
+  
 
   def show
-    @route.increment!(:view_count)
+
+    @route_items = @route.route_items.includes(:venue).order(position: :asc)
+
+    @map_items = @route_items.map do |item|
+
+      {
+
+        name: item.venue_name || item.venue&.name,
+
+        lat: item.venue_lat || item.venue&.geo_lat,
+
+        lng: item.venue_lng || item.venue&.geo_lng,
+
+        address: item.venue_address || item.venue&.address
+
+      }
+
+    end.compact
+
     
-    begin
-      @route_items = @route.route_items.includes(:venue).order(position: :asc)
-    rescue ActiveRecord::ConfigurationError
-      @route_items = @route.route_items.order(position: :asc)
-    end
-    
-    @reviews = @route.reviews.includes(:user).order(created_at: :desc).limit(10) rescue []
+
+    @route.increment_view_count
+
   end
+
+  
 
   def new
-    @route = current_user.routes.build
+
+    @route = Route.new
+
     @cities = City.all
-    @venues = Venue.all
+
+    @venues = Venue.where(status: 'approved').limit(100)
+
   end
 
+  
+
   def create
-    if params[:route][:tag_ids].present?
-      params[:route][:tag_ids] = params[:route][:tag_ids].reject(&:blank?)
-    end
 
     @route = current_user.routes.build(route_params)
 
+    
+
     if @route.save
-      create_route_items_from_google if params[:route_items].present?
-      redirect_to @route, notice: "🎉 ルート「#{@route.name}」が作成されました！"
+
+      # Handle route items if present
+
+      if params[:route_items].present?
+
+        params[:route_items].each_with_index do |item_params, index|
+
+          @route.route_items.create(
+
+            venue_name: item_params[:venue_name],
+
+            venue_address: item_params[:venue_address],
+
+            venue_lat: item_params[:venue_lat],
+
+            venue_lng: item_params[:venue_lng],
+
+            duration_minutes: item_params[:duration_minutes],
+
+            position: index + 1
+
+          )
+
+        end
+
+      end
+
+      
+
+      redirect_to @route, notice: 'ルートを作成しました'
+
     else
+
       @cities = City.all
-      @venues = Venue.all
+
+      @venues = Venue.where(status: 'approved').limit(100)
+
       render :new, status: :unprocessable_entity
+
     end
+
   end
+
+  
 
   def edit
-    authorize_owner!
+
     @cities = City.all
-    @venues = Venue.all
+
+    @venues = Venue.where(status: 'approved').limit(100)
+
   end
+
+  
 
   def update
-    authorize_owner!
-
-    if params[:route][:tag_ids].present?
-      params[:route][:tag_ids] = params[:route][:tag_ids].reject(&:blank?)
-    end
 
     if @route.update(route_params)
-      update_route_items if params[:route_items].present?
-      redirect_to @route, notice: "ルート「#{@route.name}」が更新されました！"
+
+      redirect_to @route, notice: 'ルートを更新しました'
+
     else
+
       @cities = City.all
-      @venues = Venue.all
+
+      @venues = Venue.where(status: 'approved').limit(100)
+
       render :edit, status: :unprocessable_entity
+
     end
+
   end
 
+  
+
   def destroy
-    authorize_owner!
+
     @route.destroy
-    redirect_to routes_path, notice: "ルートが削除されました"
+
+    redirect_to routes_path, notice: 'ルートを削除しました'
+
   end
+
+  
 
   private
 
+  
+
   def set_route
+
     @route = Route.find(params[:id])
+
   end
 
-  def route_params
-    params.require(:route).permit(
-      :name, 
-      :description, 
-      :estimated_duration,
-      :estimated_cost, 
-      :difficulty_level, 
-      :is_public,
-      :city_id,
-      tag_ids: []
-    )
-  end
+  
 
   def authorize_owner!
+
     unless @route.user == current_user || current_user&.is_admin?
-      redirect_to routes_path, alert: 'アクセスが拒否されました。'
+
+      redirect_to routes_path, alert: 'アクセスが拒否されました'
+
     end
+
   end
 
-  def create_route_items_from_google
-    return unless params[:route_items].present?
-    
-    success_count = 0
-    
-    params[:route_items].each_with_index do |item_params, index|
-      next if item_params[:venue_name].blank?
-      next if item_params[:venue_lat].blank? || item_params[:venue_lng].blank?
-      
-      begin
-        venue = find_or_create_venue_from_google(item_params)
-        next unless venue
-        
-        route_item = @route.route_items.create!(
-          venue: venue,
-          position: index + 1,
-          duration_minutes: item_params[:duration_minutes].to_i || 60,
-          venue_name: item_params[:venue_name],
-          venue_address: item_params[:venue_address] || '',
-          item_type: 'venue'
-        )
-        
-        success_count += 1
-      rescue => e
-        Rails.logger.error "Error creating route item: #{e.message}"
-        next
-      end
-    end
-    
-    success_count > 0
-  end
+  
 
-  def find_or_create_venue_from_google(params)
-    lat = params[:venue_lat].to_f
-    lng = params[:venue_lng].to_f
-    
-    return nil if lat == 0.0 || lng == 0.0
-    
-    existing = Venue.where(
-      'geo_lat BETWEEN ? AND ? AND geo_lng BETWEEN ? AND ?',
-      lat - 0.0001,
-      lat + 0.0001,
-      lng - 0.0001,
-      lng + 0.0001
-    ).first
+  def route_params
 
-    return existing if existing
+    params.require(:route).permit(
 
-    city = City.find_by(id: @route.city_id) || City.first
-    district = city&.districts&.first || District.first
+      :name,
 
-    return nil unless district
+      :description,
 
-    Venue.create!(
-      name: params[:venue_name],
-      description: "Added from Google Maps",
-      address: params[:venue_address] || "",
-      venue_type: 'attraction',
-      geo_lat: lat,
-      geo_lng: lng,
-      district: district,
-      status: 'approved'
+      :city_id,
+
+      :estimated_duration,
+
+      :estimated_cost,
+
+      :difficulty_level,
+
+      :is_public,
+
+      tag_ids: []
+
     )
-  rescue => e
-    Rails.logger.error "Error creating venue: #{e.message}"
-    nil
+
   end
 
-  def update_route_items
-    @route.route_items.destroy_all
-    create_route_items_from_google
-  end
 end
+

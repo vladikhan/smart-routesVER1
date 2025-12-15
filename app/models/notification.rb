@@ -10,11 +10,16 @@ class Notification < ApplicationRecord
   scope :read, -> { where(is_read: true) }
   scope :recent, -> { order(created_at: :desc) }
 
+  # Broadcast to user after creation
   after_create_commit :broadcast_notification
 
   def mark_as_read!
-    return if is_read?
-    update(is_read: true, read_at: Time.current)
+    update(is_read: true) unless is_read?
+  end
+  
+  # Alias for compatibility
+  def mark_as_read
+    mark_as_read!
   end
 
   def unread?
@@ -24,19 +29,6 @@ class Notification < ApplicationRecord
   def notifiable
     return nil unless entity_type && entity_id
     entity_type.constantize.find_by(id: entity_id)
-  end
-
-  def target_url
-    case notification_type
-    when 'route_shared', 'like'
-      notifiable ? "/routes/#{notifiable.id}" : '/'
-    when 'comment', 'review'
-      notifiable ? "/routes/#{notifiable.id}#reviews" : '/'
-    when 'follow'
-      actor ? "/users/#{actor.id}" : '/'
-    else
-      '/'
-    end
   end
 
   def message
@@ -50,7 +42,7 @@ class Notification < ApplicationRecord
     when 'review'
       "#{actor.username}さんがレビューを投稿しました"
     when 'follow'
-      "#{actor.username}さんがあなたをフォローしました"
+      "#{actor.username}さんがフォローしました"
     else
       "新しい通知があります"
     end
@@ -79,6 +71,7 @@ class Notification < ApplicationRecord
   end
 
   def broadcast_notification
+    # Broadcast to the user's notification channel
     NotificationChannel.broadcast_to(
       user,
       {
@@ -86,17 +79,13 @@ class Notification < ApplicationRecord
           id: id,
           message: message,
           icon: icon,
-          target_url: target_url,
-          created_at: created_at.iso8601,
-          is_read: is_read,
-          actor: {
-            id: actor.id,
-            username: actor.username,
-            avatar_url: actor.avatar.present? ? actor.avatar.thumb.url : nil
-          }
+          created_at: created_at,
+          is_read: is_read
         },
-        unread_count: user.unread_notifications_count
+        unread_count: user.notifications.unread.count
       }
     )
+  rescue => e
+    Rails.logger.error "Failed to broadcast notification: #{e.message}"
   end
 end

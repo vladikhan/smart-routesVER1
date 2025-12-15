@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :city do
-    name { Faker::Address.city }
-    name_en { Faker::Address.city }
+    sequence(:name) { |n| "City#{n}" }
+    sequence(:name_en) { |n| "City#{n}" }
+    description { "City description" }
     
     trait :with_districts do
       after(:create) do |city|

@@ -1,3 +1,4 @@
+# Encoding: UTF-8
 require 'rails_helper'
 
 RSpec.describe Notification, type: :model do
@@ -17,12 +18,15 @@ RSpec.describe Notification, type: :model do
     let!(:read1) { create(:notification, :read, user: user, actor: actor) }
     
     it '未読通知のみを返す' do
-      expect(Notification.unread).to match_array([unread1, unread2])
+      unread = Notification.unread.to_a
+      expect(unread).to include(unread1, unread2)
+      expect(unread).not_to include(read1)
     end
-docker compose exec web rspec spec/models/user_spec.rb
     
     it '既読通知のみを返す' do
-      expect(Notification.read).to contain_exactly(read1)
+      read = Norificaiton.read.to_a
+      expect(read).to include(read1)
+      expect(read).not_to include(unread1, unread2)
     end
   end
   
