@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'rails_helper'
 
 RSpec.describe RoutesController, type: :controller do
@@ -22,7 +23,10 @@ RSpec.describe RoutesController, type: :controller do
   end
   
   describe 'GET #show' do
-    before { get :show, params: { id: route.id } }
+    before do
+      { get: :show, params: { id: route.id } }
+    end
+       
     
     it 'отображает маршрут' do
       expect(assigns(:route)).to eq(route)
@@ -71,7 +75,9 @@ RSpec.describe RoutesController, type: :controller do
     end
     
     context 'с валидными атрибутами' do
-      before { sign_in user }
+      before do
+        sign_in user 
+      end
       
       it 'создает маршрут' do
         expect {
@@ -142,7 +148,9 @@ RSpec.describe RoutesController, type: :controller do
   
   describe 'PATCH #update' do
     context 'владелец маршрута' do
-      before { sign_in user }
+      before do
+        sign_in user 
+      end
       
       it 'обновляет маршрут' do
         patch :update, params: { 
@@ -165,7 +173,9 @@ RSpec.describe RoutesController, type: :controller do
     context 'другой пользователь' do
       let(:other_user) { create(:user) }
       
-      before { sign_in other_user }
+      before do
+        sign_in other_user 
+      end
       
       it 'запрещает доступ' do
         patch :update, params: { 
@@ -189,7 +199,9 @@ RSpec.describe RoutesController, type: :controller do
   
   describe 'DELETE #destroy' do
     context 'владелец маршрута' do
-      before { sign_in user }
+      before do
+        sign_in user 
+      end
       
       it 'удаляет маршрут' do
         route_to_delete = create(:route, user: user, city: city)
