@@ -21,8 +21,23 @@ RSpec.describe RoutesController, type: :controller do
       expect(response).to have_http_status(:success)
     end
   end
+
+  
   
   describe 'GET #show' do
+
+    before do
+      create(:venue)
+      sign_in user
+      get :new
+    end
+
+    before do
+      create(:venue)
+      sign_in owner
+      get :edit, params: { id: route.id }
+    end
+
     before do
       sign_in user
       get :show, params: { id: route.id }
@@ -37,6 +52,7 @@ RSpec.describe RoutesController, type: :controller do
   describe 'GET #new' do
     context 'авторизованный пользователь' do
       before do
+        create(:venue)
         sign_in user
         get :new
       end
@@ -105,6 +121,7 @@ RSpec.describe RoutesController, type: :controller do
   describe 'GET #edit' do
     context 'владелец маршрута' do
       before do
+        create(:venue)
         sign_in user
         get :edit, params: { id: route.id }
       end

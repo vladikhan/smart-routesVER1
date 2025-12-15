@@ -10,7 +10,6 @@ class RoutesController < ApplicationController
   end
 
   def show
-    # ИСПРАВЛЕНО: добавлен восклицательный знак!
     @route.increment_view_count! if @route.persisted?
     
     @route_items = @route.route_items
