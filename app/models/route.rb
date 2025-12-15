@@ -1,4 +1,17 @@
 class Route < ApplicationRecord
+  # Associations
+  belongs_to :user
+  belongs_to :city
+  has_many :route_items, dependent: :destroy
+  has_many :venues, through: :route_items
+  has_many :entity_tags, as: :entity, dependent: :destroy
+  has_many :tags, through: :entity_tags
+  has_many :bookmarks, dependent: :destroy
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
+  
+  # Validations
+
   # Ассоциации
   belongs_to :user
   belongs_to :city, optional: true

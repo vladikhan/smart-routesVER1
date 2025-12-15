@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_12_10_073046) do
+ActiveRecord::Schema.define(version: 2025_12_15_074009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -224,6 +224,7 @@ ActiveRecord::Schema.define(version: 2025_12_10_073046) do
     t.string "venue_name"
     t.string "venue_address"
     t.datetime "visit_time"
+    t.integer "order_index"
     t.index ["item_type", "item_id"], name: "index_route_items_on_item_type_and_item_id"
     t.index ["route_id", "position"], name: "index_route_items_on_route_id_and_position", unique: true
     t.index ["route_id"], name: "index_route_items_on_route_id"

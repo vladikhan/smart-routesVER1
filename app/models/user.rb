@@ -98,3 +98,18 @@ class User < ApplicationRecord
 		is_admin
 	end
 end
+
+
+
+  # Для совместимости с Devise confirmable в тестах
+  def confirmed?
+    email_verified
+  end
+  
+  def active_for_authentication?
+    super && email_verified
+  end
+  
+  def inactive_message
+    email_verified ? super : :unconfirmed
+  end

@@ -1,0 +1,57 @@
+require 'rails_helper'
+
+RSpec.describe 'Notifications', type: :request do
+  let(:user) { create(:user) }
+  let(:actor) { create(:user) }
+  let!(:notification) { create(:notification, user: user, actor: actor) }
+  
+  before { sign_in user }
+  
+  describe 'GET /notifications' do
+    let!(:notifications) do
+      3.times.map do
+        create(:notification, 
+               user: user, 
+               actor: actor,
+               notification_type: ['like', 'follow', 'comment'].sample)
+      end
+    end
+    
+    it 'показывает уведомления' do
+      get notifications_path
+      expect(response).to have_http_status(:success)
+    end
+  end
+  
+  describe 'GET /notifications/unread_count' do
+    before do
+      3.times { create(:notification, user: user, actor: actor, is_read: false) }
+      2.times { create(:notification, user: user, actor: actor, is_read: true) }
+    end
+    
+    it 'возвращает количество непрочитанных' do
+      get unread_count_notifications_path, as: :json
+      json = JSON.parse(response.body)
+      expect(json['count']).to eq(3)
+    end
+  end
+  
+  describe 'PATCH /notifications/:id/mark_as_read' do
+    it 'помечает как прочитанное' do
+      patch mark_as_read_notification_path(notification), as: :json
+      notification.reload
+      expect(notification.is_read).to be true
+    end
+  end
+  
+  describe 'PATCH /notifications/mark_all_as_read' do
+    before do
+      5.times { create(:notification, user: user, actor: actor, is_read: false) }
+    end
+    
+    it 'помечает все как прочитанные' do
+      patch mark_all_as_read_notifications_path, as: :json
+      expect(user.notifications.where(is_read: false).count).to eq(0)
+    end
+  end
+end
