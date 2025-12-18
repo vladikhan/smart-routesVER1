@@ -1,27 +1,26 @@
 class Route < ApplicationRecord
   # Associations
-  belongs_to :user
-  belongs_to :city
-  has_many :route_items, dependent: :destroy
+  
   has_many :venues, through: :route_items
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
-  has_many :comments,
-         as: :commentable,
-         foreign_key: :item_id,
-         foreign_type: :item_type,
-         dependent: :destroy
-  has_many :notifications, as: :notifiable, dependent: :destroy
+  
   
   # Validations
 
   # Ассоциации
   belongs_to :user
   belongs_to :city, optional: true
+
   has_many :route_items, dependent: :destroy
   has_many :venues, through: :route_items
-  has_many :comments, dependent: :destroy
-  has_many :notifications, dependent: :destroy
+  has_many :entity_tags, as: :entity, dependent: :destroy
+
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :notifications, -> { where(entity_type: 'Route') },
+   foreign_key: :entity_id, dependent: :destroy
+
+ 
   
   # Для тегов (если используется acts-as-taggable-on)
   if defined?(ActsAsTaggableOn)
