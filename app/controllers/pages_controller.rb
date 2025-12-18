@@ -7,12 +7,12 @@ class PagesController < ApplicationController
   
     #人気ルート
     @featured_routes = Route.where(is_public: true).order(view_count: :desc).limit(6).to_a
-  end
-    
     #人気レストラン（人気スポット）
     @popular_venues = Venue.order(average_rating: :desc).limit(6).to_a
     
     @recent_routes = Route.where(is_public: true).order(created_at: :desc).limit(6)
+  end
+    
 end
 
 
