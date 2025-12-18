@@ -120,128 +120,96 @@
   <%= render 'pages/footer' %>
 
   <script>
-  // =======================
-  // 1. ROUTE ITEMS
-  // =======================
-  const routeItems = [
-    <% @route_items.each do |route_item| %>
-      <% venue = route_item.try(:venue) || route_item.try(:item) %>
-      <% if venue.present? && (venue.geo_lat || venue.try(:latitude)) %>
-        {
-          name: <%= raw venue.name.to_json %>,
-          lat: <%= venue.geo_lat || venue.try(:latitude) %>,
-          lng: <%= venue.geo_lng || venue.try(:longitude) %>,
-          address: <%= raw (venue.address || "").to_json %>
-        },
-      <% end %>
-    <% end %>
-  ];
-
-  // Fallback center
-  <% if @route.present? %>
-  const defaultCenter = {
-    lat: <%= @route.geo_lat %>,
-    lng: <%= @route.geo_lng %>
+  const API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
+  
+  // Координаты venue
+  const venueData = {
+    name: <%= raw @venue.name.to_json %>,
+    lat: <%= @venue.geo_lat || @venue.try(:latitude) || 35.0116 %>,
+    lng: <%= @venue.geo_lng || @venue.try(:longitude) || 135.7681 %>,
+    address: <%= raw (@venue.address || '').to_json %>
   };
-<% else %>
-  const defaultCenter = {
-    lat: 35.0116,
-    lng: 135.7681
-  };
-<% end %>
-
-  const validItems = routeItems.filter(i => i.lat && i.lng);
-
-  // =======================
-  // 2. INIT MAP (must be global)
-  // =======================
-  function initMap() {
-    console.log("🗺️ initMap started");
-    console.log("Route items:", routeItems.length);
-    console.log("Valid items:", validItems.length);
-
-    const center = validItems.length > 0
-      ? { lat: validItems[0].lat, lng: validItems[0].lng }
-      : defaultCenter;
-
+  
+  function initVenueMap() {
+    console.log("Venue map initializing");
+    console.log("Venue coords:", venueData);
+    
+    if (!venueData.lat || !venueData.lng) {
+      console.error("❌ No coordinates for venue");
+      document.getElementById("venue-map").innerHTML = 
+        '<div style="padding:20px;text-align:center;color:#999;">座標情報がありません</div>';
+      return;
+    }
+    
+    const position = { lat: venueData.lat, lng: venueData.lng };
+    
+    // Создаем карту
     const map = new google.maps.Map(document.getElementById("venue-map"), {
-      zoom: validItems.length > 0 ? 13 : 12,
-      center,
+      zoom: 15,
+      center: position,
+      mapTypeControl: true,
+      streetViewControl: true,
+      fullscreenControl: true,
     });
-
-    if (validItems.length === 0) return;
-
-    const bounds = new google.maps.LatLngBounds();
-
-    validItems.forEach((item, index) => {
-      const marker = new google.maps.Marker({
-        map,
-        position: { lat: item.lat, lng: item.lng },
-        label: {
-          text: `${index + 1}`,
-          color: "white",
-          fontWeight: "bold"
-        },
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: "#0288d1",
-          fillOpacity: 1,
-          strokeColor: "#fff",
-          strokeWeight: 3,
-          scale: 20
-        }
-      });
-
-      const info = new google.maps.InfoWindow({
-        content: `<strong>${item.name}</strong><br>${item.address || ""}`
-      });
-
-      marker.addListener("click", () => info.open(map, marker));
-
-      bounds.extend(marker.position);
+    
+    // Маркер
+    const marker = new google.maps.Marker({
+      position,
+      map,
+      title: venueData.name,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: "#e53935",
+        fillOpacity: 1,
+        strokeColor: "white",
+        strokeWeight: 3,
+        scale: 15,
+      },
     });
-
-    if (validItems.length > 1) {
-      new google.maps.Polyline({
-        map,
-        path: validItems.map(i => ({ lat: i.lat, lng: i.lng })),
-        strokeColor: "#0288d1",
-        strokeWeight: 4
-      });
-
-      map.fitBounds(bounds);
-    }
+    
+    // InfoWindow
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="padding: 10px;">
+          <h4 style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600;">${venueData.name}</h4>
+          <p style="margin: 0; color: #666; font-size: 13px;">${venueData.address || ""}</p>
+        </div>
+      `
+    });
+    
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+    
+    // Открываем InfoWindow сразу
+    infoWindow.open(map, marker);
   }
-
-  // =======================
-  // 3. GOOGLE MAPS LOADER
-  // =======================
-  const MAPS_KEY = "<%= ENV['GOOGLE_MAPS_API_KEY'] %>";
-
-  function loadGoogleMaps() {
-    if (!MAPS_KEY) {
+  
+  function loadGoogleMapsForVenue() {
+    if (!API_KEY) {
+      console.error("❌ No API key!");
       document.getElementById("venue-map").innerHTML =
-        "<div style='padding:20px;text-align:center;color:red;'>Google Maps APIキーがありません</div>";
+        '<div style="padding:20px;text-align:center;color:#b71c1c;">Google Maps APIキーがありません</div>';
       return;
     }
-
+    
     if (window.google && window.google.maps) {
-      initMap();
+      initVenueMap();
       return;
     }
-
-    console.log("📥 Loading Google Maps...");
-
+    
+    console.log(" Loading Google Maps for venue...");
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&callback=initMap&language=ja`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initVenueMap&language=ja`;
     script.async = true;
-    window.initMap = initMap;
+    script.defer = true;
+    window.initVenueMap = initVenueMap;
     document.head.appendChild(script);
   }
-
+  
   document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", loadGoogleMaps)
-    : loadGoogleMaps();
+    ? document.addEventListener("DOMContentLoaded", loadGoogleMapsForVenue)
+    : loadGoogleMapsForVenue();
 </script>
 
 </body>

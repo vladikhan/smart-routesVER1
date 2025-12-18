@@ -10,7 +10,8 @@ Rails.application.routes.draw do
     sign_up: 'signup'
   }, controllers: {
     sessions: 'users/sessions',
-    registrations: 'users/registrations'
+    registrations: 'users/registrations',
+    confirmations: 'users/confirmations'
   }
 
   if Rails.env.development?
@@ -43,7 +44,7 @@ Rails.application.routes.draw do
 
   # Routes
   resources :routes
-  resources :venues   # ← new, show, edit, index → работают сами
+  resources :venues   
   resources :cities, only: [:index, :show]
   resources :users
 
