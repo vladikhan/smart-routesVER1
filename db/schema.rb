@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_12_18_030131) do
+ActiveRecord::Schema.define(version: 2025_12_18_031442) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -255,6 +255,7 @@ ActiveRecord::Schema.define(version: 2025_12_18_030131) do
     t.string "tags"
     t.decimal "geo_lat", precision: 10, scale: 6
     t.decimal "geo_lng", precision: 10, scale: 6
+    t.float "average_rating"
     t.index ["city_id"], name: "index_routes_on_city_id"
     t.index ["is_deleted"], name: "index_routes_on_is_deleted"
     t.index ["is_featured"], name: "index_routes_on_is_featured"
@@ -341,6 +342,7 @@ ActiveRecord::Schema.define(version: 2025_12_18_030131) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.decimal "latitude", precision: 10, scale: 6
+    t.float "average_rating"
     t.index ["district_id"], name: "index_venues_on_district_id"
     t.index ["geo_lat", "geo_lng"], name: "index_venues_on_geo_lat_and_geo_lng"
     t.index ["is_featured"], name: "index_venues_on_is_featured"
