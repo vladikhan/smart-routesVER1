@@ -11,7 +11,7 @@ class NotificationsController < ApplicationController
   end
 
   def unread_count
-    count = current_user.notifications.where(is_read: false).count
+    count = current_user.notifications.where(read: false).count
     
     respond_to do |format|
       format.json { render json: { count: count, success: true } }

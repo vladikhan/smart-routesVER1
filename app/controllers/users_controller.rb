@@ -5,7 +5,9 @@ class UsersController < ApplicationController
   before_action :authorize_user!, only: [:edit, :update]
 
   def index
-    @users = User.all.page(params[:page]).per(20)
+    @users = User.includes(:routes, :reviews)
+                 .page(params[:page])
+                 .per(20)
   end
 
   def show
@@ -20,6 +22,8 @@ class UsersController < ApplicationController
     
     @followers_count = @user.followers.count rescue 0
     @following_count = @user.following.count rescue 0
+
+    @reviews = Review.where(user_id: @user.id).order(created_at: :desc)
   end
 
   def my_profile

@@ -6,16 +6,20 @@ class RoutesController < ApplicationController
 
   def index
     @routes = Route.where(is_public: true)
-                   .includes(:user, :city)
                    .order(created_at: :desc)
+                   .page(params[:page])
+                   .includes(:user, :city)
+                   .per(10)
   end
 
   def show
     @route.increment_view_count! if @route.persisted?
     
     @route_items = @route.route_items
-                         .includes(:venue)
-                         .order(:order_index)
+                         .ordered
+                         .includes(:item)
+                  
+    @reviews = @route.reviews.order(created_at: :desc)
     
     @map_items = @route_items.map do |item|
       {
