@@ -4,7 +4,8 @@ class Route < ApplicationRecord
   has_many :venues, through: :route_items
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
-  
+  has_many :reviews, as: :reviewable, dependent: :destroy
+
   
   # Validations
 

@@ -30,9 +30,9 @@ class HomeController < ApplicationController
       @routes = @routes.joins(:city).where(cities: { name: params[:city] })
     end
     
-    if params[:min_budget].present? || params[:max_budget].present?
-      min_budget = params[:min_budget].to_i
-      max_budget = params[:max_budget].to_i
+    if params[budget_min].present? || params[budget_max].present?
+      min_budget = params[budget_min].to_i
+      max_budget = params[budget_max].to_i
       
       if min_budget > 0 && max_budget > 0
         @routes = @routes.where('estimated_cost >= ? AND estimated_cost <= ?', 

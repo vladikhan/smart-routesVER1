@@ -9,6 +9,7 @@ RSpec.describe 'Home', type: :request do
       create(:route, 
              user: user, 
              city: city, 
+             is_featured: true,
              is_public: true,
              view_count: 100,
              created_at: 2.days.ago)

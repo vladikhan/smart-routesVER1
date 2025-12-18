@@ -584,7 +584,7 @@ routes = routes_data.map.with_index do |data, idx|
   )
 
   # создаём RouteItems
-  venues_to_add.each_with_index do |venue_data, position|
+  venues_to_add.each_with_index do |venue_data, idx|
   venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
   next unless venue
 
@@ -593,8 +593,9 @@ routes = routes_data.map.with_index do |data, idx|
   RouteItem.create!(
     route: route,
     item_id: venue.id,                # ← ПОЛИМОРФНЫЙ
-    item_type: "venue",         # ← ВАЛИДНЫЙ ТИП
-    position: position + 1,
+    item_type: "venue",  
+    position: idx + 1,             # ← ВАЛИДНЫЙ ТИП
+    order_index: idx + 1,
     notes: "おすすめポイント: #{venue.description[0..50]}"
   )
 end
