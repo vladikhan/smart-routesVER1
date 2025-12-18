@@ -8,13 +8,7 @@
   <%= stylesheet_link_tag "login", "data-turbo-track": "reload" %>
 </head>
 <body>
-  <header class="login-header">
-    <%= link_to root_path, class: "login-logo" do %>
-      <span class="login-logo-icon">🗺️</span>
-      <span>Smart<strong>Routes</strong></span>
-    <% end %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-link" %>
-  </header>
+  <%= render 'pages/header'%>
   <div class="login-container">
     <div class="login-box">
       <h2 class="form-title">Resend confirmation 

@@ -15,3 +15,4 @@
 //= link notifications.css
 //= link editRoutes.css
 //= link flashMessages.css
+//= link emailVerifications.css
