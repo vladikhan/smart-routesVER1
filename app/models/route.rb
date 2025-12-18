@@ -6,8 +6,11 @@ class Route < ApplicationRecord
   has_many :venues, through: :route_items
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
-  has_many :bookmarks, dependent: :destroy
-  has_many :comments, as: :commentable, dependent: :destroy
+  has_many :comments,
+         as: :commentable,
+         foreign_key: :item_id,
+         foreign_type: :item_type,
+         dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
   
   # Validations
@@ -17,7 +20,6 @@ class Route < ApplicationRecord
   belongs_to :city, optional: true
   has_many :route_items, dependent: :destroy
   has_many :venues, through: :route_items
-  has_many :bookmarks, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :notifications, dependent: :destroy
   

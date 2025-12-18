@@ -32,11 +32,7 @@ RSpec.describe RoutesController, type: :controller do
       get :new
     end
 
-    before do
-      create(:venue)
-      sign_in owner
-      get :edit, params: { id: route.id }
-    end
+    
 
     before do
       sign_in user
