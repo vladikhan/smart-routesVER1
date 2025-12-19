@@ -1,6 +1,27 @@
+# encoding: utf-8
 class Notification < ApplicationRecord
   belongs_to :user  # recipient
   belongs_to :actor, class_name: 'User'
+
+  def target_url
+    case entity_type
+    when 'Route'
+      "/routes/#{entity_id}"
+    when 'Venue'
+      "/venues/#{entity_id}"
+    when 'Review'
+      review = Review.find_by(id: entity_id)
+      if review&.reviewable_type == 'Route'
+        "/routes/#{review.reviewable_id}"
+      elsif review&.reviewable_type == 'Venue'
+        "/venues/#{review.reviewable_id}"
+      else
+        "/"
+      end
+    else 
+      "/"
+    end
+  end
 
   validates :notification_type, presence: true, inclusion: { 
     in: %w[follow like comment review route_shared] 
@@ -32,20 +53,9 @@ class Notification < ApplicationRecord
   end
 
   def message
-    case notification_type
-    when 'route_shared'
-      "#{actor.username}さんがルートをシェアしました"
-    when 'like'
-      "#{actor.username}さんがあなたの#{entity_type_japanese}にいいねしました"
-    when 'comment'
-      "#{actor.username}さんがコメントしました"
-    when 'review'
-      "#{actor.username}さんがレビューを投稿しました"
-    when 'follow'
-      "#{actor.username}さんがフォローしました"
-    else
-      "新しい通知があります"
-    end
+    I18.t("notifications.messages.#{notification_type}",
+          actor: actor.username,
+          type: enrity_type_japanese)
   end
 
   def icon
@@ -62,12 +72,7 @@ class Notification < ApplicationRecord
   private
 
   def entity_type_japanese
-    case entity_type
-    when 'Route' then 'ルート'
-    when 'Venue' then '場所'
-    when 'Review' then 'レビュー'
-    else 'コンテンツ'
-    end
+    I18n.t("notifications.entity_types.#{entity_type}", default: "コンテンツ")
   end
 
   def broadcast_notification

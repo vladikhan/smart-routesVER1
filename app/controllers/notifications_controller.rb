@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
   skip_before_action :verify_authenticity_token, only: [:unread_count, :mark_as_read, :mark_all_as_read]
@@ -11,7 +12,7 @@ class NotificationsController < ApplicationController
   end
 
   def unread_count
-    count = current_user.notifications.where(read: false).count
+    count = current_user.notifications.where(is_read: false).count
     
     respond_to do |format|
       format.json { render json: { count: count, success: true } }

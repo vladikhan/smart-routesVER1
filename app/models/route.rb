@@ -7,7 +7,6 @@ class Route < ApplicationRecord
   has_many :reviews, as: :reviewable, dependent: :destroy
 
   
-  # Validations
 
   # Ассоциации
   belongs_to :user
@@ -15,13 +14,15 @@ class Route < ApplicationRecord
 
   has_many :route_items, dependent: :destroy
   has_many :reviews, as: :reviewable, dependent: :destroy
-  has_many :venues, through: :route_items
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
-
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :notifications, -> { where(entity_type: 'Route') },
-   foreign_key: :entity_id, dependent: :destroy
+            foreign_key: :entity_id, dependent: :destroy
+  has_many :venues, -> { where(route_items: { item_type: 'Venue'}) },
+           through: :route_items,
+           source: :item,
+           source_type: 'Venue'
 
  
   
@@ -45,9 +46,10 @@ class Route < ApplicationRecord
     end
   end
   
-  # Валидации
+  # Validations
   validates :name, presence: true, length: { maximum: 100 }
   validates :user, presence: true
+  validates :city, presence: true
   validates :view_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   
   # Вложенные атрибуты

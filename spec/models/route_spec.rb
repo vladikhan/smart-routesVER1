@@ -44,12 +44,11 @@ RSpec.describe Route, type: :model do
   end
   
   describe '#increment_view_count' do
-    let(:route) { create(:route, user: user, city: city) }
-    
     it 'increments view count' do
+      route = create(:route)
       expect {
-        route.increment_view_count
-      }.to change(route, :view_count).by(1)
+        route.increment_view_count!
+      }.to change(route.reload.view_count).by(1)
     end
   end
 end
