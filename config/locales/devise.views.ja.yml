@@ -129,11 +129,11 @@ ja:
         other: '（%{count}字以上）'
     notifications:
       messages:
-        route_shared: '%{actor}さんがルートをシェアしました'
         like: '%{actor}さんがあなたの%{type}にいいねしました'
-        comment: '%{actor}さんがコメントしました'
-        review: '%{actor}さんがレビューを投稿しました'
-        follow: '%{actor}さんがフォローしました'
+        comment: '%{actor}さんがあなたの%{type}にコメントしました'
+        follow: '%{actor}さんがあなたをフォローしました'
+        bookmark: '%{actor}さんがあなたの%{type}をブックマークしました'
+        review: '%{actor}さんがあなたの%{type}にレビューを書きました'
       entity_types:
         Route: 'ルート'
         Venue: '場所'

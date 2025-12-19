@@ -3,6 +3,14 @@ class Notification < ApplicationRecord
   belongs_to :user  # recipient
   belongs_to :actor, class_name: 'User'
 
+  validates :notification_type, presence: true
+  validates :entity_type, presence: true
+  validates :entity_id, presence: true
+
+  scope :unread, -> { where(is_read: false) }
+  scope :read, -> { where(is_read: true) }
+  scope :recent, -> { order(created_at: :desc) }
+
   def target_url
     case entity_type
     when 'Route'
@@ -22,14 +30,6 @@ class Notification < ApplicationRecord
       "/"
     end
   end
-
-  validates :notification_type, presence: true, inclusion: { 
-    in: %w[follow like comment review route_shared] 
-  }
-
-  scope :unread, -> { where(is_read: false) }
-  scope :read, -> { where(is_read: true) }
-  scope :recent, -> { order(created_at: :desc) }
 
   # Broadcast to user after creation
   after_create_commit :broadcast_notification
@@ -53,9 +53,11 @@ class Notification < ApplicationRecord
   end
 
   def message
-    I18.t("notifications.messages.#{notification_type}",
+    I18n.t("notifications.messages.#{notification_type}",
           actor: actor.username,
-          type: enrity_type_japanese)
+          type: entity_type_japanese)
+  rescue I18n::MissingTranslationData
+    "#{actor.username}さんから通知があります"
   end
 
   def icon

@@ -48,7 +48,7 @@ RSpec.describe Route, type: :model do
       route = create(:route)
       expect {
         route.increment_view_count!
-      }.to change(route.reload.view_count).by(1)
+      }.to change {route.reload.view_count}.by(1)
     end
   end
 end

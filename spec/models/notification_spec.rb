@@ -30,6 +30,12 @@ RSpec.describe 'Notifications', type: :request do
     end
     
     it 'returns unread count' do
+      user = create(:user)
+      sign_in user
+
+      create_list(:notification, 3, user: user, is_read: false)
+      create_list(:notification, 2, user: user, is_read: true)
+      
       get unread_count_notifications_path, as: :json
       json = JSON.parse(response.body)
       expect(json['count']).to eq(3)

@@ -13,7 +13,7 @@
       <img src="./assets/0.13.2/loading.gif" alt="loading"/>
     </div>
     <div id="wrapper" class="hide">
-      <div class="timestamp">Generated <abbr class="timeago" title="2025-12-19T01:38:50+00:00">2025-12-19T01:38:50+00:00</abbr></div>
+      <div class="timestamp">Generated <abbr class="timeago" title="2025-12-19T02:10:41+00:00">2025-12-19T02:10:41+00:00</abbr></div>
       <ul class="group_tabs"></ul>
 
       <div id="content">
@@ -22,14 +22,14 @@
     <span class="group_name">All Files</span>
     (<span class="covered_percent">
       <span class="red">
-  44.61%
+  45.35%
 </span>
 
      </span>
      covered at
      <span class="covered_strength">
        <span class="green">
-         1.09
+         1.33
        </span>
     </span> hits/line
     )
@@ -42,11 +42,11 @@
   </div>
 
   <div class="t-line-summary">
-    <b>890</b> relevant lines,
-    <span class="green"><b>397</b> lines covered</span> and
-    <span class="red"><b>493</b> lines missed. </span>
+    <b>893</b> relevant lines,
+    <span class="green"><b>405</b> lines covered</span> and
+    <span class="red"><b>488</b> lines missed. </span>
     (<span class="red">
-  44.61%
+  45.35%
 </span>
 )
   </div>
@@ -478,12 +478,12 @@
         
           <tr class="t-file">
             <td class="strong t-file__name"><a href="#f8c557218776cea62a5b0561b348bf5fc3f92c24" class="src_link" title="app/models/notification.rb">app/models/notification.rb</a></td>
-            <td class="red strong cell--number t-file__coverage">52.27 %</td>
-            <td class="cell--number">96</td>
-            <td class="cell--number">44</td>
-            <td class="cell--number">23</td>
-            <td class="cell--number">21</td>
-            <td class="cell--number">3.52</td>
+            <td class="red strong cell--number t-file__coverage">65.96 %</td>
+            <td class="cell--number">98</td>
+            <td class="cell--number">47</td>
+            <td class="cell--number">31</td>
+            <td class="cell--number">16</td>
+            <td class="cell--number">7.85</td>
             
           </tr>
         
@@ -549,7 +549,7 @@
             <td class="cell--number">41</td>
             <td class="cell--number">35</td>
             <td class="cell--number">6</td>
-            <td class="cell--number">2.95</td>
+            <td class="cell--number">2.98</td>
             
           </tr>
         
@@ -934,14 +934,14 @@
     <span class="group_name">Models</span>
     (<span class="covered_percent">
       <span class="red">
-  57.07%
+  58.73%
 </span>
 
      </span>
      covered at
      <span class="covered_strength">
        <span class="green">
-         1.43
+         1.99
        </span>
     </span> hits/line
     )
@@ -954,11 +954,11 @@
   </div>
 
   <div class="t-line-summary">
-    <b>375</b> relevant lines,
-    <span class="green"><b>214</b> lines covered</span> and
-    <span class="red"><b>161</b> lines missed. </span>
+    <b>378</b> relevant lines,
+    <span class="green"><b>222</b> lines covered</span> and
+    <span class="red"><b>156</b> lines missed. </span>
     (<span class="red">
-  57.07%
+  58.73%
 </span>
 )
   </div>
@@ -1093,12 +1093,12 @@
         
           <tr class="t-file">
             <td class="strong t-file__name"><a href="#f8c557218776cea62a5b0561b348bf5fc3f92c24" class="src_link" title="app/models/notification.rb">app/models/notification.rb</a></td>
-            <td class="red strong cell--number t-file__coverage">52.27 %</td>
-            <td class="cell--number">96</td>
-            <td class="cell--number">44</td>
-            <td class="cell--number">23</td>
-            <td class="cell--number">21</td>
-            <td class="cell--number">3.52</td>
+            <td class="red strong cell--number t-file__coverage">65.96 %</td>
+            <td class="cell--number">98</td>
+            <td class="cell--number">47</td>
+            <td class="cell--number">31</td>
+            <td class="cell--number">16</td>
+            <td class="cell--number">7.85</td>
             
           </tr>
         
@@ -1164,7 +1164,7 @@
             <td class="cell--number">41</td>
             <td class="cell--number">35</td>
             <td class="cell--number">6</td>
-            <td class="cell--number">2.95</td>
+            <td class="cell--number">2.98</td>
             
           </tr>
         
@@ -12150,7 +12150,7 @@
     <h3>app/models/notification.rb</h3>
     <h4>
       <span class="red">
-  52.27%
+  65.96%
 </span>
 
       lines covered
@@ -12159,9 +12159,9 @@
     
 
     <div class="t-line-summary">
-      <b>44</b> relevant lines.
-      <span class="green"><b>23</b> lines covered</span> and
-      <span class="red"><b>21</b> lines missed.</span>
+      <b>47</b> relevant lines.
+      <span class="green"><b>31</b> lines covered</span> and
+      <span class="red"><b>16</b> lines missed.</span>
     </div>
 
     
@@ -12235,234 +12235,36 @@
 
             
 
-            <code class="ruby">  def target_url</code>
+            <code class="ruby">  validates :notification_type, presence: true</code>
           </li>
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="7">
-            
-
-            
-
-            <code class="ruby">    case entity_type</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="8">
-            
-
-            
-
-            <code class="ruby">    when &#39;Route&#39;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="9">
-            
-
-            
-
-            <code class="ruby">      &quot;/routes/#{entity_id}&quot;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="10">
-            
-
-            
-
-            <code class="ruby">    when &#39;Venue&#39;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="11">
-            
-
-            
-
-            <code class="ruby">      &quot;/venues/#{entity_id}&quot;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="12">
-            
-
-            
-
-            <code class="ruby">    when &#39;Review&#39;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="13">
-            
-
-            
-
-            <code class="ruby">      review = Review.find_by(id: entity_id)</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="14">
-            
-
-            
-
-            <code class="ruby">      if review&amp;.reviewable_type == &#39;Route&#39;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="15">
-            
-
-            
-
-            <code class="ruby">        &quot;/routes/#{review.reviewable_id}&quot;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="16">
-            
-
-            
-
-            <code class="ruby">      elsif review&amp;.reviewable_type == &#39;Venue&#39;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="17">
-            
-
-            
-
-            <code class="ruby">        &quot;/venues/#{review.reviewable_id}&quot;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="18">
-            
-
-            
-
-            <code class="ruby">      else</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="19">
-            
-
-            
-
-            <code class="ruby">        &quot;/&quot;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="20">
-            
-
-            
-
-            <code class="ruby">      end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="21">
-            
-
-            
-
-            <code class="ruby">    else </code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="22">
-            
-
-            
-
-            <code class="ruby">      &quot;/&quot;</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="23">
-            
-
-            
-
-            <code class="ruby">    end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="24">
-            
-
-            
-
-            <code class="ruby">  end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="25">
-            
-
-            
-
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="covered" data-hits="1" data-linenumber="26">
+          <li class="covered" data-hits="1" data-linenumber="7">
             
               <span class="hits">1</span>
             
 
             
 
-            <code class="ruby">  validates :notification_type, presence: true, inclusion: { </code>
+            <code class="ruby">  validates :entity_type, presence: true</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="27">
+          <li class="covered" data-hits="1" data-linenumber="8">
+            
+              <span class="hits">1</span>
             
 
             
 
-            <code class="ruby">    in: %w[follow like comment review route_shared] </code>
+            <code class="ruby">  validates :entity_id, presence: true</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="28">
-            
-
-            
-
-            <code class="ruby">  }</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="29">
+          <li class="never" data-hits="" data-linenumber="9">
             
 
             
@@ -12472,9 +12274,9 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="10" data-linenumber="30">
+          <li class="covered" data-hits="55" data-linenumber="10">
             
-              <span class="hits">10</span>
+              <span class="hits">55</span>
             
 
             
@@ -12484,7 +12286,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="31">
+          <li class="covered" data-hits="1" data-linenumber="11">
             
               <span class="hits">1</span>
             
@@ -12496,7 +12298,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="32">
+          <li class="covered" data-hits="1" data-linenumber="12">
             
               <span class="hits">1</span>
             
@@ -12504,6 +12306,212 @@
             
 
             <code class="ruby">  scope :recent, -&gt; { order(created_at: :desc) }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="13">
+            
+
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="14">
+            
+              <span class="hits">1</span>
+            
+
+            
+
+            <code class="ruby">  def target_url</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="8" data-linenumber="15">
+            
+              <span class="hits">8</span>
+            
+
+            
+
+            <code class="ruby">    case entity_type</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="16">
+            
+
+            
+
+            <code class="ruby">    when &#39;Route&#39;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="8" data-linenumber="17">
+            
+              <span class="hits">8</span>
+            
+
+            
+
+            <code class="ruby">      &quot;/routes/#{entity_id}&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="18">
+            
+
+            
+
+            <code class="ruby">    when &#39;Venue&#39;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="19">
+            
+
+            
+
+            <code class="ruby">      &quot;/venues/#{entity_id}&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="20">
+            
+
+            
+
+            <code class="ruby">    when &#39;Review&#39;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="21">
+            
+
+            
+
+            <code class="ruby">      review = Review.find_by(id: entity_id)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="22">
+            
+
+            
+
+            <code class="ruby">      if review&amp;.reviewable_type == &#39;Route&#39;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="23">
+            
+
+            
+
+            <code class="ruby">        &quot;/routes/#{review.reviewable_id}&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="24">
+            
+
+            
+
+            <code class="ruby">      elsif review&amp;.reviewable_type == &#39;Venue&#39;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="25">
+            
+
+            
+
+            <code class="ruby">        &quot;/venues/#{review.reviewable_id}&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="26">
+            
+
+            
+
+            <code class="ruby">      else</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="27">
+            
+
+            
+
+            <code class="ruby">        &quot;/&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="28">
+            
+
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="29">
+            
+
+            
+
+            <code class="ruby">    else </code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="30">
+            
+
+            
+
+            <code class="ruby">      &quot;/&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="31">
+            
+
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="32">
+            
+
+            
+
+            <code class="ruby">  end</code>
           </li>
         </div>
       
@@ -12754,14 +12762,14 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="42" data-linenumber="56">
+          <li class="covered" data-hits="61" data-linenumber="56">
             
-              <span class="hits">42</span>
-            
-
+              <span class="hits">61</span>
             
 
-            <code class="ruby">    I18.t(&quot;notifications.messages.#{notification_type}&quot;,</code>
+            
+
+            <code class="ruby">    I18n.t(&quot;notifications.messages.#{notification_type}&quot;,</code>
           </li>
         </div>
       
@@ -12781,7 +12789,7 @@
 
             
 
-            <code class="ruby">          type: enrity_type_japanese)</code>
+            <code class="ruby">          type: entity_type_japanese)</code>
           </li>
         </div>
       
@@ -12791,12 +12799,32 @@
 
             
 
+            <code class="ruby">  rescue I18n::MissingTranslationData</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="60">
+            
+
+            
+
+            <code class="ruby">    &quot;#{actor.username}さんから通知があります&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="61">
+            
+
+            
+
             <code class="ruby">  end</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="60">
+          <li class="never" data-hits="" data-linenumber="62">
             
 
             
@@ -12806,7 +12834,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="61">
+          <li class="covered" data-hits="1" data-linenumber="63">
             
               <span class="hits">1</span>
             
@@ -12818,7 +12846,9 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="62">
+          <li class="covered" data-hits="53" data-linenumber="64">
+            
+              <span class="hits">53</span>
             
 
             
@@ -12828,7 +12858,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="63">
+          <li class="missed" data-hits="0" data-linenumber="65">
             
 
             
@@ -12838,7 +12868,9 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="64">
+          <li class="covered" data-hits="45" data-linenumber="66">
+            
+              <span class="hits">45</span>
             
 
             
@@ -12848,7 +12880,9 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="65">
+          <li class="covered" data-hits="6" data-linenumber="67">
+            
+              <span class="hits">6</span>
             
 
             
@@ -12858,7 +12892,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="66">
+          <li class="missed" data-hits="0" data-linenumber="68">
             
 
             
@@ -12868,7 +12902,9 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="67">
+          <li class="covered" data-hits="2" data-linenumber="69">
+            
+              <span class="hits">2</span>
             
 
             
@@ -12878,7 +12914,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="68">
+          <li class="missed" data-hits="0" data-linenumber="70">
             
 
             
@@ -12888,7 +12924,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="69">
+          <li class="never" data-hits="" data-linenumber="71">
             
 
             
@@ -12898,34 +12934,12 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="70">
+          <li class="never" data-hits="" data-linenumber="72">
             
 
             
 
             <code class="ruby">  end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="71">
-            
-
-            
-
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="covered" data-hits="1" data-linenumber="72">
-            
-              <span class="hits">1</span>
-            
-
-            
-
-            <code class="ruby">  private</code>
           </li>
         </div>
       
@@ -12947,32 +12961,12 @@
 
             
 
-            <code class="ruby">  def entity_type_japanese</code>
+            <code class="ruby">  private</code>
           </li>
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="75">
-            
-
-            
-
-            <code class="ruby">    I18n.t(&quot;notifications.entity_types.#{entity_type}&quot;, default: &quot;コンテンツ&quot;)</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="76">
-            
-
-            
-
-            <code class="ruby">  end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="77">
+          <li class="never" data-hits="" data-linenumber="75">
             
 
             
@@ -12982,7 +12976,51 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="78">
+          <li class="covered" data-hits="1" data-linenumber="76">
+            
+              <span class="hits">1</span>
+            
+
+            
+
+            <code class="ruby">  def entity_type_japanese</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="61" data-linenumber="77">
+            
+              <span class="hits">61</span>
+            
+
+            
+
+            <code class="ruby">    I18n.t(&quot;notifications.entity_types.#{entity_type}&quot;, default: &quot;コンテンツ&quot;)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="78">
+            
+
+            
+
+            <code class="ruby">  end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="79">
+            
+
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="80">
             
               <span class="hits">1</span>
             
@@ -12994,7 +13032,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="79">
+          <li class="never" data-hits="" data-linenumber="81">
             
 
             
@@ -13004,9 +13042,9 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="40" data-linenumber="80">
+          <li class="covered" data-hits="45" data-linenumber="82">
             
-              <span class="hits">40</span>
+              <span class="hits">45</span>
             
 
             
@@ -13016,7 +13054,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="81">
+          <li class="never" data-hits="" data-linenumber="83">
             
 
             
@@ -13026,7 +13064,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="82">
+          <li class="never" data-hits="" data-linenumber="84">
             
 
             
@@ -13036,7 +13074,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="83">
+          <li class="never" data-hits="" data-linenumber="85">
             
 
             
@@ -13046,7 +13084,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="84">
+          <li class="never" data-hits="" data-linenumber="86">
             
 
             
@@ -13056,7 +13094,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="85">
+          <li class="never" data-hits="" data-linenumber="87">
             
 
             
@@ -13066,7 +13104,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="86">
+          <li class="never" data-hits="" data-linenumber="88">
             
 
             
@@ -13076,7 +13114,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="87">
+          <li class="never" data-hits="" data-linenumber="89">
             
 
             
@@ -13086,7 +13124,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="88">
+          <li class="never" data-hits="" data-linenumber="90">
             
 
             
@@ -13096,7 +13134,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="89">
+          <li class="never" data-hits="" data-linenumber="91">
             
 
             
@@ -13106,7 +13144,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="90">
+          <li class="never" data-hits="" data-linenumber="92">
             
 
             
@@ -13116,7 +13154,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="91">
+          <li class="never" data-hits="" data-linenumber="93">
             
 
             
@@ -13126,7 +13164,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="92">
+          <li class="never" data-hits="" data-linenumber="94">
             
 
             
@@ -13136,7 +13174,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="93">
+          <li class="never" data-hits="" data-linenumber="95">
             
 
             
@@ -13146,9 +13184,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="40" data-linenumber="94">
-            
-              <span class="hits">40</span>
+          <li class="missed" data-hits="0" data-linenumber="96">
             
 
             
@@ -13158,7 +13194,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="95">
+          <li class="never" data-hits="" data-linenumber="97">
             
 
             
@@ -13168,7 +13204,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="96">
+          <li class="never" data-hits="" data-linenumber="98">
             
 
             
@@ -15500,9 +15536,9 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="4" data-linenumber="72">
+          <li class="covered" data-hits="5" data-linenumber="72">
             
-              <span class="hits">4</span>
+              <span class="hits">5</span>
             
 
             
