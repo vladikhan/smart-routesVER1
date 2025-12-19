@@ -36,12 +36,23 @@ RSpec.describe 'Notifications', type: :request do
       sign_in user
 
       route = create(:route, user: user)
-      create_list(:notification, 3, user, actor: actor, entity_type: 'Route', entity_id: route.id, is_read: false)
+      create_list(:notification, 3, 
+                  user: user, 
+                  actor: actor, 
+                  entity_type: 'Route', 
+                  entity_id: route.id, 
+                  is_read: false)
 
-      create(:notification, user: user, actor: actor, entity_type: 'Route', entity_id: route.id, is_read: true)
+      create(:notification, 
+              user: user, 
+              actor: actor, 
+              entity_type: 'Route', 
+              entity_id: route.id, 
+              is_read: true)
 
       get unread_count_notifications_path, as: :json
       json = JSON.parse(response.body)
+      
       expect(json['count']).to eq(3)
     end
   end
