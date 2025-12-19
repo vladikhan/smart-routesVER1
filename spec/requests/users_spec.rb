@@ -47,11 +47,13 @@ RSpec.describe 'Users', type: :request do
     end
     
     context 'when other user' do
-      before { sign_in other_user }
       
       it 'denies access' do
+        other_user = create(:user)
+        sign_in other_user
+        
         get edit_user_path(user)
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(routes_path)
       end
     end
     
