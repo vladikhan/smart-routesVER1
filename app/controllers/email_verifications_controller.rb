@@ -1,5 +1,6 @@
 class EmailVerificationsController < ApplicationController
   before_action :authenticate_user!
+  skip_before_action :verify_authenticity_token, only: [:verify]
 
   def new
   end
