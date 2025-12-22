@@ -13,7 +13,7 @@ class NotificationsController < ApplicationController
 
   def unread_count
     @unread_count = current_user.notifications.unread.count
-    render json: { unread_count: @unread_count }
+    render json: { count: current_user.notifications.unread.count }
   end
 
   def mark_as_read
