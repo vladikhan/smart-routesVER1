@@ -5,6 +5,10 @@ class EmailVerificationsController < ApplicationController
   def new
   end
 
+  def show
+    
+  end
+
   def verify
     code = params[:verification_code]
     
