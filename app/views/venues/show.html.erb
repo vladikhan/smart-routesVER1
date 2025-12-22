@@ -122,69 +122,166 @@
   <script>
   const API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
   
-  // Координаты venue
-  const venueData = {
+  // =======================
+  // 📍 MAIN VENUE DATA
+  // =======================
+  const mainVenue = {
     name: <%= raw @venue.name.to_json %>,
     lat: <%= @venue.geo_lat || @venue.try(:latitude) || 35.0116 %>,
     lng: <%= @venue.geo_lng || @venue.try(:longitude) || 135.7681 %>,
-    address: <%= raw (@venue.address || '').to_json %>
+    address: <%= raw (@venue.address || '').to_json %>,
+    id: <%= @venue.id %>
   };
   
+  // =======================
+  // 🏘️ NEARBY VENUES DATA (optional)
+  // =======================
+  const nearbyVenues = [
+    <% if @nearby_venues.present? %>
+      <% @nearby_venues.each do |venue| %>
+        <% if venue.geo_lat.present? && venue.geo_lng.present? %>
+          {
+            name: <%= raw venue.name.to_json %>,
+            lat: <%= venue.geo_lat %>,
+            lng: <%= venue.geo_lng %>,
+            address: <%= raw (venue.address || '').to_json %>,
+            id: <%= venue.id %>
+          },
+        <% end %>
+      <% end %>
+    <% end %>
+  ];
+  
+  // =======================
+  // 🗺️ INIT MAP FUNCTION
+  // =======================
   function initVenueMap() {
-    console.log("Venue map initializing");
-    console.log("Venue coords:", venueData);
+    console.log("🗺️ Venue map initializing");
+    console.log("Main venue:", mainVenue);
+    console.log("Nearby venues:", nearbyVenues.length);
     
-    if (!venueData.lat || !venueData.lng) {
-      console.error("❌ No coordinates for venue");
+    // Проверка координат
+    if (!mainVenue.lat || !mainVenue.lng || isNaN(mainVenue.lat) || isNaN(mainVenue.lng)) {
+      console.error("❌ No valid coordinates for venue");
       document.getElementById("venue-map").innerHTML = 
         '<div style="padding:20px;text-align:center;color:#999;">座標情報がありません</div>';
       return;
     }
     
-    const position = { lat: venueData.lat, lng: venueData.lng };
+    const mainPosition = { lat: mainVenue.lat, lng: mainVenue.lng };
     
     // Создаем карту
     const map = new google.maps.Map(document.getElementById("venue-map"), {
-      zoom: 15,
-      center: position,
+      zoom: nearbyVenues.length > 0 ? 14 : 15,
+      center: mainPosition,
       mapTypeControl: true,
       streetViewControl: true,
       fullscreenControl: true,
     });
     
-    // Маркер
-    const marker = new google.maps.Marker({
-      position,
+    const bounds = new google.maps.LatLngBounds();
+    
+    // =======================
+    // 🔴 MAIN VENUE MARKER (RED)
+    // =======================
+    const mainMarker = new google.maps.Marker({
+      position: mainPosition,
       map,
-      title: venueData.name,
+      title: mainVenue.name,
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: "#e53935",
         fillOpacity: 1,
         strokeColor: "white",
         strokeWeight: 3,
-        scale: 15,
+        scale: 18,
       },
+      zIndex: 1000 // На переднем плане
     });
     
-    // InfoWindow
-    const infoWindow = new google.maps.InfoWindow({
+    const mainInfoWindow = new google.maps.InfoWindow({
       content: `
-        <div style="padding: 10px;">
-          <h4 style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600;">${venueData.name}</h4>
-          <p style="margin: 0; color: #666; font-size: 13px;">${venueData.address || ""}</p>
+        <div style="padding: 12px; max-width: 250px;">
+          <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #e53935;">
+            📍 ${mainVenue.name}
+          </h4>
+          <p style="margin: 0; color: #666; font-size: 13px; line-height: 1.4;">
+            ${mainVenue.address || ""}
+          </p>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+            <small style="color: #999;">現在地</small>
+          </div>
         </div>
       `
     });
     
-    marker.addListener("click", () => {
-      infoWindow.open(map, marker);
+    mainMarker.addListener("click", () => {
+      mainInfoWindow.open(map, mainMarker);
     });
     
-    // Открываем InfoWindow сразу
-    infoWindow.open(map, marker);
+    // Открываем InfoWindow сразу для главного venue
+    mainInfoWindow.open(map, mainMarker);
+    bounds.extend(mainPosition);
+    
+    // =======================
+    // 🔵 NEARBY VENUES MARKERS (BLUE)
+    // =======================
+    if (nearbyVenues.length > 0) {
+      nearbyVenues.forEach((venue, index) => {
+        const position = { lat: venue.lat, lng: venue.lng };
+        
+        const marker = new google.maps.Marker({
+          position,
+          map,
+          title: venue.name,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: "#0288d1",
+            fillOpacity: 1,
+            strokeColor: "white",
+            strokeWeight: 2,
+            scale: 12,
+          },
+          zIndex: 100
+        });
+        
+        const infoWindow = new google.maps.InfoWindow({
+          content: `
+            <div style="padding: 10px; max-width: 220px;">
+              <h4 style="margin: 0 0 5px 0; font-size: 14px;">
+                <a href="/venues/${venue.id}" style="color: #0288d1; text-decoration: none;">
+                  ${venue.name}
+                </a>
+              </h4>
+              <p style="margin: 0; color: #666; font-size: 12px; line-height: 1.3;">
+                ${venue.address || ""}
+              </p>
+            </div>
+          `
+        });
+        
+        marker.addListener("click", () => {
+          infoWindow.open(map, marker);
+        });
+        
+        bounds.extend(position);
+      });
+      
+      // Подгоняем карту под все маркеры
+      map.fitBounds(bounds);
+      
+      // Ограничиваем максимальный zoom
+      google.maps.event.addListenerOnce(map, 'bounds_changed', function() {
+        if (map.getZoom() > 16) {
+          map.setZoom(16);
+        }
+      });
+    }
   }
   
+  // =======================
+  // 🔌 GOOGLE MAPS LOADER
+  // =======================
   function loadGoogleMapsForVenue() {
     if (!API_KEY) {
       console.error("❌ No API key!");
@@ -198,7 +295,7 @@
       return;
     }
     
-    console.log(" Loading Google Maps for venue...");
+    console.log("Loading Google Maps for venue...");
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initVenueMap&language=ja`;
     script.async = true;

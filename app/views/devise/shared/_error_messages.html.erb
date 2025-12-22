@@ -1,6 +1,5 @@
 <% if resource.errors.any? %>
   <div class="error_box" data-turbo-cache="false">
-    <div class="error-icon">⚠️</div>
     <div class="error-content">
       <h3 class="error-title">
         <%= pluralize(resource.errors.count, "ツノエラー") %>が発生しました

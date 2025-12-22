@@ -1,14 +1,91 @@
-<div style="max-width: 500px; margin: 50px auto; padding: 20px;">
-  <h1>メール確認</h1>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>メール確認 - Smart Routes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'emailVerifications', media: 'all' %>
   
-  <%= form_with url: email_verification_path, method: :post do |f| %>
-    <div class="form-group">
-      <%= f.label :verification_code, "確認コード" %>
-      <%= f.text_field :verification_code, class: "form-control" %>
+  
+</head>
+
+<body>
+  <div class="verification-container">
+    <div class="verification-header">
+      <div class="verification-icon">📧</div>
+      <h1>メール確認</h1>
+      <p>確認コードを入力してください</p>
     </div>
     
-    <%= f.submit "確認する", class: "btn btn-primary" %>
-  <% end %>
+    <div class="verification-body">
+      <% if flash[:notice] %>
+        <div class="success-message">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+      
+      <% if flash[:alert] %>
+        <div class="error-message">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+      
+      <div class="info-box">
+        <p>
+          <strong><%= current_user.email %></strong> 宛に送信された6桁の確認コードを入力してください。
+        </p>
+      </div>
+      
+      <%= form_with url: email_verification_path, method: :post, local: true do |f| %>
+        <div class="form-group">
+          <%= f.label :verification_code, "確認コード" %>
+          <%= f.text_field :verification_code, 
+                          class: "form-control", 
+                          placeholder: "000000",
+                          maxlength: 6,
+                          pattern: "[0-9]{6}",
+                          required: true,
+                          autofocus: true %>
+        </div>
+        
+        <%= f.submit "確認する", class: "btn-primary" %>
+      <% end %>
+      
+      <div class="divider">
+        <span>または</span>
+      </div>
+      
+      <%= link_to email_verification_resend_path, method: :post, class: "resend-link" do %>
+        確認コードを再送信
+      <% end %>
+      
+      <%= link_to "ホームに戻る", root_path, class: "back-link" %>
+    </div>
+  </div>
   
-  <%= link_to "確認コードを再送信", email_verification_resend_path, method: :post %>
-</div>
+  <script>
+    // Auto-format input (add spaces for readability)
+    const input = document.querySelector('.form-control');
+    if (input) {
+      input.addEventListener('input', function(e) {
+        // Remove non-digits
+        let value = e.target.value.replace(/\D/g, '');
+        // Limit to 6 digits
+        value = value.substring(0, 6);
+        e.target.value = value;
+      });
+      
+      // Auto-submit when 6 digits entered
+      input.addEventListener('keyup', function(e) {
+        if (e.target.value.length === 6) {
+          // Optional: auto-submit
+          // e.target.closest('form').submit();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

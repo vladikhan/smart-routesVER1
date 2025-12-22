@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Authentication', type: :request do
-  let(:user) { create(:user, password: 'password123', password_confirmation: 'password123') }
+  let!(:user) { create(:user, password: 'password123', password_confirmation: 'password123') }
   
   describe 'POST /login' do
     context '有効な認証情報' do

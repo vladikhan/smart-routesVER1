@@ -46,9 +46,9 @@ ActiveRecord::Schema.define(version: 2025_12_19_054723) do
     t.boolean "is_hidden_by_admin", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "item_type", null: false
-    t.bigint "item_id", null: false
-    t.index ["item_type", "item_id"], name: "index_comments_on_item"
+    t.string "commentable_type", null: false
+    t.bigint "commentable_id", null: false
+    t.index ["commentable_type", "commentable_id"], name: "index_comments_on_item"
     t.index ["parent_id"], name: "index_comments_on_parent_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
@@ -224,6 +224,7 @@ ActiveRecord::Schema.define(version: 2025_12_19_054723) do
     t.string "venue_name"
     t.string "venue_address"
     t.datetime "visit_time"
+    t.integer "order_index"
     t.index ["item_type", "item_id"], name: "index_route_items_on_item_type_and_item_id"
     t.index ["route_id", "position"], name: "index_route_items_on_route_id_and_position", unique: true
     t.index ["route_id"], name: "index_route_items_on_route_id"
@@ -249,12 +250,12 @@ ActiveRecord::Schema.define(version: 2025_12_19_054723) do
     t.integer "reviews_count", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.float "average_rating", default: 0.0
     t.integer "bookmarks_count", default: 0, null: false
     t.bigint "city_id", null: false
     t.string "tags"
     t.decimal "geo_lat", precision: 10, scale: 6
     t.decimal "geo_lng", precision: 10, scale: 6
+    t.float "average_rating", default: 0.0
     t.index ["city_id"], name: "index_routes_on_city_id"
     t.index ["is_deleted"], name: "index_routes_on_is_deleted"
     t.index ["is_featured"], name: "index_routes_on_is_featured"
@@ -340,8 +341,8 @@ ActiveRecord::Schema.define(version: 2025_12_19_054723) do
     t.integer "likes_count", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.float "average_rating", default: 0.0
     t.decimal "latitude", precision: 10, scale: 6
+    t.float "average_rating", default: 0.0
     t.index ["district_id"], name: "index_venues_on_district_id"
     t.index ["geo_lat", "geo_lng"], name: "index_venues_on_geo_lat_and_geo_lng"
     t.index ["is_featured"], name: "index_venues_on_is_featured"

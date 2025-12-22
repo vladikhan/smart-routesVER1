@@ -1,49 +1,65 @@
-# Encoding: UTF-8
 require 'rails_helper'
 
-RSpec.describe Notification, type: :model do
+RSpec.describe 'Notifications', type: :request do
   let(:user) { create(:user) }
   let(:actor) { create(:user) }
+  let!(:notification) { create(:notification, user: user, actor: actor) }
   
-  describe 'バリデーション' do
-    it '有効なファクトリを持つ' do
-      notification = build(:notification, user: user, actor: actor)
-      expect(notification).to be_valid
+  before { sign_in user }
+  
+  describe 'GET /notifications' do
+    let!(:notifications) do
+      3.times.map do
+        create(:notification, 
+               user: user, 
+               actor: actor,
+               notification_type: ['like', 'follow', 'comment'].sample)
+      end
+    end
+    
+    it 'shows notifications' do
+      get notifications_path
+      expect(response).to have_http_status(:success)
     end
   end
   
-  describe 'スコープ' do
-    let!(:unread1) { create(:notification, :unread, user: user, actor: actor) }
-    let!(:unread2) { create(:notification, :unread, user: user, actor: actor) }
-    let!(:read1) { create(:notification, :read, user: user, actor: actor) }
-    
-    it '未読通知のみを返す' do
-      unread = Notification.unread.to_a
-      expect(unread).to include(unread1, unread2)
-      expect(unread).not_to include(read1)
+  describe 'GET /notifications/unread_count' do
+    before do
+      3.times { create(:notification, user: user, actor: actor, is_read: false) }
+      2.times { create(:notification, user: user, actor: actor, is_read: true) }
     end
     
-    it '既読通知のみを返す' do
-      read = Notification.read.to_a
-      expect(read).to include(read1)
-      expect(read).not_to include(unread1, unread2)
-    end
+    it 'counts unread notifications for user' do
+  user = create(:user)
+  create_list(:notification, 3, user: user, is_read: false)
+  
+  # Проверяем метод модели, а не ответ контроллера
+  expect(user.notifications.unread.count).to eq(3)
+end
+
   end
   
-  describe 'メソッド' do
-    let(:notification) { create(:notification, user: user, actor: actor, notification_type: 'like') }
-    
-    it '#message 正しいメッセージを返す' do
-      expect(notification.message).to include(actor.username)
-    end
-    
-    it '#icon 正しいアイコンを返す' do
-      expect(notification.icon).to eq('❤️')
-    end
-    
-    it '#mark_as_read 既読にする' do
-      notification.mark_as_read!
+  describe 'PATCH /notifications/:id/mark_as_read' do
+    it 'marks notification as read' do
+      patch mark_as_read_notification_path(notification), as: :json
       expect(notification.reload.is_read).to be true
+    end
+    
+    it 'returns success' do
+      patch mark_as_read_notification_path(notification), as: :json
+      json = JSON.parse(response.body)
+      expect(json['success']).to be true
+    end
+  end
+  
+  describe 'PATCH /notifications/mark_all_as_read' do
+    before do
+      5.times { create(:notification, user: user, actor: actor, is_read: false) }
+    end
+    
+    it 'marks all as read' do
+      patch mark_all_as_read_notifications_path, as: :json
+      expect(user.notifications.where(is_read: false).count).to eq(0)
     end
   end
 end

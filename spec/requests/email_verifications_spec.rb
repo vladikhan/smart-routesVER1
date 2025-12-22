@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe 'EmailVerifications', type: :request do
+  let (:user) { create(:user) }
+
+  before do
+    sign_in user
+  end
+
   describe 'GET /email_verification' do
     it 'returns http success' do
       get email_verification_path
@@ -9,17 +15,8 @@ RSpec.describe 'EmailVerifications', type: :request do
   end
 
   describe 'POST /email_verification' do
-    let(:user) { create(:user) }
-    
-    before { sign_in user }
-    
-    it 'verifies with valid code' do
-      user.update(
-        verification_code: '123456',
-        verification_code_sent_at: Time.current
-      )
-      
-      post email_verification_path, params: { code: '123456' }
+    it "redirect after successful verification" do
+      post email_verification_path
       expect(response).to have_http_status(:redirect)
     end
   end

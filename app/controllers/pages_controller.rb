@@ -6,19 +6,29 @@ class PagesController < ApplicationController
     @reviews_count = Review.count rescue 0
   
     #人気ルート
-    @featured_routes = Rails.cache.fetch("featured_routes", expires_in: 1.hour) do
-    Route.where(is_featured: true).order(:featured_order).limit(6).to_a
-    end
-    
-    #where(is_public: true).order(view_count: :desc).limit(6) rescue []
-
+    @featured_routes = Route.where(is_public: true).order(view_count: :desc).limit(6).to_a
     #人気レストラン（人気スポット）
-    @popular_venues = Rails.cache.fetch("popular_venues", expires_in: 1.hour) do
-    Venue.order(average_rating: :desc).limit(6).to_a
-    end
+    @popular_venues = Venue.order(average_rating: :desc).limit(6).to_a
+    
+    @recent_routes = Route.where(is_public: true).order(created_at: :desc).limit(6)
   end
     
-  def logout_confirm
-    
+end
+
+
+    # app/models/review.rb
+def update_reviewable_rating
+  all_reviews = reviewable.reviews
+  
+  if all_reviews.any?
+    avg_rating = all_reviews.average(:total_score).to_f.round(1)
+    reviewable.update_columns(
+      average_rating: avg_rating,
+      reviews_count: all_reviews.count
+    )
   end
 end
+
+    def logout_confirm
+    
+    end

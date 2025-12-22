@@ -102,41 +102,41 @@
             <% @route_items.each_with_index do |route_item, index| %>
               <% 
                 # Handle both 'venue' and 'item' associations
-                venue = route_item.respond_to?(:venue) ? route_item.venue : (route_item.respond_to?(:item) ? route_item.item : nil)
+                venue = route_item.item 
               %>
               
               <% if venue.present? %>
-                <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>
-                  <div class="venue-list-item">
-                    <div class="venue-number"><%= index + 1 %></div>
-                    <div class="venue-info">
-                      <h4><%= venue.name %></h4>
-                      <p><%= truncate(venue.description, length: 100) if venue.description.present? %></p>
-                      <div class="venue-tags-inline">
-                        <span class="tag-inline">⏱️ <%= route_item.duration_minutes %>分</span>
-                        <% if venue.cuisine_type.present? %>
-                          <span class="tag-inline"><%= venue.cuisine_type %></span>
-                        <% end %>
-                        <% if venue.price_range.present? %>
-                          <span class="tag-inline"><%= venue.price_range %></span>
-                        <% end %>
-                      </div>
-                    </div>
-                  </div>
-                <% end %>
-              <% else %>
-                <div class="venue-list-item" style="opacity: 0.7;">
-                  <div class="venue-number"><%= index + 1 %></div>
-                  <div class="venue-info">
-                    <h4><%= route_item.venue_name || "場所" %></h4>
-                    <p><%= route_item.venue_address if route_item.venue_address.present? %></p>
-                    <div class="venue-tags-inline">
-                      <span class="tag-inline">⏱️ <%= route_item.duration_minutes %>分</span>
-                    </div>
-                  </div>
-                </div>
-              <% end %>
+    <%= link_to venue_path(venue), style: "text-decoration: none; color: inherit;" do %>
+      <div class="venue-list-item">
+        <div class="venue-number"><%= index + 1 %></div>
+        <div class="venue-info">
+          <h4><%= venue.name %></h4>
+          <p><%= truncate(venue.description, length: 100) if venue.description.present? %></p>
+          <div class="venue-tags-inline">
+            <span class="tag-inline">⏱️ <%= route_item.duration_minutes || 30 %>分</span>
+            <% if venue.respond_to?(:cuisine_type) && venue.cuisine_type.present? %>
+              <span class="tag-inline"><%= venue.cuisine_type %></span>
             <% end %>
+            <% if venue.respond_to?(:price_range) && venue.price_range.present? %>
+              <span class="tag-inline"><%= venue.price_range %></span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="venue-list-item" style="opacity: 0.7;">
+      <div class="venue-number"><%= index + 1 %></div>
+      <div class="venue-info">
+        <h4><%= route_item.venue_name || route_item.name || "場所" %></h4>
+        <p><%= route_item.venue_address || route_item.address if route_item.respond_to?(:venue_address) %></p>
+        <div class="venue-tags-inline">
+          <span class="tag-inline">⏱️ <%= route_item.duration_minutes || 30 %>分</span>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
           <% else %>
             <div style="text-align: center; padding: 60px 20px; color: #999;">
               <div style="font-size: 64px; margin-bottom: 15px;">📍</div>
@@ -275,15 +275,19 @@
 // =======================
 const routeItems = [
   <% @route_items.each do |route_item| %>
-    <% venue = route_item.try(:venue) || route_item.try(:item) %>
-    <% if venue.present? && (venue.geo_lat.present? || venue.try(:latitude).present?) %>
-      {
-        name: <%= raw venue.name.to_json %>,
-        lat: <%= venue.geo_lat || venue.try(:latitude) %>,
-        lng: <%= venue.geo_lng || venue.try(:longitude) %>,
-        address: <%= raw (venue.address || '').to_json %>
-      },
+    <% venue = route_item.item %>
+    <% if venue.present? %>
+    <% lat = venue.respond_to?(:geo_lat) ? venue.geo_lat : venue.try(:latitude) %>
+      <% lng = venue.respond_to?(:geo_lng) ? venue.geo_lng : venue.try(:longitude) %>
+      <% if lat.present? && lng.present? %>
+        {
+          name: <%= raw venue.name.to_json %>,
+          lat: <%= lat %>,
+          lng: <%= lng %>,
+          address: <%= raw (venue.try(:address) || '').to_json %>
+        },
     <% end %>
+  <% end %>
   <% end %>
 ];
 

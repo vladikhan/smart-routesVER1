@@ -1,6 +1,6 @@
 class Review < ApplicationRecord
   belongs_to :user
-  belongs_to :reviewable, polymorphic: true, counter_cache: true
+  belongs_to :reviewable, polymorphic: true
 
   has_many :review_images, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
@@ -15,15 +15,11 @@ class Review < ApplicationRecord
   accepts_nested_attributes_for :review_images, allow_destroy: true
 
   # コールバック
-  after_create :update_reviewable_rating
-  after_update :update_reviewable_rating
-  after_destroy :update_reviewable_rating
+  # after_create :update_reviewable_rating
+  # after_update :update_reviewable_rating
+  # after_destroy :update_reviewable_rating
 
   private
 
-  def update_reviewable_rating
-    # VenueまたはRouteの平均評価を再計算
-    new_rating = reviewable.reviews.average(:total_score).to_f.round(1)
-    reviewable.update_column(:average_rating, new_rating)
-  end
+  
 end

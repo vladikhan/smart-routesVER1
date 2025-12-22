@@ -28,7 +28,6 @@ class Venue < ApplicationRecord
     self.popularity_score ||= 0.0
     self.reviews_count ||= 0
     self.likes_count ||= 0
-    self.average_rating ||= 0.0
     self.status ||= 'approved'
   end
 

@@ -1,91 +1,83 @@
+# encoding: UTF-8
 class Notification < ApplicationRecord
-  belongs_to :user  # recipient
+  belongs_to :user
   belongs_to :actor, class_name: 'User'
-
-  validates :notification_type, presence: true, inclusion: { 
-    in: %w[follow like comment review route_shared] 
-  }
-
-  scope :unread, -> { where(is_read: false) }
-  scope :read, -> { where(is_read: true) }
-  scope :recent, -> { order(created_at: :desc) }
-
-  # Broadcast to user after creation
-  after_create_commit :broadcast_notification
-
-  def mark_as_read!
-    update(is_read: true) unless is_read?
-  end
   
-  # Alias for compatibility
-  def mark_as_read
-    mark_as_read!
-  end
-
-  def unread?
-    !is_read?
-  end
-
-  def notifiable
-    return nil unless entity_type && entity_id
-    entity_type.constantize.find_by(id: entity_id)
-  end
-
-  def message
-    case notification_type
-    when 'route_shared'
-      "#{actor.username}さんがルートをシェアしました"
-    when 'like'
-      "#{actor.username}さんがあなたの#{entity_type_japanese}にいいねしました"
-    when 'comment'
-      "#{actor.username}さんがコメントしました"
-    when 'review'
-      "#{actor.username}さんがレビューを投稿しました"
-    when 'follow'
-      "#{actor.username}さんがフォローしました"
-    else
-      "新しい通知があります"
-    end
-  end
+  validates :notification_type, presence: true
+  validates :entity_type, presence: true
+  validates :entity_id, presence: true
+  
+  scope :unread, -> { where(is_read: false) }
+  scope :recent, -> { order(created_at: :desc) }
 
   def icon
     case notification_type
-    when 'route_shared' then '📤'
-    when 'like' then '❤️'
-    when 'comment' then '💬'
-    when 'review' then '⭐'
-    when 'follow' then '👤'
-    else '🔔'
+    when 'like'
+      '❤️'
+    when 'comment'
+      '💬'
+    when 'follow'
+      '👤'
+    when 'bookmark'
+      '💾'
+    when 'review'
+      '⭐'
+    else
+      '🔔'
     end
   end
-
-  private
-
+  
+  def message
+    I18n.t("notifications.messages.#{notification_type}",
+           actor: actor.username,
+           type: entity_type_japanese)
+  rescue I18n::MissingTranslationData
+    "#{actor.username}さんから通知があります"
+  end
+  
   def entity_type_japanese
     case entity_type
-    when 'Route' then 'ルート'
-    when 'Venue' then '場所'
-    when 'Review' then 'レビュー'
-    else 'コンテンツ'
+    when 'Route'
+      'ルート'
+    when 'Venue'
+      '場所'
+    when 'Review'
+      'レビュー'
+    when 'Comment'
+      'コメント'
+    else
+      entity_type
     end
   end
-
-  def broadcast_notification
-    # Broadcast to the user's notification channel
-    NotificationChannel.broadcast_to(
-      user,
-      {
-        notification: {
-          id: id,
-          message: message,
-          icon: icon,
-          created_at: created_at,
-          is_read: is_read
-        },
-        unread_count: user.notifications.unread.count
-      }
-    )
-  rescue => e
-    Rails.logger.error "Failed to broadcast notification: #{e.message}"
+  
+  def target_url
+    case entity_type
+    when 'Route'
+      "/routes/#{entity_id}"
+    when 'Venue'
+      "/venues/#{entity_id}"
+    when 'Review'
+      review = Review.find_by(id: entity_id)
+      if review&.reviewable_type == 'Route'
+        "/routes/#{review.reviewable_id}"
+      elsif review&.reviewable_type == 'Venue'
+        "/venues/#{review.reviewable_id}"
+      else
+        "/"
+      end
+    when 'Comment'
+      comment = Comment.find_by(id: entity_id)
+      if comment&.commentable_type == 'Route'
+        "/routes/#{comment.commentable_id}"
+      else
+        "/"
+      end
+    else
+      "/"
+    end
+  end
+  
+  def mark_as_read!
+    update(is_read: true)
   end
 end

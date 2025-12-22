@@ -23,7 +23,7 @@
   <main class="main-content">
     <div class="section-header">
       <h2 class="section-title">
-        <%= @routes.total_count %>件のルート
+        <%= @routes.count %>件のルート
       </h2>
       
       <%= form_with url: routes_path, method: :get, local: true do |f| %>
@@ -128,7 +128,7 @@
 
     <!-- Pagination -->
     <div class="pagination">
-      <%= paginate @routes %>
+      <%# <%= paginate @routes %> 
     </div>
   </main>
 
