@@ -20,6 +20,7 @@ class EmailVerificationsController < ApplicationController
       render :new, status: :unprocessable_entity
     end
   end
+  
 
   def resend
     code = SecureRandom.random_number(1000000).to_s.rjust(6, '0')
