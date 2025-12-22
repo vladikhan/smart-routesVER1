@@ -23,6 +23,7 @@ class Review < ApplicationRecord
 
   def update_reviewable_rating
     # VenueまたはRouteの平均評価を再計算
-    reviewable.update_column(:average_rating, reviewable.reviews.average(:total_score).to_f.round(1))
+    new_rating = reviewable.reviews.average(:total_score).to_f.round(1)
+    reviewable.update_column(:average_rating, new_rating)
   end
 end

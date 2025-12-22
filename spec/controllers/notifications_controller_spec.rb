@@ -60,7 +60,7 @@ RSpec.describe NotificationsController, type: :controller do
   describe 'GET #unread_count' do
 
     before do
-
+      sign_in user
       3.times { create(:notification, user: user, actor: actor, is_read: false) }
 
       2.times { create(:notification, user: user, actor: actor, is_read: true) }
@@ -124,7 +124,7 @@ RSpec.describe NotificationsController, type: :controller do
   describe 'PATCH #mark_all_as_read' do
 
     before do
-
+      sign_in user
       5.times { create(:notification, user: user, actor: actor, is_read: false) }
 
     end

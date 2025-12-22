@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_12_10_073046) do
+ActiveRecord::Schema.define(version: 2025_12_19_054723) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -213,7 +213,7 @@ ActiveRecord::Schema.define(version: 2025_12_10_073046) do
   create_table "route_items", force: :cascade do |t|
     t.bigint "route_id", null: false
     t.string "item_type", default: "venue"
-    t.integer "item_id", null: false
+    t.integer "item_id"
     t.integer "position", null: false
     t.text "notes"
     t.datetime "created_at", precision: 6, null: false

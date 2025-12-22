@@ -1,25 +1,18 @@
-# Encoding: UTF-8
 class UsersController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_user!, only: [:edit, :update, :my_profile]
   before_action :set_user, only: [:show, :edit, :update]
-  before_action :authorize_user!, only: [:edit, :update]
+  before_action :check_user_authorization, only: [:edit, :update]
 
   def index
-    @users = User.all.page(params[:page]).per(20)
+    @users = User.page(params[:page]).per(20)
   end
-
+  
   def show
-    # Show all routes if viewing own profile, only public if viewing others
-    if current_user == @user
-      @routes = @user.routes.order(created_at: :desc).page(params[:page]).per(10)
+    if user_signed_in? && @user == current_user
+      @routes = @user.routes.order(created_at: :desc)
     else
-      @routes = @user.routes.where(is_public: true)
-                           .order(created_at: :desc)
-                           .page(params[:page]).per(10)
+      @routes = @user.routes.where(is_public: true).order(created_at: :desc)
     end
-    
-    @followers_count = @user.followers.count rescue 0
-    @following_count = @user.following.count rescue 0
   end
 
   def my_profile
@@ -27,14 +20,14 @@ class UsersController < ApplicationController
   end
 
   def edit
-    # @user is already set by before_action
+    @user = current_user
   end
 
   def update
     if @user.update(user_params)
-      redirect_to user_path(@user), notice: 'プロフィールを更新しました'
+      redirect_to user_path(@user), notice: 'Профиль обновлен'
     else
-      render :edit, status: :unprocessable_entity
+      render :edit
     end
   end
 
@@ -44,21 +37,13 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
-  def authorize_user!
-    unless current_user == @user || current_user&.is_admin?
-      redirect_to routes_path, alert: 'アクセスが拒否されました'
+  def check_user_authorization
+    unless @user == current_user
+      redirect_to root_path, alert: 'Доступ запрещен'
     end
   end
 
   def user_params
-    params.require(:user).permit(
-      :username,
-      :bio,
-      :location,
-      :avatar,
-      :budget_min,
-      :budget_max
-    )
+    params.require(:user).permit(:username, :email, :bio, :location, :avatar, :birthday, :gender)
   end
 end
-

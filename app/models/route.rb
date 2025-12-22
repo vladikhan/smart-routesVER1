@@ -7,6 +7,9 @@ class Route < ApplicationRecord
   has_many :bookmarks, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  has_many :entity_tags, as: :entity, dependent: :destroy
+  has_many :tags, through: :entity_tags
+  has_many :reviews, as: :reviewable, dependent: :destroy
   
   # Для тегов (если используется acts-as-taggable-on)
   if defined?(ActsAsTaggableOn)
@@ -31,6 +34,7 @@ class Route < ApplicationRecord
   # Валидации
   validates :name, presence: true, length: { maximum: 100 }
   validates :user, presence: true
+  validates :city, presence: true 
   validates :view_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   
   # Вложенные атрибуты

@@ -9,6 +9,7 @@ class Venue < ApplicationRecord
   has_many :venue_photos, dependent: :destroy
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
+  
 
   validates :name, presence: true, length: { maximum: 100 }
   validates :address, presence: true

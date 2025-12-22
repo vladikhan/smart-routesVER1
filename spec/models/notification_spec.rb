@@ -24,7 +24,7 @@ RSpec.describe Notification, type: :model do
     end
     
     it '既読通知のみを返す' do
-      read = Norificaiton.read.to_a
+      read = Notification.read.to_a
       expect(read).to include(read1)
       expect(read).not_to include(unread1, unread2)
     end
