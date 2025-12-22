@@ -13,11 +13,11 @@ class RouteItem < ApplicationRecord
   
   # Если venue не указан, можно использовать прямые координаты
   def venue
-    item if item_type == "venue"
+    item if item_type == "Venue"
   end
 
   def venue?
-    item_type == "venue"
+    item_type == "Venue"
   end
   
   def name
@@ -41,7 +41,7 @@ class RouteItem < ApplicationRecord
   end
 
   def venue?
-    item_type == "venue"
+    item_type == "Venue"
   end
 
   def venue?
