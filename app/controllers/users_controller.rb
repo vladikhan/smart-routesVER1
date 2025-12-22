@@ -19,7 +19,7 @@ class UsersController < ApplicationController
                            .order(created_at: :desc)
                            .page(params[:page]).per(10)
     end
-    
+    @routes = @routes.includes(:city, :tags).limit(20)
     @followers_count = @user.followers.count rescue 0
     @following_count = @user.following.count rescue 0
 
