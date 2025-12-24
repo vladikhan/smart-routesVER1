@@ -1,5 +1,6 @@
-class Api::AuthController Devise::RegistrationsController
-	skip_before_action :verify_authencity_token
+module Api
+class RegistrationsController < Devise::RegistrationsController	
+	skip_before_action :verify_authenticity_token, raise: false
 
 	  # GET /resource/sign_up
   # def new
@@ -57,6 +58,5 @@ class Api::AuthController Devise::RegistrationsController
 	def sign_up_params
 		params.require(:user).permit(:email, :password, :password_confirmation, :username, :bio, :location)
 	end
-
-	
+	end
 end

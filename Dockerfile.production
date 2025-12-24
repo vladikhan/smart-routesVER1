@@ -1,0 +1,41 @@
+FROM ruby:3.1.6
+
+WORKDIR /app
+
+# 1. Системные зависимости
+RUN apt-get update -qq && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    npm \
+    curl \
+    ca-certificates \
+    && npm install -g yarn \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Установка Bundler
+RUN gem install bundler:2.6.9
+
+# 3. Копируем файлы зависимостей
+COPY Gemfile Gemfile.lock ./
+
+# 4. Устанавливаем платформу и гемы
+RUN bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle lock --add-platform x86_64-linux && \
+    bundle install --jobs 4 --retry 3
+
+# 5. КОПИРУЕМ ВЕСЬ ПРОЕКТ (обязательно до запуска sed!)
+COPY . .
+
+# 6. ФИКС ДЛЯ RUBY 3.1+: принудительно добавляем require "logger"
+RUN sed -i '1i require "logger"' config/application.rb
+
+# 7. Очистка временных файлов
+RUN rm -rf tmp/pids/server.pid
+
+EXPOSE 3000
+
+
+# 8. Запуск сервера
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-e", "production"]

@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '~> 3.1.4'
+gem 'aws-sdk-s3', require: false
 
 gem 'rails', '~> 6.1.7', '>= 6.1.7.6'
 gem 'pg'
@@ -22,12 +23,12 @@ gem 'jbuilder', '~> 2.7'
 gem 'valid_email2'
 
 
+gem 'devise'
 
 group :development, :test do
   gem 'factory_bot_rails', '~> 6.2'
   gem 'rspec-rails', '~> 6.1.3'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
-  gem 'devise'
   gem 'devise-i18n'
   gem 'faker', '~> 3.2'
   gem 'shoulda-matchers', '~> 5.3'
@@ -82,7 +83,6 @@ gem 'mini_magick', '~> 4.11'
 # gem 'jquery-rails'
 gem 'acts_as_list'
 
-gem 'aws-sdk-s3', '~> 1.0'
 gem "bootstrap", "~> 5.3"
 # gem 'sass-rails'
 

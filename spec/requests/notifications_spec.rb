@@ -37,6 +37,8 @@ RSpec.describe 'Notifications', type: :request do
   expect(user.notifications.unread.count).to eq(3)
 end
 
+
+
   end
   
   describe 'PATCH /notifications/:id/mark_as_read' do
