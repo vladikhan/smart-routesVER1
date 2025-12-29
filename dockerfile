@@ -1,16 +1,22 @@
-FROM ruby:3.1
+FROM ruby:3.1.6
 
 # Install dependencies
-RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
+RUN apt-get update -qq && apt-get install -y \
+		nodejs \
+		npm \ 
+		postgresql-client \
+		build-essential \
+		libpq-dev \
+		&& npm install -g yarn
 
 WORKDIR /app
-COPY Gemfile* ./
+COPY Gemfile Gemfile.lock ./
 RUN bundle install
-
-RUN apt-get update -qq && apt-get install -y nodejs npm
-RUN npm install -g yarn
 
 COPY . .
 
+RUN sed -i '1i require "logger"' config/application.rb
+
 EXPOSE 3000
-CMD ["bash"]
+
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]

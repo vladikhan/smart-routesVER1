@@ -12,8 +12,38 @@ class NotificationsController < ApplicationController
   end
 
   def unread_count
+    # === НОВЫЙ БЛОК: DEBUG ЛОГИРОВАНИЕ ===
+    Rails.logger.info "=" * 80
+    Rails.logger.info "🔍 NOTIFICATIONS DEBUG:"
+    Rails.logger.info "  User authenticated: #{user_signed_in?}"
+    Rails.logger.info "  Current user: #{current_user.inspect}"
+    Rails.logger.info "  Session ID: #{session.id}"
+    Rails.logger.info "  Cookies present: #{cookies.to_h.keys}"
+    Rails.logger.info "  Request from: #{request.remote_ip}"
+    Rails.logger.info "=" * 80
+    # =====================================
+
     @unread_count = current_user.notifications.unread.count
-    render json: { count: current_user.notifications.unread.count }
+    
+    respond_to do |format|
+      format.json { 
+        render json: { 
+          count: @unread_count,
+          authenticated: true,
+          user_id: current_user.id 
+        } 
+      }
+      format.html { render json: { count: @unread_count } }
+    end
+  # === НОВЫЙ БЛОК: ОБРАБОТКА ОШИБОК ===
+  rescue => e
+    Rails.logger.error "❌ Error in unread_count: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    
+    respond_to do |format|
+      format.json { render json: { error: e.message }, status: :internal_server_error }
+      format.html { render json: { error: e.message }, status: :internal_server_error }
+    end
   end
 
   def mark_as_read
@@ -55,7 +85,8 @@ class NotificationsController < ApplicationController
     when User then user_path(notifiable)
     else root_path
     end
-  rescue
+  rescue => e
+    Rails.logger.error "Error in notification_target_path: #{e.message}"
     root_path
   end
 end
