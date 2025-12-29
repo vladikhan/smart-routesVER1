@@ -1,24 +1,30 @@
-# README
+大阪・京都・奈良向け旅行ルート共有プラットフォーム
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+概要
+Smart Routes は、観光地とローカルグルメを組み合わせた旅行ルートを
+作成・共有・検索できるプラットフォームです。
+実際の旅行者によるレビューと評価をもとに、効率的で信頼できる旅の計画を支援します。
 
-Things you may want to cover:
+背景・課題
+	•	コロナ後、日本の観光市場は30%以上成長
+	•	観光＋食事を組み合わせたルート探しが難しい
+	•	情報収集に時間がかかり、個人の好みや予算を反映しづらい
 
-* Ruby version
+解決策
+	•	AIによるルート生成（都市・好み・予算を考慮）
+	•	ユーザー作成＆検証済みルート
+	•	レビュー・評価・写真
+	•	おすすめ表示（人気・トレンド）
+	•	フォロー・保存・メッセージ機能
+	•	地図連動ナビゲーション
 
-* System dependencies
+対象ユーザー
+	•	訪日外国人観光客（20〜40代）
+	•	旅行・グルメを事前に計画する日本人
+	•	「ルート＋食事」を重視する旅行者
 
-* Configuration
+技術スタック
+	•	Ruby on Rails / PostgreSQL / Redis
+	•	Docker / AWS（EC2, RDS, S3, Route53）
+	•	Google Maps API / Devise
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
