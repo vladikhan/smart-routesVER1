@@ -24,6 +24,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b 0.0.0.0"
+    volumes:
+      - .:/app
+    ports:
+      - "80:3000"
+    depends_on:
+      - db
+      - redis
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/smart_routes_dev
       REDIS_URL: redis://redis:6379/0
