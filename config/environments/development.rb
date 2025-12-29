@@ -25,9 +25,10 @@ Rails.application.configure do
   # Action Mailer для разработки
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_caching = false
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
-  config.action_mailer.delivery_method = :letter_opener_web
-  config.action_mailer.perform_deliveries = true
+  
+  
+
+  
 
   # Логи и отладка
   config.active_support.deprecation = :log
@@ -38,4 +39,21 @@ Rails.application.configure do
   config.assets.debug = true
   config.assets.quiet = true
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.default_url_options = { host: '52.195.115.255' }
+    config.hosts << "smartroutes.learning.datora.org"
+    config.hosts << "52.195.115.255"
+    config.action_mailer.smtp_settings = {
+      address:              'smtp.gmail.com',
+      port:                 587,
+      domain:               'gmail.com',
+      user_name:            ENV['GMAIL_USERNAME'],
+      password:             ENV['GMAIL_PASSWORD'],
+      authentication:       'plain',
+      enable_starttls_auto: true
+    } 
+  
 end

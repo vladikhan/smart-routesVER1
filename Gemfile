@@ -45,7 +45,7 @@ group :development do
   gem 'web-console', '>= 4.1.0'
   gem 'rack-mini-profiler', '~> 2.0'
   gem 'listen', '~> 3.3'
-  gem 'letter_opener_web'
+  # gem 'letter_opener_web'
 
 
 end
@@ -69,7 +69,7 @@ gem "kaminari", "~> 1.2.2"
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Используем Dart Sass вместо sassc
-gem "sass-embedded", "~> 1.79" 
+# gem "sass-embedded", "~> 1.83.2" 
 gem "cssbundling-rails"   
 
 gem 'sprockets-rails'

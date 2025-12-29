@@ -43,3 +43,4 @@ Devise.setup do |config|
 
   
 end
+Devise.setup { |config| config.skip_session_storage = [:http_auth] }

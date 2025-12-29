@@ -1,13 +1,18 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
+  config.action_controller.default_protect_from_forgery = false
+  config.force_ssl = false
+
   config.eager_load = true
 
+  config.hosts << "smartroutes.learning.datora.org"
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
-
+  
+  config.hosts.clear
  
-  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.public_file_server.enabled = true
 
   config.assets.compile = false
 
@@ -20,8 +25,7 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
-  config.force_ssl = false
-
+  config.ssl_options = { hsts: false }
   config.action_mailer.perform_caching = false
 
   config.action_mailer.delivery_method = :smtp
