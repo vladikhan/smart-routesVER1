@@ -77,9 +77,13 @@ group :development do
   gem 'debug'
   gem 'letter_opener_web'
   gem 'listen', '~> 3.3'
+  gem 'listen', '~> 3.3'
+  gem 'rack-mini-profiler', '~> 2.0'
   gem 'rack-mini-profiler', '~> 2.0'
   gem 'spring'
   gem 'web-console', '>= 4.1.0'
+  gem 'web-console', '>= 4.1.0'
+  # gem 'letter_opener_web'
 end
 
 group :test do
@@ -89,3 +93,34 @@ group :test do
   gem 'simplecov', require: false
   gem 'webdrivers', '~> 5.2'
 end
+
+gem 'redis', '~>5.0'
+gem 'redis-rails'
+
+gem 'kaminari', '~> 1.2.2'
+
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+
+# Используем Dart Sass вместо sassc
+# gem "sass-embedded", "~> 1.83.2"
+gem 'cssbundling-rails'
+
+gem 'sprockets-rails'
+
+gem 'debug'
+
+gem 'carrierwave', '~>2.2'
+gem 'mini_magick', '~> 4.11'
+
+# gem 'jquery-rails'
+gem 'acts_as_list'
+
+gem 'bootstrap', '~> 5.3'
+# gem 'sass-rails'
+
+gem 'jsbundling-rails', '~> 1.3'
+
+gem 'dotenv-rails', '~> 3.1.8'
+
+gem 'csv', '~> 3.3'
+gem 'geocoder', '~> 1.8'

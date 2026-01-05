@@ -20,9 +20,7 @@ RUN gem install bundler:2.6.9
 COPY Gemfile Gemfile.lock ./
 
 # 4. Устанавливаем платформу и гемы
-RUN bundle config set --local deployment 'true' && \
-    bundle config set --local without 'development test' && \
-    bundle lock --add-platform x86_64-linux && \
+RUN bundle lock --add-platform x86_64-linux && \
     bundle install --jobs 4 --retry 3
 
 # 5. КОПИРУЕМ ВЕСЬ ПРОЕКТ (обязательно до запуска sed!)

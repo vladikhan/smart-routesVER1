@@ -8,6 +8,7 @@ Bundler.require(*Rails.groups)
 
 module Myapp
   class Application < Rails::Application
+    config.hosts.clear
     
     config.load_defaults 6.1
 
