@@ -2,19 +2,19 @@
 require 'faker'
 
 if Rails.env.development?
-	puts "既存データをクリア中..."
+  puts "既存データをクリア中..."
 
-	[DmMessage, DmRoom, Notification, ReviewResponse, PlaceOwner,
+  [DmMessage, DmRoom, Notification, ReviewResponse, PlaceOwner,
 Bookmark, EntityTag, Like, Comment, ReviewImage, Review, RouteItem,Route, Venue, District, City, Tag, Follower, User].each do |model|
-	model.delete_all
+  model.delete_all
 end
 
-	# IDカウンターをリセット
-	ActiveRecord::Base.connection.tables.each do |table|
-		ActiveRecord::Base.connection.reset_pk_sequence!(table)
-	end
+  # IDカウンターをリセット
+  ActiveRecord::Base.connection.tables.each do |table|
+    ActiveRecord::Base.connection.reset_pk_sequence!(table)
+  end
 
-	puts "クリア完了"
+  puts "クリア完了"
 end
 
 puts "シードデータの作成中..."
@@ -64,13 +64,13 @@ puts  "都市とエリアを作成中..."
 
 #京都
 kyoto = City.create!(
-	name: '京都',
-	name_en: 'Kyoto',
-	description: '千年の都、日本の伝統文化の中心地'
+  name: '京都',
+  name_en: 'Kyoto',
+  description: '千年の都、日本の伝統文化の中心地'
 )
 
 kyoto_districts_data = [
-	{ name: '東山区', name_en: 'Higashiyama' },
+  { name: '東山区', name_en: 'Higashiyama' },
   { name: '祇園', name_en: 'Gion' },
   { name: '嵐山', name_en: 'Arashiyama' },
   { name: '伏見', name_en: 'Fushimi' },
@@ -80,18 +80,18 @@ kyoto_districts_data = [
 ]
 
 kyoto_districts = kyoto_districts_data.map do |data|
-	kyoto.districts.create!(data)
+  kyoto.districts.create!(data)
 end
 
 #大阪
 osaka = City.create!(
-	name: '大阪',
-	name_en: 'Osaka',
-	description: '日本第二の都市、食い倒れの街'
+  name: '大阪',
+  name_en: 'Osaka',
+  description: '日本第二の都市、食い倒れの街'
 )
 
 osaka_districts_data = [
-	{ name: '道頓堀', name_en: 'Dotonbori' },
+  { name: '道頓堀', name_en: 'Dotonbori' },
   { name: '梅田', name_en: 'Umeda' },
   { name: '難波', name_en: 'Namba' },
   { name: '心斎橋', name_en: 'Shinsaibashi' },
@@ -102,7 +102,7 @@ osaka_districts_data = [
 ]
 
 osaka_districts = osaka_districts_data.map do |data|
-	osaka.districts.create!(data)
+  osaka.districts.create!(data)
 end
 
 puts "#{City.count}都市と#{District.count}エリアを作成しました。" 
@@ -111,7 +111,7 @@ puts "#{City.count}都市と#{District.count}エリアを作成しました。"
 puts "タグを作成中..."
 
 tags_data = %w[
-	ramen sushi izakaya cafe bar yakiniku okonomiyaki takoyaki
+  ramen sushi izakaya cafe bar yakiniku okonomiyaki takoyaki
   vegan halal familyfriendly romantic budget luxury
   historic temple shrine castle museum shopping nightlife
   view photogenic hidden_gem local_favorite michelin
@@ -120,7 +120,7 @@ tags_data = %w[
 ]
 
 tags = tags_data.map do |tag_name|
-	Tag.create!(parameter: tag_name)
+  Tag.create!(parameter: tag_name)
 end
 
 puts "#{Tag.count}個のタグを作成しました"
@@ -129,48 +129,48 @@ puts "#{Tag.count}個のタグを作成しました"
 puts " 京都の場所を作成中..."
 
 kyoto_venues_data = [
-	{
-		name: '清水寺',
-		venue_type: 'temple',
-		description: '京都を代表する寺院。清水の舞台からの眺めは圧巻です。',
-		address: '京都市東山区清水1-294',
-		price_range: '¥',
-		phone: '075-551-1234',
-		business_hours: '6:00-18:00',
-		geo_lat: 34.9949,
+  {
+    name: '清水寺',
+    venue_type: 'temple',
+    description: '京都を代表する寺院。清水の舞台からの眺めは圧巻です。',
+    address: '京都市東山区清水1-294',
+    price_range: '¥',
+    phone: '075-551-1234',
+    business_hours: '6:00-18:00',
+    geo_lat: 34.9949,
     geo_lng: 135.7850,
-		district: kyoto_districts[0],
-		tags: ['temple', 'historic', 'view', 'photogenic', 'world_heritage'],
-		status: 'approved'
-	},
-	{
-		name: '伏見稲荷大社',
-		venue_type: 'shrine',
-		description: '千本鳥居で有名な神社。幻想的な赤い鳥居のトンネルが続きます。',
-		address: '京都市伏見区深草藪之内町68',
-		phone: '075-641-7331',
-		business_hours: '24時間開放',
-		geo_lat: 34.9671,
+    district: kyoto_districts[0],
+    tags: ['temple', 'historic', 'view', 'photogenic', 'world_heritage'],
+    status: 'approved'
+  },
+  {
+    name: '伏見稲荷大社',
+    venue_type: 'shrine',
+    description: '千本鳥居で有名な神社。幻想的な赤い鳥居のトンネルが続きます。',
+    address: '京都市伏見区深草藪之内町68',
+    phone: '075-641-7331',
+    business_hours: '24時間開放',
+    geo_lat: 34.9671,
     geo_lng: 135.7727,
-		district: kyoto_districts[3],
-		tags: ['shrine', 'historic', 'photogenic', 'hiking', 'free'],
-		status: 'approved'
-	},
-	{
-		name: '金閣寺',
-		venue_type: 'temple',
-		description: '金箔で覆われた舎利殿。池に映る姿は息をのむ美しさ。',
+    district: kyoto_districts[3],
+    tags: ['shrine', 'historic', 'photogenic', 'hiking', 'free'],
+    status: 'approved'
+  },
+  {
+    name: '金閣寺',
+    venue_type: 'temple',
+    description: '金箔で覆われた舎利殿。池に映る姿は息をのむ美しさ。',
     address: '京都市北区金閣寺町1',
-		price_range: '¥',
-		phone: '075-461-0013',
-		business_hours:'09:00-17:00',
-		geo_lat: 35.0394,
+    price_range: '¥',
+    phone: '075-461-0013',
+    business_hours:'09:00-17:00',
+    geo_lat: 35.0394,
     geo_lng: 135.7292,
-		district: kyoto_districts[5],
-		tags: ['temple', 'historic', 'garden', 'photogenic', 'world_heritage'],
-		status: 'approved'
-	},
-	{
+    district: kyoto_districts[5],
+    tags: ['temple', 'historic', 'garden', 'photogenic', 'world_heritage'],
+    status: 'approved'
+  },
+  {
     name: '嵐山竹林の小径',
     venue_type: 'nature',
     description: '幻想的な竹林のトンネル。京都を代表する景観スポット。',
@@ -242,21 +242,21 @@ kyoto_venues_data = [
 ]
 
 kyoto_venues = kyoto_venues_data.map do |data|
-	tag_names = data.delete(:tags)
-	district = data.delete(:district)
+  tag_names = data.delete(:tags)
+  district = data.delete(:district)
 
-	venue = Venue.create!(
-		**data,
-		district: district,
-		user:users.sample
-	)
+  venue = Venue.create!(
+    **data,
+    district: district,
+    user:users.sample
+  )
 
-	tag_names.each do |tag_name|
-		tag = tags.find { |t| t.parameter == tag_name }
-		EntityTag.create!(entity: venue, tag: tag) if tag
-	end
+  tag_names.each do |tag_name|
+    tag = tags.find { |t| t.parameter == tag_name }
+    EntityTag.create!(entity: venue, tag: tag) if tag
+  end
 
-	venue
+  venue
 end
 
 puts "京都の場所 #{kyoto_venues.count}件を作成しました"
@@ -266,23 +266,23 @@ puts "京都の場所 #{kyoto_venues.count}件を作成しました"
 puts "大阪の場所を作成中..."
 
 osaka_venues_data = [
-	{
-		name: '一蘭ラーメン 道頓堀店',
-		venue_type: 'restaurant',
-		description: '大阪で最高の深夜ラーメン店！個室ブースで一人でも気軽に楽しめます。',
+  {
+    name: '一蘭ラーメン 道頓堀店',
+    venue_type: 'restaurant',
+    description: '大阪で最高の深夜ラーメン店！個室ブースで一人でも気軽に楽しめます。',
     address: '大阪市中央区道頓堀1-7-3',
-		cuisine_type: 'ramen',
-		price_range: '¥',
-		phone: '06-6211-0101',
-		business_hours: '24時間営業',
+    cuisine_type: 'ramen',
+    price_range: '¥',
+    phone: '06-6211-0101',
+    business_hours: '24時間営業',
     geo_lat: 34.6686,
     geo_lng: 135.5020,
-		district: osaka_districts[0],
-		tags: ['ramen', 'latenight', '24hours', 'solo_dining'],
-		status: 'approved'
-	},
-	{
-		 name: '大阪城',
+    district: osaka_districts[0],
+    tags: ['ramen', 'latenight', '24hours', 'solo_dining'],
+    status: 'approved'
+  },
+  {
+     name: '大阪城',
     venue_type: 'castle',
     description: '大阪のシンボル。天守閣からの眺めは絶景です。',
     address: '大阪市中央区大阪城1-1',
@@ -291,10 +291,10 @@ osaka_venues_data = [
     business_hours: '9:00-17:00',
     geo_lat: 34.6873,
     geo_lng: 135.5262,
-		district: osaka_districts[6],
-		tags: ['historic', 'castle', 'landmark', 'photogenic', 'cherry_blossom'],
-		status: 'approved'
-	},
+    district: osaka_districts[6],
+    tags: ['historic', 'castle', 'landmark', 'photogenic', 'cherry_blossom'],
+    status: 'approved'
+  },
 {
     name: 'たこ焼き道楽わなか 本店',
     venue_type: 'restaurant',
@@ -437,21 +437,21 @@ osaka_venues_data = [
 ]
 
 osaka_venues = osaka_venues_data.map do |data|
-	tag_names = data.delete(:tags),
-	district = data.delete(:district),
+  tag_names = data.delete(:tags),
+  district = data.delete(:district),
 
-	venue = Venue.create!(
-		**data,
-		district: district,
-		user: users.sample
-	)
+  venue = Venue.create!(
+    **data,
+    district: district,
+    user: users.sample
+  )
 
-	tag_names.each do |tag_name|
-		tag = tags.find { |t| t.parameter == tag_name }
-		EntityTag.create!(entity: venue, tag: tag) if tag
-	end
+  tag_names.each do |tag_name|
+    tag = tags.find { |t| t.parameter == tag_name }
+    EntityTag.create!(entity: venue, tag: tag) if tag
+  end
 
-	venue
+  venue
 end
 
 puts "大阪の場所 #{osaka_venues.count}件を作成しました"
@@ -473,24 +473,24 @@ routes_data = [
     user: users.sample,
     city: kyoto
   },
-	{
-		 name: '京都 世界遺産めぐり',
+  {
+     name: '京都 世界遺産めぐり',
     description: '清水寺、金閣寺、伏見稲荷大社を一日で。京都の三大名所を制覇！',
-		estimated_duration: 480,
-		estimated_cost: 3000, 
-		difficulty_level: 'medium',
-		venues: [kyoto_venues[0], kyoto_venues[2], kyoto_venues[1]],
-		tags: ['historic', 'temple', 'world_heritage', 'walking']
-	},
-	{
-		name: '嵐山・祇園 伝統美満喫コース',
+    estimated_duration: 480,
+    estimated_cost: 3000, 
+    difficulty_level: 'medium',
+    venues: [kyoto_venues[0], kyoto_venues[2], kyoto_venues[1]],
+    tags: ['historic', 'temple', 'world_heritage', 'walking']
+  },
+  {
+    name: '嵐山・祇園 伝統美満喫コース',
     description: '竹林と舞妓さんの街。京都らしさを存分に味わう。',
     estimated_duration: 360,
     estimated_cost: 5000,
-		difficulty_level: 'easy',
-		venues: [kyoto_venues[3], kyoto_venues[4], kyoto_venues[5]],
-		tags: ['traditional', 'photogenic', 'bamboo', 'culture']
-	},{
+    difficulty_level: 'easy',
+    venues: [kyoto_venues[3], kyoto_venues[4], kyoto_venues[5]],
+    tags: ['traditional', 'photogenic', 'bamboo', 'culture']
+  },{
     name: '究極の大阪グルメツアー',
     description: '大阪の名物料理を一日で制覇！たこ焼き、お好み焼き、串カツ、ラーメンまで。',
     estimated_duration: 360,
@@ -616,32 +616,32 @@ puts "#{Route.count}件のルートを作成しました"
 puts "レビューを作成中..."
 
 all_venues.each do |venue|
-	rand(3..10).times do
-		user = users.sample
-		next if Review.exists?(user: user, reviewable: venue)
+  rand(3..10).times do
+    user = users.sample
+    next if Review.exists?(user: user, reviewable: venue)
 
-		Review.create!(
-			user: user,
-			reviewable: venue,
-			text: Faker::Restaurant.review,
-			total_score: [3.5, 4.0, 5.0].sample
-		)
-	end
+    Review.create!(
+      user: user,
+      reviewable: venue,
+      text: Faker::Restaurant.review,
+      total_score: [3.5, 4.0, 5.0].sample
+    )
+  end
 end
 
 routes.each do |route|
-	rand(3..8).times do
-		user = users.sample
-		next if Review.exists?(user: user, reviewable: route)
+  rand(3..8).times do
+    user = users.sample
+    next if Review.exists?(user: user, reviewable: route)
 
 
-		Review.create!(
-			user:user,
-			reviewable: route,
-			text: "素晴らしいルートでした！" + Faker::Lorem.paragraph,
-			total_score: [4.0, 4.5, 5.0].sample
-		)
-	end
+    Review.create!(
+      user:user,
+      reviewable: route,
+      text: "素晴らしいルートでした！" + Faker::Lorem.paragraph,
+      total_score: [4.0, 4.5, 5.0].sample
+    )
+  end
 end
 
 puts "#{Review.count}件のレビューを作成しました"
@@ -650,13 +650,13 @@ puts "#{Review.count}件のレビューを作成しました"
 puts "コメントを作成中..."
 
 Review.limit(30).each do |review|
-	rand(0..4).times do
-		Comment.create!(
-			user: users.sample,
-			commentable: review,
-			text: Faker::Lorem.sentence
-		)
-	end
+  rand(0..4).times do
+    Comment.create!(
+      user: users.sample,
+      commentable: review,
+      text: Faker::Lorem.sentence
+    )
+  end
 end
 
 puts "#{Comment.count}件のコメントを作成しました"
@@ -666,21 +666,21 @@ puts "#{Comment.count}件のコメントを作成しました"
 puts "いいねを作成中..."
 
 all_venues.each do |venue|
-	users.sample(rand(8..20)).each do |user|
-		Like.create!(user: user, likeable: venue)
-	end
+  users.sample(rand(8..20)).each do |user|
+    Like.create!(user: user, likeable: venue)
+  end
 end
 
 routes.each do |route|
-	users.sample(rand(5..15)).each do |user|
-		Like.create!(user: user, likeable: route)
-	end
+  users.sample(rand(5..15)).each do |user|
+    Like.create!(user: user, likeable: route)
+  end
 end
 
 Review.limit(50).each do |review|
-	users.sample(rand(1..6)).each do |user|
-		Like.create!(user: user, likeable: review)
-	end
+  users.sample(rand(1..6)).each do |user|
+    Like.create!(user: user, likeable: review)
+  end
 end
 
 puts  "#{Like.count}件のいいねを作成しました"
@@ -689,14 +689,14 @@ puts  "#{Like.count}件のいいねを作成しました"
 puts "フォロー関係を作成中..."
 
 users.first(15).each do |user|
-	users.sample(rand(4..10)).each do |following_user|
-		next if user == following_user
-		Follower.create!(
-			follower_user: user,
-			following_user: following_user,
-			status: 'accepted'
-		) rescue ActiveRecord::RecordInvalid
-	end
+  users.sample(rand(4..10)).each do |following_user|
+    next if user == following_user
+    Follower.create!(
+      follower_user: user,
+      following_user: following_user,
+      status: 'accepted'
+    ) rescue ActiveRecord::RecordInvalid
+  end
 end
 
 puts "#{Follower.count}件のフォロー関係を作成しました"
@@ -706,21 +706,21 @@ puts "#{Follower.count}件のフォロー関係を作成しました"
 puts "ブックマークを作成中..."
 
 users.first(15).each do |user|
-	all_venues.sample(rand(3..8)).each do |venue|
-		Bookmark.create!(
-			user: user,
-			item: venue,
-			correction_name: ['Want to Visit', 'Favorites', 'Hidden Gems', 'Kyoto Must-See', 'Osaka Food'].sample
-		) rescue ActiveRecord::RecordInvalid
-	end
+  all_venues.sample(rand(3..8)).each do |venue|
+    Bookmark.create!(
+      user: user,
+      item: venue,
+      correction_name: ['Want to Visit', 'Favorites', 'Hidden Gems', 'Kyoto Must-See', 'Osaka Food'].sample
+    ) rescue ActiveRecord::RecordInvalid
+  end
 
-	routes.sample(rand(2..4)).each do |route|
-		Bookmark.create!(
-			user: user,
-			item: route,
-			collection_name: ['Want to Try', 'Favorites', 'Saved Routes'].sample
-		)rescue ActiveRecord::RecordInvalid 
-	end
+  routes.sample(rand(2..4)).each do |route|
+    Bookmark.create!(
+      user: user,
+      item: route,
+      collection_name: ['Want to Try', 'Favorites', 'Saved Routes'].sample
+    )rescue ActiveRecord::RecordInvalid 
+  end
 end
 
 puts "#{Bookmark.count}件のブックマークを作成しました"
@@ -729,24 +729,24 @@ puts "#{Bookmark.count}件のブックマークを作成しました"
 puts "DMルームとメッセージを作成中..."
 
 users.first(10).each do |sender|
-	receiver = users.sample
-	next if sender == receiver
+  receiver = users.sample
+  next if sender == receiver
 
-	room = DmRoom.create!(
-		sender: sender, 
-		receiver: receiver,
-	) rescue nil
+  room = DmRoom.create!(
+    sender: sender, 
+    receiver: receiver,
+  ) rescue nil
 
-	if room 
-		rand(3..8).times do 
-			DmMessage.create!(
-				dm_room: room,
-				user: [sender, receiver].sample,
-				message: Faker::Lorem.sentence,
-				is_read: [true, false].sample
-			)
-		end
-	end
+  if room 
+    rand(3..8).times do 
+      DmMessage.create!(
+        dm_room: room,
+        user: [sender, receiver].sample,
+        message: Faker::Lorem.sentence,
+        is_read: [true, false].sample
+      )
+    end
+  end
 end
 
 puts "#{DmRoom.count}件のDMルーム、#{DmMessage.count}件のメッセージを作成しました"
@@ -799,32 +799,32 @@ puts "ビジネスアカウントを作成中..."
 
 # 京都の主要施設
 [kyoto_venues[0], kyoto_venues[2], kyoto_venues[5]].each do |venue| 
-	PlaceOwner.create!(
-		user: users.sample, 
-		venue: venue,
-		role: 'owner',
-		status: 'approved',
-		verified_at: Time.current,
-		verified_by: admin.id,
-		business_name: venue.name,
-		contact_email: "owner#{venue.id}@example.com",
-		contact_phone: '+81-75-123-4567'
-	)
+  PlaceOwner.create!(
+    user: users.sample, 
+    venue: venue,
+    role: 'owner',
+    status: 'approved',
+    verified_at: Time.current,
+    verified_by: admin.id,
+    business_name: venue.name,
+    contact_email: "owner#{venue.id}@example.com",
+    contact_phone: '+81-75-123-4567'
+  )
 end
 
 # 大阪の主要施設
 [osaka_venues[0], osaka_venues[4], osaka_venues[8]].each do |venue|
-	PlaceOwner.create!(
-		user: users.sample,
-		venue: venue,
-		role: 'owner',
-		status: 'approved',
-		verified_at: Time.current,
-		verified_by: admin.id,
-		business_name: venue.name,
-		contact_email: "owner#{venue.id}@example.com",
-		contact_phone: '+81-6-1234-5678'
-	)
+  PlaceOwner.create!(
+    user: users.sample,
+    venue: venue,
+    role: 'owner',
+    status: 'approved',
+    verified_at: Time.current,
+    verified_by: admin.id,
+    business_name: venue.name,
+    contact_email: "owner#{venue.id}@example.com",
+    contact_phone: '+81-6-1234-5678'
+  )
 end
 
 puts "#{PlaceOwner.count}件のビジネスアカウントを作成しました"
