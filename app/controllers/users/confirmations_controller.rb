@@ -1,15 +1,18 @@
-# encoding: utf-8
 class Users::ConfirmationsController < Devise::ConfirmationsController
-  
   def show
-    super
-  end
+    self.resource = resource_class.find_by_confirmation_token(params[:confirmation_token])
 
-  protected
+    if resource.present?
+      redirect_to your_otp_page_path(confirmation_token: params[:confirmation_token])
+    else
+      super
+    end
 
-  # Куда редиректить после успешного подтверждения
-  def after_confirmation_path_for(resource_name, resource)
-    flash[:notice] = "メールアドレスが確認されました！"
-    root_path # или new_user_session_path для логина
+    protected
+
+    def after_confirmation_path_for(resource_name, resource)
+      flash[:notice] = 'メールアドレスが確認されました！'
+      root_path
+    end
   end
 end
