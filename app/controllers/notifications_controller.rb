@@ -26,12 +26,12 @@ class NotificationsController < ApplicationController
     respond_to do |format|
       format.json do
         render json: {
-          unread_count: @count,
+          unread_count: @unread_count,
           authenticated: true,
           user_id: current_user.id
         }
       end
-      format.any { render json: { unread_count: @count } }
+      format.any { render json: { unread_count: @unread_count } }
     end
   # === НОВЫЙ БЛОК: ОБРАБОТКА ОШИБОК ===
   rescue StandardError => e

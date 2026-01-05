@@ -50,7 +50,6 @@ gem 'sprockets-rails'
 gem 'acts_as_list'
 gem 'counter_culture'
 gem 'csv', '~> 3.3'
-gem 'dotenv-rails', '~> 3.1'
 gem 'geocoder', '~> 1.8'
 gem 'kaminari', '~> 1.2.2' # Пагинация
 gem 'nokogiri'
@@ -77,13 +76,9 @@ group :development do
   gem 'debug'
   gem 'letter_opener_web'
   gem 'listen', '~> 3.3'
-  gem 'listen', '~> 3.3'
-  gem 'rack-mini-profiler', '~> 2.0'
   gem 'rack-mini-profiler', '~> 2.0'
   gem 'spring'
   gem 'web-console', '>= 4.1.0'
-  gem 'web-console', '>= 4.1.0'
-  # gem 'letter_opener_web'
 end
 
 group :test do

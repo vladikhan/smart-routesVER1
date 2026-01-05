@@ -23,4 +23,27 @@ class DmRoom < ApplicationRecord
   def last_message
     dm_messages.order(created_at: :desc).first
   end
+
+  # Counter for unread messages
+  def increment_unread_for(user)
+    if user.id == sender_id
+      increment!(:unread_count_sender)
+    else
+      increment!(:unread_count_receiver)
+    end
+  end
+
+  def reset_unread_for(user)
+    if user.id == sender.id
+      update(unread_count_sender: 0)
+    else
+      update(unread_count_receiver: 0)
+    end
+  end
+
+  private
+
+  def sender_and_receiver_are_different
+    errors.add(:base, 'You cannot chat with yourself') if sender_id == receiver_id
+  end
 end
