@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   mount ActionCable.server => '/cable'
 
   get 'home/index'
-  
+
   devise_for :users, path: '', path_names: {
     sign_in: 'login',
     sign_out: 'logout',
@@ -17,36 +17,44 @@ Rails.application.routes.draw do
   if Rails.env.development?
     # mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
-  
-  root "pages#home"
+
+  root 'pages#home'
 
   # Home
   get 'search', to: 'home#search'
 
-  
-  
   # My Profile shortcuts
   get 'my_profile', to: 'users#my_profile'
   get 'profile', to: 'users#my_profile'
   get 'current_user', to: 'users#my_profile'
   get 'logout_confirm', to: 'pages#logout_confirm'
-  
+
   # Users
-  resources :users, only: [:index, :show, :edit, :update]
-  
+  resources :users, only: %i[index show edit update]
+
   # Email verification
   get 'email_verification', to: 'email_verifications#new'
   post 'email_verification', to: 'email_verifications#verify'
   post 'email_verification/resend', to: 'email_verifications#resend', as: 'email_verification_resend'
-  
+
   # Logout confirmation
   get 'logout_confirm', to: 'pages#logout_confirm'
 
   # Routes
   resources :routes
-  resources :venues   
-  resources :cities, only: [:index, :show]
+  resources :venues
+  resources :cities, only: %i[index show]
   resources :users
+
+  rsources :dm_rooms, only: %i[index show create] do
+    member do
+      post :mark_all_as_read
+    end
+    resources :dm_messages, only: [:create]
+    member do
+      post :mark_all_as_read
+    end
+  end
 
   # Notification routes
   resources :notifications, only: [:index] do
@@ -58,4 +66,6 @@ Rails.application.routes.draw do
       get :unread_count
     end
   end
+
+  mount ActionCable.server => '/cable'
 end

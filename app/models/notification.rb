@@ -1,5 +1,4 @@
 class Notification < ApplicationRecord
-  belongs_to :user
   belongs_to :actor, class_name: 'User'
   belongs_to :notifiable, polymorphic: true
 
@@ -69,7 +68,12 @@ class Notification < ApplicationRecord
     when 'Venue'
       Rails.application.routes.url_helpers.venue_path(notifiable)
     when 'DmMessage'
-      Rails.application.routes.url_helpers.dm_room_path(notifiable.dm_room)
+      # Используем ID напрямую, чтобы не грузить весь объект комнаты из базы
+      if notifiable.respond_to?(:dm_room_id)
+        Rails.application.routes.url_helpers.dm_room_path(notifiable.dm_room_id)
+      else
+        '/'
+      end
     when 'Comment'
       target = notifiable.commentable
       target.is_a?(Route) ? Rails.application.routes.url_helpers.route_path(target) : Rails.application.routes.url_helpers.venue_path(target)
@@ -78,7 +82,8 @@ class Notification < ApplicationRecord
     else
       Rails.application.routes.url_helpers.root_path
     end
-  rescue StandardError
+  rescue StandardError => e
+    Rails.logger.error "Notification target_url error: #{e.message}"
     '/'
   end
 

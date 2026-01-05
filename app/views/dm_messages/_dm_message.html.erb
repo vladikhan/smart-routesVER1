@@ -1,0 +1,36 @@
+<% is_own_message = dm_message.user_id == current_user.id %>
+
+<div class="mb-3 d-flex <%= is_own_message ? 'justify-content-end' : 'justify-content-start' %>"
+     data-message-id="<%= dm_message.id %>">
+  
+  <div style="max-width: 70%;">
+    <% unless is_own_message %>
+      <div class="d-flex align-items-center mb-1">
+        <%= image_tag dm_message.user.avatar_url || 'default_avatar.png', 
+                     class: 'rounded-circle me-2', 
+                     size: '24x24' %>
+        <small class="text-muted">@<%= dm_message.user.username %></small>
+      </div>
+    <% end %>
+    
+    <div class="<%= is_own_message ? 'bg-primary text-white' : 'bg-white' %> rounded-3 p-3 shadow-sm">
+      <% if dm_message.image.attached? %>
+        <%= image_tag dm_message.image, class: 'img-fluid rounded mb-2', style: 'max-width: 100%;' %>
+      <% end %>
+      
+      <% if dm_message.message.present? %>
+        <p class="mb-0" style="white-space: pre-wrap; word-break: break-word;"><%= dm_message.message %></p>
+      <% end %>
+      
+      <div class="d-flex justify-content-between align-items-center mt-2">
+        <small class="<%= is_own_message ? 'text-white-50' : 'text-muted' %>">
+          <%= dm_message.created_at.strftime('%H:%M') %>
+        </small>
+        
+        <% if is_own_message && dm_message.is_read %>
+          <small class="text-white-50">既読</small>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

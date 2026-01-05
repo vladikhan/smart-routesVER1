@@ -1,43 +1,42 @@
 class DmRoom < ApplicationRecord
   belongs_to :sender, class_name: 'User'
   belongs_to :receiver, class_name: 'User'
-
   has_many :dm_messages, dependent: :destroy
 
   validates :sender_id, uniqueness: { scope: :receiver_id }
   validate :sender_and_receiver_are_different
 
+  # Метод класса для поиска или создания комнаты
   def self.between(user1_id, user2_id)
-    where(
-      '(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)',
-      user1_id, user2_id, user2_id, user1_id
-    ).first_or_create(sender_id: user1_id, receiver_id: user2_id)
+    u1, u2 = [user1_id, user2_id].sort
+    where(sender_id: u1, receiver_id: u2).first_or_create
   end
 
-  # Get another chatuser for current user
+  # Получить собеседника
   def other_user(current_user)
     current_user.id == sender_id ? receiver : sender
   end
 
-  # Get last message
+  # Последнее сообщение в этой комнате
   def last_message
     dm_messages.order(created_at: :desc).first
   end
 
-  # Counter for unread messages
-  def increment_unread_for(user)
-    if user.id == sender_id
-      increment!(:unread_count_sender)
-    else
-      increment!(:unread_count_receiver)
-    end
+  # Количество непрочитанных для конкретного юзера
+  def unread_count_for(user)
+    (user.id == sender_id ? unread_count_sender : unread_count_receiver).to_i
   end
 
+  def any_unread_for?(user)
+    unread_count_for(user) > 0
+  end
+
+  # ОБЯЗАТЕЛЬНО: Сброс счетчика при открытии чата
   def reset_unread_for(user)
-    if user.id == sender.id
-      update(unread_count_sender: 0)
-    else
-      update(unread_count_receiver: 0)
+    if user.id == sender_id
+      update_columns(unread_count_sender: 0)
+    elsif user.id == receiver_id
+      update_columns(unread_count_receiver: 0)
     end
   end
 

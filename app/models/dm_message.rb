@@ -1,5 +1,5 @@
 class DmMessage < ApplicationRecord
-  belongs_to :dm_room
+  belongs_to :dm_room, touch: true
   belongs_to :user
 
   has_one_attached :image
@@ -21,7 +21,6 @@ class DmMessage < ApplicationRecord
   private
 
   def update_room_timestamp
-    # Используем touch, это стандартный способ обновить updated_at или кастомное поле
     dm_room.update(last_message_at: created_at)
   end
 
