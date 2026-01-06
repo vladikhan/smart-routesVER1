@@ -46,7 +46,7 @@ Rails.application.routes.draw do
   resources :cities, only: %i[index show]
   resources :users
 
-  rsources :dm_rooms, only: %i[index show create] do
+  resources :dm_rooms, only: %i[index show create] do
     member do
       post :mark_all_as_read
     end

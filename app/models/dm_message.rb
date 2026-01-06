@@ -31,15 +31,14 @@ class DmMessage < ApplicationRecord
   end
 
   def broadcast_message
-    # Важно: убедись, что avatar_url определен в модели User
     ActionCable.server.broadcast(
       "dm_room_#{dm_room.id}",
       {
-        message: message,
         user_id: user.id,
-        username: user.username,
-        avatar: user.try(:avatar_url),
-        created_at: created_at.strftime('%H:%M')
+        html: ApplicationController.render(
+          partial: 'dm_messages/message',
+          locals: { message: self, current_user: nil }
+        )
       }
     )
   end

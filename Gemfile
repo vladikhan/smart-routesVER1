@@ -11,7 +11,7 @@ gem 'puma', '~> 5.0'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.6'
 gem 'turbolinks', '~> 5'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
-gem 'webpacker', '~> 5.0'
+# gem 'webpacker', '~> 5.0'
 
 # --- Redis & Sidekiq (Для очередей и кэша) ---
 gem 'redis', '~> 5.0'
@@ -89,33 +89,11 @@ group :test do
   gem 'webdrivers', '~> 5.2'
 end
 
-gem 'redis', '~>5.0'
-gem 'redis-rails'
-
-gem 'kaminari', '~> 1.2.2'
-
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
-
 # Используем Dart Sass вместо sassc
 # gem "sass-embedded", "~> 1.83.2"
-gem 'cssbundling-rails'
-
-gem 'sprockets-rails'
-
-gem 'debug'
-
-gem 'carrierwave', '~>2.2'
-gem 'mini_magick', '~> 4.11'
 
 # gem 'jquery-rails'
-gem 'acts_as_list'
 
-gem 'bootstrap', '~> 5.3'
 # gem 'sass-rails'
 
-gem 'jsbundling-rails', '~> 1.3'
-
 gem 'dotenv-rails', '~> 3.1.8'
-
-gem 'csv', '~> 3.3'
-gem 'geocoder', '~> 1.8'
