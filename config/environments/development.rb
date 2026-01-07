@@ -49,7 +49,15 @@ Rails.application.configure do
   # Action Mailer для разработки
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_caching = false
-  config.action_mailer.default_url_options = { host: '52.195.115.255' }
+
+  # For EC2
+  config.action_mailer.default_url_options = { host: 'smartroutes.learning.datora.org', protocol: 'https' }
+
+  # config.action_mailer.default_url_options = { host: '52.195.115.255' }
+
+  # For local
+  # config.action_mailer.dedault_url_options = { host: 'localhost', port: 3000 }
+
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
 
@@ -76,7 +84,11 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: '52.195.115.255' }
+
+  # config.action_mailer.default_url_options = { host: '52.195.115.255' }
+
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
   config.hosts << 'smartroutes.learning.datora.org'
   config.hosts << '52.195.115.255'
   config.action_mailer.smtp_settings = {

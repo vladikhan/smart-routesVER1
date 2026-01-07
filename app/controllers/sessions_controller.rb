@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 class SessionsController < Devise::SessionsController
+  skip_before_action :check_email_verification, only: %i[create new]
   def new
     self.resource = resource_class.new(sign_in_params)
     super
   end
 
   def create
-    
     user = User.find_by(email: params[:email])
 
     if user && user.authenticate(params[:password])
@@ -18,7 +17,6 @@ class SessionsController < Devise::SessionsController
   end
 
   def logout_confirm
-
   end
 
   def destroy

@@ -1,7 +1,8 @@
 class EmailVerificationsController < ApplicationController
-  skip_before_action :authenticate_user!, only: %i[new create], raise: false
-
+  before_action :authenticate_user!
   def new
+    puts "DEBUG: current_user is #{current_user.inspect}"
+    @user = current_user
   end
 
   def show
@@ -25,6 +26,8 @@ class EmailVerificationsController < ApplicationController
       verification_code: code,
       verification_code_sent_at: Time.current
     )
+
+    UserMailer.verification_code_email(current_user).deliver_now
 
     redirect_to email_verification_path, notice: '確認コードを再送信しました'
   end

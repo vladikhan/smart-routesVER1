@@ -1,25 +1,26 @@
 class RouteItem < ApplicationRecord
   belongs_to :route
   belongs_to :item, polymorphic: true
-  
+  belongs_to :venue, optional: true
+
   validates :route, presence: true
-  validates :position, presence: true, 
-            numericality: { greater_than_or_equal_to: 0 }
+  validates :position, presence: true,
+                       numericality: { greater_than_or_equal_to: 0 }
 
   validates :position, presence: true,
-            numericality: { greater_than_or_equal_to: 0}
-  
+                       numericality: { greater_than_or_equal_to: 0 }
+
   scope :ordered, -> { order(:position) }
-  
+
   # Если venue не указан, можно использовать прямые координаты
   def venue
-    item if item_type == "Venue"
+    item if item_type == 'Venue'
   end
 
   def venue?
-    item_type == "Venue"
+    item_type == 'Venue'
   end
-  
+
   def name
     item&.name
   end
@@ -31,17 +32,17 @@ class RouteItem < ApplicationRecord
   def latitude
     item&.latitude if item.respond_to?(:latitude)
   end
-  
+
   def longitude
     item&.longitude if item.respond_to?(:longitude)
   end
-  
+
   def display_name
     venue&.name || name || "Location #{position + 1}"
   end
 
   def venue?
-    item_type == "Venue"
+    item_type == 'Venue'
   end
 
   def venue?

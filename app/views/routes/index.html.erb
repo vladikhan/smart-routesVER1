@@ -27,7 +27,7 @@
       </h2>
       
       <%= form_with url: routes_path, method: :get, local: true do |f| %>
-        <%= f.hidden_field :q, value: params[:q] %>
+        <%= f.hidden_field :q, value: params[:q], placeholder: "京都に美味しい食べ物" %>
         <%= f.hidden_field :difficulty, value: params[:difficulty] %>
         <%= f.hidden_field :duration, value: params[:duration] %>
         <%= f.hidden_field :cost, value: params[:cost] %>
@@ -133,6 +133,6 @@
   </main>
 
   <!-- Footer -->
-  <%= render 'layouts/footer' %>
+  <%= render 'pages/footer' %>
 </body>
 </html>

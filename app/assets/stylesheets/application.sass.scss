@@ -1,6 +1,6 @@
 //@import "bootstrap";
 
-@import 'login';
+@use 'login';
 
 /* Smart Routes - Main Styles */
 
@@ -21,6 +21,12 @@ $search-bg: #e0e0e0;
 $footer-bg: #2296f3;
 $card-border: #e0e0e0;
 
+main,
+.main-content {
+	flex: 1 0 auto;
+	padding-bottom: 50px;
+}
+
 /* === Body === */
 body {
 	font-family:
@@ -35,6 +41,9 @@ body {
 	background: $bg-color;
 	color: $text-color;
 	line-height: 1.6;
+	margin: 0;
+
+	min-height: 100%;
 }
 
 /* === Header === */
@@ -64,7 +73,7 @@ body {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	position: sticky;
 	top: 0;
-	z-index: 100;
+	z-index: 1000;
 
 	.container {
 		max-width: 1200px;
@@ -129,6 +138,29 @@ body {
 		&:hover {
 			background: rgba(255, 255, 255, 0.9);
 		}
+	}
+}
+
+.resend-container {
+	display: flex;
+	justify-content: center; /* Центрирует по горизонтали */
+	width: 100%;
+	margin-top: 20px;
+}
+
+.resend-button {
+	border: none;
+	border-radius: 10px;
+	color: #666;
+	background-color: #0cbdd1;
+	padding: 16px;
+	cursor: pointer;
+	transition: all 0.3s;
+	font-size: 15px;
+	font-weight: 500;
+
+	&:hover {
+		color: white;
 	}
 }
 /* Notifications */
@@ -669,12 +701,15 @@ body {
 	background: $footer-bg;
 	color: white;
 	padding: 40px 0 20px;
-	margin-top: 60px;
+	width: 100%;
+	flex-shrink: 0;
+	position: relative;
+	z-index: 10;
+	overflow: visible;
 }
 
 .footer-content {
-	display: grid;
-	grid-template-columns: 2fr 1fr 1fr;
+	display: block;
 	gap: 40px;
 	margin-bottom: 30px;
 
@@ -686,15 +721,22 @@ body {
 .footer h5 {
 	margin-bottom: 15px;
 	font-size: 18px;
+	text-align: center;
 }
 
 .footer p {
+	text-align: center;
+	width: 100%;
 	color: rgba(255, 255, 255, 0.7);
 	line-height: 1.6;
+	&:last-child {
+		margin-bottom: 0;
+	}
 }
 
 .footer-links {
 	list-style: none;
+	padding: 0;
 
 	li {
 		margin-bottom: 10px;
@@ -713,9 +755,9 @@ body {
 
 .footer-bottom {
 	text-align: center;
-	padding-top: 20px;
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 	color: rgba(255, 255, 255, 0.5);
+	margin-top: 20px;
 }
 
 /* === Alert === */

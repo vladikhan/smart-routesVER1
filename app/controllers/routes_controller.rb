@@ -1,26 +1,28 @@
-# encoding: utf-8
 class RoutesController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_route, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_owner!, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!, except: %i[index show]
+  before_action :set_route, only: %i[show edit update destroy]
+  before_action :authorize_owner!, only: %i[edit update destroy]
 
   def index
-    @routes = Route.where(is_public: true)
-                   .order(created_at: :desc)
-                   .page(params[:page])
-                   .includes(:user, :city)
-                   .per(10)
+    @routes = Route.all
+
+    return unless params[:q].present?
+
+    @routes = @routes.left_outer_joins(:city).where(
+      'routes.name ILIKE :q OR cities.name ILIKE :q',
+      q: "%#{params[:q]}%"
+    ).distinct
   end
 
   def show
     @route.increment_view_count! if @route.persisted?
-    
+
     @route_items = @route.route_items
                          .ordered
                          .includes(:item)
-                  
+
     @reviews = @route.reviews.order(created_at: :desc)
-    
+
     @map_items = @route_items.map do |item|
       {
         id: item.id,
@@ -47,14 +49,10 @@ class RoutesController < ApplicationController
 
   def create
     @route = current_user.routes.build(route_params)
-    
-    if params[:route][:google_maps_items].present?
-      process_google_maps_items(params[:route][:google_maps_items])
-    end
-    
-    if params[:route][:tag_list].present?
-      @route.tag_list = params[:route][:tag_list].split(',').map(&:strip)
-    end
+
+    process_google_maps_items(params[:route][:google_maps_items]) if params[:route][:google_maps_items].present?
+
+    @route.tag_list = params[:route][:tag_list].split(',').map(&:strip) if params[:route][:tag_list].present?
 
     if @route.save
       redirect_to @route, notice: 'ルートが作成されました'
@@ -66,9 +64,7 @@ class RoutesController < ApplicationController
   end
 
   def update
-    if params[:route][:tag_list].present?
-      @route.tag_list = params[:route][:tag_list].split(',').map(&:strip)
-    end
+    @route.tag_list = params[:route][:tag_list].split(',').map(&:strip) if params[:route][:tag_list].present?
 
     if @route.update(route_params)
       redirect_to @route, notice: 'ルートが更新されました'
@@ -91,9 +87,9 @@ class RoutesController < ApplicationController
   end
 
   def authorize_owner!
-    unless @route.user == current_user
-      redirect_to routes_path, alert: 'アクセスが拒否されました'
-    end
+    return if @route.user == current_user
+
+    redirect_to routes_path, alert: 'アクセスが拒否されました'
   end
 
   def route_params
@@ -106,15 +102,15 @@ class RoutesController < ApplicationController
       :is_public,
       :start_date,
       :end_date,
-      route_items_attributes: [
-        :id,
-        :venue_id,
-        :name,
-        :description,
-        :order_index,
-        :latitude,
-        :longitude,
-        :_destroy
+      route_items_attributes: %i[
+        id
+        venue_id
+        name
+        description
+        order_index
+        latitude
+        longitude
+        _destroy
       ]
     )
   end

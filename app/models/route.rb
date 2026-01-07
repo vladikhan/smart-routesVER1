@@ -1,12 +1,10 @@
 class Route < ApplicationRecord
   # Associations
-  
+
   has_many :venues, through: :route_items
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
   has_many :reviews, as: :reviewable, dependent: :destroy
-
-  
 
   # Ассоциации
   belongs_to :user
@@ -18,25 +16,23 @@ class Route < ApplicationRecord
   has_many :tags, through: :entity_tags
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :notifications, -> { where(entity_type: 'Route') },
-            foreign_key: :entity_id, dependent: :destroy
-  has_many :venues, -> { where(route_items: { item_type: 'Venue'}) },
+           foreign_key: :entity_id, dependent: :destroy
+  has_many :venues, -> { where(route_items: { item_type: 'Venue' }) },
            through: :route_items,
            source: :item,
            source_type: 'Venue'
 
- 
-  
   # Для тегов (если используется acts-as-taggable-on)
   if defined?(ActsAsTaggableOn)
     acts_as_taggable_on :tags
   else
     # Простая реализация тегов без гема
     serialize :tag_list, Array
-    
+
     def tag_list
       super || []
     end
-    
+
     def tag_list=(value)
       if value.is_a?(String)
         super(value.split(',').map(&:strip))
@@ -45,39 +41,47 @@ class Route < ApplicationRecord
       end
     end
   end
-  
+
   # Validations
   validates :name, presence: true, length: { maximum: 100 }
   validates :user, presence: true
   validates :city, presence: true
   validates :view_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  
+
   # Вложенные атрибуты
-  accepts_nested_attributes_for :route_items, 
+  accepts_nested_attributes_for :route_items,
                                 allow_destroy: true,
                                 reject_if: :all_blank
-  
+
   # Скоупы
   scope :public_routes, -> { where(is_public: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :trending, -> { order(view_count: :desc) }
   scope :by_city, ->(city_id) { where(city_id: city_id) }
-  scope :budget, -> { where("estimated_cost <= ?", 5000) }
-  
+  scope :budget, -> { where('estimated_cost <= ?', 5000) }
+  scope :search_by_name_and_city, lambda { |query|
+    left_outer_joins(:city).where(
+      'routes.name ILIKE :q OR
+                        cities.name ILIKE :q OR
+                        venues.name ILIKE :q',
+      q: "%#{params[:query]}"
+    ).distinct
+  }
+
   # Колбэки
   before_create :initialize_view_count
-  
+
   # Методы
   def increment_view_count!
     increment!(:view_count)
   end
-  
+
   def owner?(user)
     self.user == user
   end
-  
+
   private
-  
+
   def initialize_view_count
     self.view_count ||= 0
   end

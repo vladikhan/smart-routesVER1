@@ -1,29 +1,24 @@
 <div class="container">
   <div class="stats">
     
-    <%# Карточка маршрутов %>
     <%= link_to routes_path, class: "stat-card" do %>
       <div class="stat-icon">🗺️</div>
       <div class="stat-number"><%= @routes_count %></div>
       <div class="stat-label">ルート</div>
     <% end %>
     
-
-    <%# Карточка мест %>
     <%= link_to venues_path, class: "stat-card" do %>
       <div class="stat-icon">📍</div>
       <div class="stat-number"><%= @venues_count %></div>
       <div class="stat-label">場所</div>
     <% end %>
 
-    <%# Карточка пользователей %>
     <%= link_to users_path, class: "stat-card" do %>
       <div class="stat-icon">👥</div>
       <div class="stat-number"><%= @users_count %></div>
       <div class="stat-label">ユーザー</div>
     <% end %>
 
-    <%# Карточка отзывов %>
     <div class="stat-card">
         <div class="stat-icon">⭐</div>
         <div class="stat-number"><%= @reviews_count %></div>
