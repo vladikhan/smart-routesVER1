@@ -30,7 +30,7 @@ gem 'devise'
 gem 'devise-i18n'
 
 # --- Загрузка файлов и AWS ---
-gem 'asset_sync'
+# gem 'asset_sync'
 gem 'aws-sdk-s3', require: false
 gem 'carrierwave', '~> 2.2'
 gem 'fog-aws'

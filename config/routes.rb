@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   mount ActionCable.server => '/cable'
 
   get 'home/index'
+  get '/health/check', to: proc { [200, {}, ['OK']] }
 
   devise_for :users, path: '', path_names: {
     sign_in: 'login',

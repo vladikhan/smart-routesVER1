@@ -46,7 +46,8 @@ class Notification < ApplicationRecord
   end
 
   def entity_type_japanese
-    case entity_type
+    case notifiable_type
+
     when 'Route'
       'ルート'
     when 'Venue'

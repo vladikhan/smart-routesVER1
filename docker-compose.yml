@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b 0.0.0.0"
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb"
     volumes:
       - .:/app
     env_file:
@@ -37,7 +37,8 @@ services:
       - redis
     environment:
       DISABLE_SPRING: 1
-      RAILS_ENV: development
+      RAILS_ENV: production
+      NODE_ENV: production
       DATABASE_URL: postgres://postgres:password@db:5432/smart_routes_dev
       REDIS_URL: redis://redis:6379/0
       GMAIL_USERNAME: ${GMAIL_USERNAME}
@@ -45,6 +46,7 @@ services:
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY}
       RAILS_SERVE_STATIC_FILES: "true"
+      RAILS_HOSTS: "smartroutes.learning.datora.org,52.195.115.255,.datora.org,localhost,127.0.0.1,10.1.23.250"
 
 volumes:
   redis_data:
