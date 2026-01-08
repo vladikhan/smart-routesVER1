@@ -1,6 +1,6 @@
 class DmRoomsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_dm_rooms, only: %i[index show]
+  before_action :sent_dm_rooms, only: %i[index show]
   before_action :set_active_room, only: %i[show mark_all_as_read]
 
   def index

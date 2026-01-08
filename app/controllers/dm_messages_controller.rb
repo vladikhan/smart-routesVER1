@@ -1,6 +1,6 @@
 class DmMessagesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_dm_rooms
+  before_action :sent_dm_rooms
 
   def create
     return render json: { error: 'Access denied' }, status: :firbidden unless @dm_room.participant?(current_user)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_01_08_004641) do
+ActiveRecord::Schema.define(version: 2026_01_08_074916) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 2026_01_08_004641) do
     t.boolean "is_read", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "read_at"
     t.index ["dm_room_id"], name: "index_dm_messages_on_dm_room_id"
     t.index ["is_read"], name: "index_dm_messages_on_is_read"
     t.index ["user_id"], name: "index_dm_messages_on_user_id"
@@ -89,6 +90,8 @@ ActiveRecord::Schema.define(version: 2026_01_08_004641) do
     t.datetime "last_message_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "unread_count_sender"
+    t.integer "unread_count_receiver"
     t.index ["receiver_id"], name: "index_dm_rooms_on_receiver_id"
     t.index ["sender_id", "receiver_id"], name: "index_dm_rooms_on_sender_id_and_receiver_id", unique: true
     t.index ["sender_id"], name: "index_dm_rooms_on_sender_id"

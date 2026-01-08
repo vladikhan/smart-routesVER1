@@ -12,7 +12,6 @@ class DmRoom < ApplicationRecord
     where(sender_id: u1, receiver_id: u2).first_or_create!
   end
 
-  # Добавляем этот метод, чтобы тесты и контроллер (DmRoomsController#create) работали
   def self.find_or_create_between(user1, user2)
     between(user1.id, user2.id)
   end
@@ -31,6 +30,10 @@ class DmRoom < ApplicationRecord
 
   def any_unread_for?(user)
     unread_count_for(user) > 0
+  end
+
+  def participant?(user)
+    sender_id == user.id || receiver_id == user.id
   end
 
   def reset_unread_for(user)

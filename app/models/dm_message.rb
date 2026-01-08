@@ -13,6 +13,7 @@ class DmMessage < ApplicationRecord
   after_create_commit :create_notification
 
   scope :unread, -> { where(is_read: false) }
+  scope :unread_by, ->(user) { where(is_read: false).where.not(user_id: user.id) }
 
   def mark_as_read
     update_columns(is_read: true, read_at: Time.current)
