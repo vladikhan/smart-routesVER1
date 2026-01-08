@@ -52,8 +52,7 @@ class DmMessage < ApplicationRecord
     Notification.create!(
       user_id: receiver.id,
       actor_id: user.id,
-      entity_type: 'DmMessage',
-      entity_id: id,
+      notifiable: self,
       notification_type: 'new_message'
     )
   end

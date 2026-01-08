@@ -1,71 +1,100 @@
+
+
 <div class="container-fluid vh-100" style="max-width: 1400px; padding: 0;">
   <div class="row g-0 h-100">
-    <!-- Левая панель: список чатов -->
-    <div class="col-md-4 col-lg-3 border-end bg-white" style="overflow-y: auto; height: 100vh;">
-      <div class="p-3 border-bottom">
-        <h5 class="mb-0">メッセージ</h5>
+    
+    <!-- ========== ЛЕВАЯ ПАНЕЛЬ: СПИСОК ЧАТОВ ========== -->
+    <div class="col-md-4 col-lg-3 border-end bg-white dm-chat-sidebar">
+      <!-- Шапка списка чатов -->
+      <div class="p-3 border-bottom bg-light">
+        <h5 class="mb-0 fw-bold">メッセージ</h5>
       </div>
       
+      <!-- Список чатов -->
       <div class="list-group list-group-flush">
-        <% @dm_rooms.each do |room| %>
-          <% other_user = room.other_user(current_user) %>
-          <% last_msg = room.last_message %>
-          <% unread_count = current_user.id == room.sender_id ? room.unread_count_sender : room.unread_count_receiver %>
-          
-          <%= link_to dm_room_path(room), 
-                      class: "list-group-item list-group-item-action border-0 #{'active bg-light' if @active_room&.id == room.id}",
-                      data: { turbo_frame: 'chat_area' } do %>
-            <div class="d-flex align-items-center">
-              <!-- Аватар -->
-              <div class="position-relative me-3">
-                <%= image_tag other_user.avatar_url || 'default_avatar.png', 
-                             class: 'rounded-circle', 
-                             size: '48x48',
-                             style: 'object-fit: cover;' %>
-                
-                <!-- Онлайн индикатор (опционально) -->
-                <% if other_user.online? %>
-                  <span class="position-absolute bottom-0 end-0 bg-success rounded-circle" 
-                        style="width: 12px; height: 12px; border: 2px solid white;"></span>
-                <% end %>
-              </div>
+        <% if @dm_rooms.any? %>
+          <% @dm_rooms.each do |room| %>
+            <% other_user = room.other_user(current_user) %>
+            <% last_msg = room.last_message %>
+            <% unread_count = current_user.id == room.sender_id ? room.unread_count_sender : room.unread_count_receiver %>
+            
+            <%= link_to dm_room_path(room), 
+                        class: "list-group-item list-group-item-action border-0 chat-list-item #{'active' if @active_room&.id == room.id}",
+                        data: { turbo_frame: 'chat_area' } do %>
               
-              <div class="flex-grow-1 min-width-0">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                  <h6 class="mb-0 fw-bold text-truncate">@<%= other_user.username %></h6>
-                  <small class="text-muted"><%= time_ago_in_words(room.last_message_at || room.created_at) %>前</small>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center">
-                  <p class="mb-0 text-muted text-truncate small">
-                    <%= last_msg&.message&.truncate(30) || 'まだメッセージがありません' %>
-                  </p>
+              <div class="d-flex align-items-center py-2">
+                <!-- Аватар -->
+                <div class="position-relative me-3">
+                  <% if other_user.avatar.attached? %>
+                    <%= image_tag other_user.avatar, class: 'chat-avatar', alt: other_user.username %>
+                  <% else %>
+                    <%= image_tag "https://ui-avatars.com/api/?name=#{other_user.username}&size=48&background=random", 
+                                 class: 'chat-avatar', 
+                                 alt: other_user.username %>
+                  <% end %>
                   
-                  <% if unread_count > 0 %>
-                    <span class="badge rounded-pill bg-primary"><%= unread_count %></span>
+                  <!-- Онлайн индикатор (если есть метод online?) -->
+                  <% if other_user.respond_to?(:online?) && other_user.online? %>
+                    <span class="online-indicator"></span>
                   <% end %>
                 </div>
+                
+                <div class="flex-grow-1 min-width-0">
+                  <!-- Имя и время -->
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="mb-0 fw-bold text-truncate">@<%= other_user.username %></h6>
+                    <small class="text-muted">
+                      <%= time_ago_in_words(room.last_message_at || room.created_at) %>前
+                    </small>
+                  </div>
+                  
+                  <!-- Последнее сообщение и бадж -->
+                  <div class="d-flex justify-content-between align-items-center">
+                    <p class="mb-0 text-muted text-truncate small" style="max-width: 200px;">
+                      <% if last_msg %>
+                        <% if last_msg.user_id == current_user.id %>
+                          <span class="text-primary">あなた:</span>
+                        <% end %>
+                        <%= last_msg.message&.truncate(30) || '📷 画像' %>
+                      <% else %>
+                        まだメッセージがありません
+                      <% end %>
+                    </p>
+                    
+                    <% if unread_count > 0 %>
+                      <span class="unread-badge"><%= unread_count %></span>
+                    <% end %>
+                  </div>
+                </div>
               </div>
-            </div>
+            <% end %>
           <% end %>
+        <% else %>
+          <div class="text-center p-5 text-muted">
+            <i class="bi bi-chat-dots" style="font-size: 3rem;"></i>
+            <p class="mt-3">チャットがありません</p>
+          </div>
         <% end %>
       </div>
     </div>
     
-    <!-- Правая панель: чат -->
-    <div class="col-md-8 col-lg-9 d-flex flex-column bg-light" style="height: 100vh;">
+    <!-- ========== ПРАВАЯ ПАНЕЛЬ: ЧАТ ========== -->
+    <div class="col-md-8 col-lg-9 d-flex flex-column dm-chat-main">
       <%= turbo_frame_tag 'chat_area' do %>
         <% if @active_room %>
           <%= render 'dm_rooms/chat_window', dm_room: @active_room, messages: @messages %>
         <% else %>
+          <!-- Пустое состояние -->
           <div class="d-flex align-items-center justify-content-center h-100">
             <div class="text-center text-muted">
-              <i class="bi bi-chat-dots" style="font-size: 4rem;"></i>
-              <p class="mt-3">チャットを選択してください</p>
+              <i class="bi bi-chat-dots" style="font-size: 5rem; opacity: 0.3;"></i>
+              <h5 class="mt-4">チャットを選択してください</h5>
+              <p>左側からチャットを選んでメッセージを開始しましょう</p>
             </div>
           </div>
         <% end %>
       <% end %>
     </div>
+    
   </div>
 </div>

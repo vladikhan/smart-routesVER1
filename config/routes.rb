@@ -46,14 +46,17 @@ Rails.application.routes.draw do
   resources :cities, only: %i[index show]
   resources :users
 
+  get 'sent_dm_rooms', to: 'dm_rooms#sent', as: 'sent_dm_rooms'
+
   resources :dm_rooms, only: %i[index show create] do
+    collection do
+      get :sent
+      get :received
+    end
     member do
       post :mark_all_as_read
     end
     resources :dm_messages, only: [:create]
-    member do
-      post :mark_all_as_read
-    end
   end
 
   # Notification routes

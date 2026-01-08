@@ -41,7 +41,7 @@ class User < ApplicationRecord
   end
 
   # Override Devise confirmable to use code instead of link
-  def senf_confirmation_instructions
+  def send_confirmation_instructions
     generate_verification_code
     UserMailer.verification_code_email(self).deliver_now
   end
@@ -102,22 +102,23 @@ class User < ApplicationRecord
   def admin?
     is_admin
   end
-end
 
-def dm_rooms
-  DmRoom.where('sender_id = ? OR receiver_id = ?', id, id)
-        .order(last_message_at: :desc)
-end
+  def dm_rooms
+    DmRoom.where('sender_id = ? OR receiver_id = ?', id, id)
+          .order(last_message_at: :desc)
+  end
 
-# Для совместимости с Devise confirmable в тестах
-def confirmed?
-  email_verified
-end
+  def confirmed?
+    email_verified
+  end
 
-def active_for_authentication?
-  super && email_verified
-end
+  # Для совместимости с Devise confirmable в тестах
 
-def inactive_message
-  email_verified ? super : :unconfirmed
+  def active_for_authentication?
+    super && email_verified
+  end
+
+  def inactive_message
+    email_verified ? super : :unconfirmed
+  end
 end

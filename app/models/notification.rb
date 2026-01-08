@@ -1,6 +1,7 @@
 class Notification < ApplicationRecord
   belongs_to :actor, class_name: 'User'
-  belongs_to :notifiable, polymorphic: true
+  belongs_to :notifiable, polymorphic: true, foreign_type: 'entity_type', foreign_key: 'entity_id'
+  belongs_to :user
 
   validates :notification_type, presence: true
   validates :entity_type, presence: true

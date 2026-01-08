@@ -58,6 +58,8 @@ gem 'slack-notifier'       # Уведомления в Slack
 gem 'validates_timeliness', '~> 6.0'
 gem 'valid_email2'
 
+gem 'turbo-rails'
+
 # --- Группа разработки и тестов ---
 group :development, :test do
   gem 'bullet' # Ищет лишние запросы в базу (N+1)

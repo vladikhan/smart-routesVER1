@@ -32,6 +32,14 @@ class DmRoomsController < ApplicationController
     head :ok
   end
 
+  def sent
+    sent_dm_rooms
+
+    @active_room = @dm_rooms.first
+    prepare_active_room_data if @active_room
+    render :index
+  end
+
   private
 
   def sent_dm_rooms

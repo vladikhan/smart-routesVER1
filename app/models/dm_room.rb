@@ -6,23 +6,25 @@ class DmRoom < ApplicationRecord
   validates :sender_id, uniqueness: { scope: :receiver_id }
   validate :sender_and_receiver_are_different
 
-  # Метод класса для поиска или создания комнаты
+  # Твой оригинальный метод с сортировкой ID
   def self.between(user1_id, user2_id)
-    u1, u2 = [user1_id, user2_id].sort
-    where(sender_id: u1, receiver_id: u2).first_or_create
+    u1, u2 = [user1_id.to_i, user2_id.to_i].sort
+    where(sender_id: u1, receiver_id: u2).first_or_create!
   end
 
-  # Получить собеседника
+  # Добавляем этот метод, чтобы тесты и контроллер (DmRoomsController#create) работали
+  def self.find_or_create_between(user1, user2)
+    between(user1.id, user2.id)
+  end
+
   def other_user(current_user)
     current_user.id == sender_id ? receiver : sender
   end
 
-  # Последнее сообщение в этой комнате
   def last_message
     dm_messages.order(created_at: :desc).first
   end
 
-  # Количество непрочитанных для конкретного юзера
   def unread_count_for(user)
     (user.id == sender_id ? unread_count_sender : unread_count_receiver).to_i
   end
@@ -31,7 +33,6 @@ class DmRoom < ApplicationRecord
     unread_count_for(user) > 0
   end
 
-  # ОБЯЗАТЕЛЬНО: Сброс счетчика при открытии чата
   def reset_unread_for(user)
     if user.id == sender_id
       update_columns(unread_count_sender: 0)

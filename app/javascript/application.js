@@ -4,3 +4,4 @@ import './channels'
 import './controllers'
 import './maps'
 import './notifications'
+require('@rails/activestorage').start()

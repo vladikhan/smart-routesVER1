@@ -7,6 +7,8 @@ Rails.application.configure do
   config.eager_load = true
 
   config.hosts << 'smartroutes.learning.datora.org'
+  config.hosts << '52.195.115.255'
+  config.hosts << '.datora.org'
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
