@@ -24,10 +24,12 @@ class DmMessage < ApplicationRecord
     dm_room.update(last_message_at: created_at)
   end
 
-  def increment_unread_count
-    receiver = dm_room.other_user(user)
-    # Убедись, что этот метод есть в модели DmRoom!
-    dm_room.increment_unread_for(receiver) if dm_room.respond_to?(:increment_unread_for)
+  def increment_unread_for(user)
+    if user.id == sender_id
+      increment!(:unread_count_sender)
+    else
+      increment!(:unread_count_receiver)
+    end
   end
 
   def broadcast_message
@@ -48,9 +50,10 @@ class DmMessage < ApplicationRecord
     return unless receiver
 
     Notification.create!(
-      user: receiver,
-      actor: user,
-      notifiable: self,
+      user_id: receiver.id,
+      actor_id: user.id,
+      entity_type: 'DmMessage',
+      entity_id: id,
       notification_type: 'new_message'
     )
   end
