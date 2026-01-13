@@ -8,9 +8,9 @@ class DmMessage < ApplicationRecord
 
   # コールバック
   after_create_commit :update_room_timestamp
-  after_create_commit :increment_unread_count
-  after_create_commit :broadcast_message
-  after_create_commit :create_notification
+  after_create_commit :increment_unread_for
+  # after_create_commit :broadcast_message
+  # after_create_commit :create_notification
 
   scope :unread, -> { where(is_read: false) }
   scope :unread_by, ->(user) { where(is_read: false).where.not(user_id: user.id) }
@@ -25,26 +25,28 @@ class DmMessage < ApplicationRecord
     dm_room.update(last_message_at: created_at)
   end
 
-  def increment_unread_for(user)
-    if user.id == sender_id
-      increment!(:unread_count_sender)
+  def increment_unread_for
+    receiver = dm_room.sender_id == user_id ? dm_room.receiver : dm_room.sender
+
+    if dm_room.sender_id == user_id
+      dm_room.increment!(:unread_count_receiver)
     else
-      increment!(:unread_count_receiver)
+      dm_room.increment!(:unread_count_sender)
     end
   end
 
-  def broadcast_message
-    ActionCable.server.broadcast(
-      "dm_room_#{dm_room.id}",
-      {
-        user_id: user.id,
-        html: ApplicationController.render(
-          partial: 'dm_messages/message',
-          locals: { message: self, current_user: nil }
-        )
-      }
-    )
-  end
+  # def broadcast_message
+  # ActionCable.server.broadcast(
+  #  "dm_room_#{dm_room.id}",
+  # {
+  #  user_id: user.id,
+  # html: ApplicationController.render(
+  #  partial: 'dm_messages/message',
+  # locals: { message: self, current_user: nil }
+  #      )
+  #   }
+  # )
+  # end
 
   def create_notification
     receiver = dm_room.other_user(user)

@@ -1,0 +1,21 @@
+<div class="dm-chat-header">
+  <div class="header-content">
+    <div class="user-info">
+      <%= image_tag @other_user.avatar_url, class: 'user-avatar' %>
+      <div class="user-details">
+        <h5 class="user-name"><%= @other_user.name %></h5>
+        <span class="user-status">
+          <%= @other_user.online? ? 'Online' : "was #{time_ago_in_words(@other_user.last_seen_at)} ago" %>
+        </span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" title="Search">
+        <i class="bi bi-search"></i>
+      </button>
+      <button class="btn-icon" title="Settings">
+        <i class="bi bi-three-dots-vertical"></i>
+      </button>
+    </div>
+  </div>
+</div>

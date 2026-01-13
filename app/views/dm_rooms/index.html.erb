@@ -1,530 +1,206 @@
-<div class="dm-container">
+<%= stylesheet_link_tag 'dmRooms', media: 'all' %>
+<%= render 'pages/header'%>
+
+<div class="dm-chat-container">
   <!-- Left Sidebar: Room List -->
-  <div class="dm-sidebar">
-    <div class="dm-sidebar-header">
-      <h4 class="mb-0">メッセージ</h4>
-      <%= link_to sent_dm_rooms_path, class: "btn btn-sm btn-outline-primary" do %>
+  <div class="dm-chat-sidebar" id="chatSidebar">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+      <h4>メッセージ</h4>
+      <%= link_to sent_dm_rooms_path, class: "btn btn-sm btn-outline-light" do %>
         <i class="fas fa-paper-plane"></i> 送信済み
       <% end %>
     </div>
     
-    <div class="dm-rooms-list">
+    <!-- Chat Search -->
+    <div class="chat-search">
+      <input type="text" placeholder="チャットを検索..." id="chatSearchInput" class="search-input">
+    </div>
+    
+    <!-- Rooms List -->
+    <div class="list-group list-group-flush">
       <% if @dm_rooms.any? %>
         <% @dm_rooms.each do |room| %>
           <% other = room.other_user(current_user) %>
           <%= link_to dm_room_path(room), 
-              class: "dm-room-item #{room == @active_room ? 'active' : ''}", 
+              class: "list-group-item chat-list-item #{room == @active_room ? 'active' : ''}", 
               data: { room_id: room.id } do %>
             
-            <div class="dm-room-avatar">
-              <% if other.image_url.present? %>
-                <%= image_tag other.image_url, class: "avatar-img", alt: other.username %>
-              <% else %>
-                <div class="avatar-placeholder">
-                  <%= other.username[0].upcase %>
-                </div>
-              <% end %>
-            </div>
-            
-            <div class="dm-room-info">
-              <div class="dm-room-name">
-                <%= other.username %>
-                <% if room.any_unread_for?(current_user) %>
-                  <span class="unread-badge"><%= room.unread_count_for(current_user) %></span>
-                <% end %>
-              </div>
-              <div class="dm-room-last-message">
-                <% if room.last_message %>
-                  <%= truncate(room.last_message.content, length: 40) %>
+            <div class="chat-content">
+              <div class="chat-avatar-wrapper">
+                <% if other.image_url.present? %>
+                  <%= image_tag other.image_url, class: "chat-avatar", alt: other.username %>
                 <% else %>
-                  <span class="text-muted">メッセージがありません</span>
+                  <div class="chat-avatar" style="background: linear-gradient(135deg, #5ab2f7, #12cff3 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                    <%= other.username[0].upcase %>
+                  </div>
+                <% end %>
+                
+                <% if other.respond_to?(:online?) && other.online? %>
+                  <span class="online-indicator"></span>
                 <% end %>
               </div>
-            </div>
-            
-            <div class="dm-room-time">
-              <% if room.last_message %>
-                <%= time_ago_in_words(room.last_message.created_at) %>前
-              <% end %>
+              
+              <div class="chat-info">
+                <div class="chat-header">
+                  <span class="chat-name"><%= other.username %></span>
+                  <span class="chat-time">
+                    <% if room.last_message %>
+                      <%= time_ago_in_words(room.last_message.created_at) %>前
+                    <% end %>
+                  </span>
+                </div>
+                
+                <div class="chat-preview">
+                  <span class="last-message">
+                    <% if room.last_message %>
+                      <%= truncate(room.last_message.message, length: 40) %>
+                    <% else %>
+                      <span class="text-muted">メッセージがありません</span>
+                    <% end %>
+                  </span>
+                  
+                  <% if room.any_unread_for?(current_user) %>
+                    <span class="unread-badge"><%= room.unread_count_for(current_user) %></span>
+                  <% end %>
+                </div>
+              </div>
             </div>
           <% end %>
         <% end %>
       <% else %>
         <div class="empty-state">
-          <i class="fas fa-comments fa-3x text-muted mb-3"></i>
-          <p class="text-muted">メッセージがありません</p>
+          <div class="empty-icon"><i class="fas fa-comments"></i></div>
+          <h3>メッセージがありません</h3>
+          <p>新しい会話を始めましょう！</p>
         </div>
       <% end %>
     </div>
   </div>
-
   <!-- Right Panel: Chat Messages -->
-  <div class="dm-chat-area">
+  <div class="dm-chat-main">
     <% if @active_room %>
       <% other = @active_room.other_user(current_user) %>
       
       <!-- Chat Header -->
       <div class="dm-chat-header">
-        <div class="d-flex align-items-center">
-          <div class="dm-header-avatar">
-            <% if @active_room.other_user(current_user).image_url.present? %>
-              <%= image_tag @active_room.other_user(current_user).image_url, class: "avatar-img" %>
-            <% else %>
-              <div class="avatar-placeholder">
-                <%= @active_room.other_user(current_user).username[0].upcase %>
-              </div>
+        <div class="header-content">
+          <div class="user-info">
+            <div class="chat-avatar-wrapper">
+              <% if other.image_url.present? %>
+                <%= image_tag other.image_url, class: "user-avatar", alt: other.username %>
+              <% else %>
+                <div class="user-avatar" style="background: linear-gradient(135deg, #5ab2f7, #12cff3 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                  <%= other.username[0].upcase %>
+                </div>
+              <% end %>
+            </div>
+            
+            <div class="user-details">
+              <h5 class="user-name"><%= other.username %></h5>
+              <span class="user-status">
+                <% if other.respond_to?(:online?) && other.online? %>
+                  オンライン
+                <% else %>
+                  オフライン
+                <% end %>
+              </span>
+            </div>
+          </div>
+          
+          <div class="header-actions">
+            <%= link_to user_path(other), class: "btn-icon", title: "プロフィールを見る" do %>
+              <i class="fas fa-user"></i>
             <% end %>
+            <button class="btn-icon" title="その他">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
           </div>
-          <div>
-            <h5 class="mb-0"><%= other.username %></h5>
-            <small class="text-muted">オンライン</small>
-          </div>
-        </div>
-        
-        <div class="dm-header-actions">
-          <%= link_to user_path(other), class: "btn btn-sm btn-light", title: "プロフィールを見る" do %>
-            <i class="fas fa-user"></i>
-          <% end %>
         </div>
       </div>
 
       <!-- Messages Container -->
-      <div id="messages-container" class="dm-messages-container">
-        <% if @messages.any? %>
-          <% @messages.each do |message| %>
-            <div class="message-item <%= message.user == current_user ? 'message-sent' : 'message-received' %>"
-                 data-message-id="<%= message.id %>">
-              
-              <% unless message.user == current_user %>
-                <div class="message-avatar">
-                  <% if message.user.profile_image.attached? %>
-                    <%= image_tag message.user.profile_image, class: "avatar-img-sm" %>
-                  <% else %>
-                    <div class="avatar-placeholder-sm">
-                      <%= message.user.username[0].upcase %>
-                    </div>
-                  <% end %>
-                </div>
-              <% end %>
-              
-              <div class="message-bubble">
-                <div class="message-content">
-                  <%= simple_format(message.content) %>
-                </div>
-                <div class="message-meta">
-                  <small class="message-time">
-                    <%= message.created_at.strftime("%H:%M") %>
-                  </small>
-                  <% if message.user == current_user && message.is_read? %>
-                    <i class="fas fa-check-double text-primary" title="既読"></i>
-                  <% elsif message.user == current_user %>
-                    <i class="fas fa-check text-muted" title="送信済み"></i>
-                  <% end %>
-                </div>
+      <div class="dm-messages-area" id="messages-area">
+        <div id="messages-container">
+          <% if @messages.any? %>
+            <% group_messages_by_date(@messages).each do |date, messages| %>
+              <div class="date-divider">
+                <span><%= format_message_date(date) %></span>
               </div>
+              
+              <% messages.each do |message| %>
+                <%= render partial: 'dm_messages/message', 
+                          locals: { message: message, current_user: current_user } %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fas fa-comment-dots"></i></div>
+              <h3>会話を始めましょう！</h3>
+              <p>最初のメッセージを送信してください</p>
             </div>
           <% end %>
-        <% else %>
-          <div class="empty-chat-state">
-            <i class="fas fa-comment-dots fa-3x text-muted mb-3"></i>
-            <p class="text-muted">最初のメッセージを送信しましょう！</p>
-          </div>
-        <% end %>
+        </div>
       </div>
 
       <!-- Message Input Form -->
-      <div class="dm-chat-footer">
+      <div class="dm-input-area">
+        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span><%= other.username %>が入力中...</span>
+        </div>
+        
         <%= form_with url: dm_room_dm_messages_path(@active_room), 
                       method: :post,
                       local: false,
                       id: "new-message-form",
-                      class: "dm-message-form" do |f| %>
+                      class: "message-form" do |f| %>
           
-          <div class="message-input-wrapper">
-            <%= f.text_area :content, 
-                           rows: 1,
-                           class: "form-control message-input",
-                           placeholder: "メッセージを入力...",
-                           id: "message-content-input",
-                           autocomplete: "off" %>
-            
-            <button type="button" class="btn btn-light btn-icon emoji-btn" title="絵文字">
-              <i class="far fa-smile"></i>
+          <div class="input-wrapper">
+            <button type="button" class="attachment-btn" title="ファイルを添付">
+              <i class="fas fa-paperclip"></i>
             </button>
+            
+            <div class="input-container">
+              <%= f.text_area :content, 
+                             rows: 1,
+                             class: "message-textarea",
+                             placeholder: "メッセージを入力...",
+                             id: "message-content-input",
+                             autocomplete: "off",
+                             maxlength: 5000 %>
+              
+              <button type="button" class="emoji-btn" title="絵文字">😊</button>
+            </div>
+            
+            <%= f.submit class: "send-btn", id: "send-message-btn" do %>
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+              </svg>
+            <% end %>
           </div>
-          
-          <%= f.submit "送信", class: "btn btn-primary btn-send", id: "send-message-btn" %>
         <% end %>
       </div>
 
     <% else %>
-      <div class="empty-chat-area">
-        <i class="fas fa-comments fa-4x text-muted mb-4"></i>
-        <h4 class="text-muted">チャットを選択してください</h4>
-        <p class="text-muted">左側から会話を選んでメッセージを始めましょう</p>
+      <div class="empty-state" style="height: 100vh;">
+        <div class="empty-icon"><i class="fas fa-comments"></i></div>
+        <h3>チャットを選択してください</h3>
+        <p>左側から会話を選んでメッセージを始めましょう</p>
       </div>
     <% end %>
   </div>
 </div>
 
-<style>
-/* Container */
-.dm-container {
-  display: flex;
-  height: calc(100vh - 80px);
-  background: #f8f9fa;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-/* Sidebar */
-.dm-sidebar {
-  width: 360px;
-  background: white;
-  border-right: 1px solid #e9ecef;
-  display: flex;
-  flex-direction: column;
-}
-
-.dm-sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.dm-sidebar-header h4 {
-  color: white;
-}
-
-.dm-rooms-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 0;
-}
-
-.dm-room-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  color: inherit;
-  border-left: 3px solid transparent;
-}
-
-.dm-room-item:hover {
-  background: #f8f9fa;
-}
-
-.dm-room-item.active {
-  background: #e7f3ff;
-  border-left-color: #007bff;
-}
-
-.dm-room-avatar {
-  position: relative;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.avatar-img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.online-badge {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 12px;
-  height: 12px;
-  background: #28a745;
-  border: 2px solid white;
-  border-radius: 50%;
-}
-
-.dm-room-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.dm-room-name {
-  font-weight: 600;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.unread-badge {
-  background: #007bff;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.dm-room-last-message {
-  font-size: 13px;
-  color: #6c757d;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dm-room-time {
-  font-size: 11px;
-  color: #adb5bd;
-  flex-shrink: 0;
-}
-
-/* Chat Area */
-.dm-chat-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: white;
-}
-
-.dm-chat-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid #e9ecef;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: white;
-  z-index: 10;
-}
-
-.dm-header-avatar {
-  margin-right: 12px;
-}
-
-.dm-messages-container {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-  background: #f8f9fa;
-  scroll-behavior: smooth;
-}
-
-.dm-messages-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.dm-messages-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-/* Messages */
-.message-item {
-  display: flex;
-  margin-bottom: 16px;
-  animation: slideIn 0.3s ease-out;
-}
-
-.message-sent {
-  justify-content: flex-end;
-}
-
-.message-received {
-  justify-content: flex-start;
-}
-
-.message-avatar {
-  margin-right: 8px;
-  flex-shrink: 0;
-}
-
-.avatar-img-sm {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.avatar-placeholder-sm {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.message-bubble {
-  max-width: 60%;
-  padding: 12px 16px;
-  border-radius: 18px;
-  position: relative;
-}
-
-.message-sent .message-bubble {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.message-received .message-bubble {
-  background: white;
-  border: 1px solid #e9ecef;
-  border-bottom-left-radius: 4px;
-}
-
-.message-content {
-  word-wrap: break-word;
-  line-height: 1.5;
-}
-
-.message-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.message-time {
-  opacity: 0.7;
-}
-
-.message-sent .message-time {
-  color: white;
-}
-
-.message-received .message-time {
-  color: #6c757d;
-}
-
-/* Chat Footer */
-.dm-chat-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #e9ecef;
-  background: white;
-}
-
-.dm-message-form {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-}
-
-.message-input-wrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  background: #f8f9fa;
-  border-radius: 24px;
-  padding: 8px 16px;
-  gap: 8px;
-}
-
-.message-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  resize: none;
-  outline: none;
-  max-height: 120px;
-  font-size: 14px;
-}
-
-.message-input:focus {
-  box-shadow: none;
-}
-
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-}
-
-.btn-send {
-  border-radius: 24px;
-  padding: 10px 24px;
-  font-weight: 600;
-}
-
-/* Empty States */
-.empty-state,
-.empty-chat-state,
-.empty-chat-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #6c757d;
-}
-
-/* Animations */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .dm-sidebar {
-    width: 100%;
-    position: absolute;
-    z-index: 20;
-    height: 100%;
-  }
-  
-  .dm-sidebar.hidden {
-    display: none;
-  }
-  
-  .message-bubble {
-    max-width: 80%;
-  }
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Auto-scroll to bottom on load
-  const messagesContainer = document.getElementById('messages-container');
-  if (messagesContainer) {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  // Auto-scroll to bottom
+  const messagesArea = document.querySelector('.dm-messages-area');
+  if (messagesArea) {
+    messagesArea.scrollTop = messagesArea.scrollHeight;
   }
 
   // Auto-resize textarea
@@ -532,10 +208,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (textarea) {
     textarea.addEventListener('input', function() {
       this.style.height = 'auto';
-      this.style.height = (this.scrollHeight) + 'px';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
 
-    // Submit on Enter (but allow Shift+Enter for new line)
+    // Enter to send (Shift+Enter for new line)
     textarea.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -544,17 +220,60 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Mark messages as read when opening room
-  if (messagesContainer) {
-    const roomId = document.querySelector('.dm-room-item.active')?.dataset.roomId;
+  // Mark as read
+  if (messagesArea) {
+    const roomId = document.querySelector('.chat-list-item.active')?.dataset.roomId;
     if (roomId) {
       fetch(`/dm_rooms/${roomId}/mark_all_as_read`, {
         method: 'POST',
         headers: {
           'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
         }
+      }).then(response => {
+        if (response.ok) {
+          const badge = document.querySelector('.chat-list-item.active .unread-badge');
+          if (badge) badge.remove();
+        }
       });
     }
+  }
+
+
+  // Search
+  const searchInput = document.getElementById('chatSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const term = this.value.toLowerCase();
+      document.querySelectorAll('.chat-list-item').forEach(item => {
+        const name = item.querySelector('.chat-name').textContent.toLowerCase();
+        const msg = item.querySelector('.last-message').textContent.toLowerCase();
+        item.style.display = (name.includes(term) || msg.includes(term)) ? '' : 'none';
+      });
+    });
+  }
+
+  // Auto-scroll on new message
+  const observer = new MutationObserver(() => {
+    if (messagesArea) messagesArea.scrollTop = messagesArea.scrollHeight;
+  });
+
+  const container = document.getElementById('messages-container');
+  if (container) {
+    observer.observe(container, { childList: true, subtree: true });
+  }
+
+  // Clear textarea after send
+  const form = document.getElementById('new-message-form');
+  if (form && textarea) {
+    form.addEventListener('ajax:success', () => {
+      textarea.value = '';
+      textarea.style.height = 'auto';
+    });
+    
+    const sendBtn = document.getElementById('send-message-btn');
+    textarea.addEventListener('input', () => {
+      if (sendBtn) sendBtn.disabled = textarea.value.trim().length === 0;
+    });
   }
 });
 </script>

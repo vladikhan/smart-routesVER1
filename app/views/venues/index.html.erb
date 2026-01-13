@@ -6,6 +6,7 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
+  <%= stylesheet_link_tag 'venues', media: 'all' %>
 </head>
 <body>
   <%= render 'pages/header' %>
@@ -78,6 +79,12 @@
       <% end %>
     </div>
   </section>
+  <style>
+  .venue-card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+  }
+</style>
   
   <div style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
     <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">場所一覧</h1>
@@ -85,7 +92,7 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
       <% @venues.each do |venue| %>
         <%= link_to venue_path(venue), style: "text-decoration: none;" do %>
-          <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); transition: all 0.3s;">
+          <div class='venue-card-hover' style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); transition: all 0.3s;">
             <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #64b5f7, #0288d1); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">
               <%= venue.venue_type == 'restaurant' ? '🍽️' : '🏛️' %>
             </div>

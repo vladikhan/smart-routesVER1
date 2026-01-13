@@ -1,6 +1,6 @@
 class DmRoom < ApplicationRecord
-  belongs_to :sender, class_name: 'User'
-  belongs_to :receiver, class_name: 'User'
+  belongs_to :sender, class_name: 'User', foreign_key: 'sender_id'
+  belongs_to :receiver, class_name: 'User', foreign_key: 'receiver_id'
   has_many :dm_messages, dependent: :destroy
 
   validates :sender_id, uniqueness: { scope: :receiver_id }
@@ -41,6 +41,14 @@ class DmRoom < ApplicationRecord
       update_columns(unread_count_sender: 0)
     elsif user.id == receiver_id
       update_columns(unread_count_receiver: 0)
+    end
+  end
+
+  def increment_unread_for(sender)
+    if sender.id == sender_id
+      increment!(:unread_count_receiver)
+    else
+      increment!(:unread_count_sender)
     end
   end
 

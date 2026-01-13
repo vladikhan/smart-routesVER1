@@ -25,6 +25,124 @@
 	position: relative;
 }
 
+/* Основной контейнер страницы */
+.venues-container {
+	max-width: 1200px;
+	margin: 30px auto;
+	padding: 0 20px;
+}
+
+.venues-title {
+	font-size: 32px;
+	font-weight: 700;
+	margin-bottom: 30px;
+}
+
+/* Сетка карточек */
+.venues-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 25px;
+}
+
+/* Ссылка-обертка */
+.venue-link {
+	text-decoration: none;
+}
+
+/* Карточка */
+.venue-card {
+	background: white;
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	transition: all 0.3s;
+}
+
+.venue-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.venue-card-header {
+	width: 100%;
+	height: 180px;
+	background: linear-gradient(135deg, #64b5f7, #0288d1);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 48px;
+	color: white;
+}
+
+.venue-card-body {
+	padding: 20px;
+}
+
+.venue-card-title {
+	font-size: 18px;
+	font-weight: 700;
+	margin: 0 0 10px 0;
+	color: #333;
+}
+
+.venue-card-description {
+	font-size: 14px;
+	color: #666;
+	line-height: 1.5;
+	margin-bottom: 15px;
+}
+
+/* Теги (Cuisine, District, Price) */
+.venue-tags {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 10px;
+}
+
+.tag {
+	padding: 4px 10px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.tag-cuisine {
+	background: #e3f2fd;
+	color: #1976d2;
+}
+.tag-district {
+	background: #f3e5f5;
+	color: #7b1fa2;
+}
+.tag-price {
+	background: #e8f5e9;
+	color: #388e3c;
+}
+
+/* Футер карточки (Rating, Views) */
+.venue-card-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 13px;
+	color: #999;
+	margin-top: 10px;
+}
+
+/* Пустое состояние */
+.empty-state {
+	text-align: center;
+	padding: 80px 20px;
+	color: #999;
+}
+
+.empty-state-icon {
+	font-size: 64px;
+	margin-bottom: 20px;
+}
+
 /* Shared Card Styling */
 .venue-info-card {
 	background: white;

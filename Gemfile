@@ -14,7 +14,7 @@ gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # gem 'webpacker', '~> 5.0'
 
 # --- Redis & Sidekiq (Для очередей и кэша) ---
-gem 'redis', '~> 5.0'
+gem 'redis', '~> 4.0'
 gem 'redis-namespace'
 gem 'redis-rails'
 gem 'sidekiq', '~> 6.4'

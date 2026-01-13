@@ -37,8 +37,8 @@ services:
       - redis
     environment:
       DISABLE_SPRING: 1
-      RAILS_ENV: production
-      NODE_ENV: production
+      RAILS_ENV: development
+      NODE_ENV: development
       DATABASE_URL: postgres://postgres:password@db:5432/smart_routes_dev
       REDIS_URL: redis://redis:6379/0
       GMAIL_USERNAME: ${GMAIL_USERNAME}
