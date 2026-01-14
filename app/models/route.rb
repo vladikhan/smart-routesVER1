@@ -1,88 +1,63 @@
 class Route < ApplicationRecord
-  # Associations
-
-  has_many :venues, through: :route_items
-  has_many :entity_tags, as: :entity, dependent: :destroy
-  has_many :tags, through: :entity_tags
-  has_many :reviews, as: :reviewable, dependent: :destroy
-
-  # Ассоциации
   belongs_to :user
   belongs_to :city, optional: true
 
   has_many :route_items, dependent: :destroy
+  has_many :venues, through: :route_items, source: :item, source_type: 'Venue'
+
+  has_many :likes, as: :likeable, dependent: :destroy
+  has_many :comments, as: :commentable, dependent: :destroy
   has_many :reviews, as: :reviewable, dependent: :destroy
+
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
-  has_many :comments, as: :commentable, dependent: :destroy
-  has_many :notifications, -> { where(entity_type: 'Route') },
-           foreign_key: :entity_id, dependent: :destroy
-  has_many :venues, -> { where(route_items: { item_type: 'Venue' }) },
-           through: :route_items,
-           source: :item,
-           source_type: 'Venue'
 
-  # Для тегов (если используется acts-as-taggable-on)
-  if defined?(ActsAsTaggableOn)
-    acts_as_taggable_on :tags
-  else
-    # Простая реализация тегов без гема
-    serialize :tag_list, Array
+  accepts_nested_attributes_for :route_items, allow_destroy: true, reject_if: :all_blank
 
-    def tag_list
-      super || []
-    end
-
-    def tag_list=(value)
-      if value.is_a?(String)
-        super(value.split(',').map(&:strip))
-      else
-        super(value)
-      end
-    end
-  end
-
-  # Validations
   validates :name, presence: true, length: { maximum: 100 }
+  validates :description, length: { maximum: 5000 }
   validates :user, presence: true
   validates :city, presence: true
-  validates :view_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :view_count, numericality: { greater_than_or_equal_to: 0 }
 
-  # Вложенные атрибуты
-  accepts_nested_attributes_for :route_items,
-                                allow_destroy: true,
-                                reject_if: :all_blank
+  # === Колбэки ===
+  before_create :initialize_view_count
+  # Уведомляем подписчиков после создания маршрута
+  after_create_commit :notify_followers_about_new_route
 
-  # Скоупы
   scope :public_routes, -> { where(is_public: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :trending, -> { order(view_count: :desc) }
   scope :by_city, ->(city_id) { where(city_id: city_id) }
-  scope :budget, -> { where('estimated_cost <= ?', 5000) }
-  scope :search_by_name_and_city, lambda { |query|
-    left_outer_joins(:city).where(
-      'routes.name ILIKE :q OR
-                        cities.name ILIKE :q OR
-                        venues.name ILIKE :q',
-      q: "%#{params[:query]}"
-    ).distinct
-  }
 
-  # Колбэки
-  before_create :initialize_view_count
-
-  # Методы
   def increment_view_count!
     increment!(:view_count)
   end
 
-  def owner?(user)
-    self.user == user
+  def liked_by?(user)
+    return false unless user
+
+    likes.exists?(user_id: user.id)
+  end
+
+  def update_average_rating
+    # У тебя в Review поле называется total_score
+    avg = reviews.average(:total_score) || 0
+    update_columns({ average_rating: avg.to_f.round(1),
+                     reviews_count: reviews.count })
   end
 
   private
 
   def initialize_view_count
     self.view_count ||= 0
+  end
+
+  def notify_followers_about_new_route
+    return unless is_public?
+
+    NotificationService.notify_new_route_from_following(self)
   end
 end

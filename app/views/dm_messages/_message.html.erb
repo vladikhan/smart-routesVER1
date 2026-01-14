@@ -1,5 +1,4 @@
 <% local_user = defined?(user) ? user : nil %>
-<% binding.pry %>
 <% is_own_message = (message.user_id == local_user&.id) %>
 
 <div class="message-item <%= is_own_message ? 'message-sent' : 'message-received' %>"

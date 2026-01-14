@@ -1,3 +1,4 @@
+<!-- app/views/notifications/index.html.erb -->
 
 <!DOCTYPE html>
 <html>
@@ -8,13 +9,12 @@
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
   <%= stylesheet_link_tag 'notifications', media: 'all' %>
-  
-  
 </head>
 <body>
   <%= render 'pages/header' %>
 
   <div class="notifications-page">
+    <!-- Page Header -->
     <div class="page-header-section">
       <h1 class="page-title">
         <span>🔔</span>
@@ -28,12 +28,23 @@
       <% end %>
     </div>
 
+    <!-- Notifications List -->
     <% if @notifications.any? %>
       <% @notifications.each do |notification| %>
-        <%= link_to notification.target_url, class: "notification-card #{'unread' unless notification.is_read?}",
-            data: { notification_id: notification.id },
+        <%= link_to notification.target_url, 
+            class: "notification-card #{notification.is_read? ? 'read' : 'unread'}",
+            data: { 
+              notification_id: notification.id,
+              redirect_url: notification.target_url 
+            },
             onclick: "markAsReadOnClick(#{notification.id}, event)" do %>
-          <div class="notification-icon-large"><%= notification.icon %></div>
+          
+          <!-- Icon -->
+          <div class="notification-icon-large">
+            <%= notification.icon %>
+          </div>
+          
+          <!-- Body -->
           <div class="notification-body">
             <div class="notification-message">
               <%= notification.message %>
@@ -42,26 +53,34 @@
               <%= time_ago_in_words(notification.created_at) %>前
             </div>
           </div>
+          
+          <!-- Unread Indicator -->
           <% unless notification.is_read? %>
-            <div style="width: 12px; height: 12px; background: #0288d1; border-radius: 50%; flex-shrink: 0;"></div>
+            <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);"></div>
           <% end %>
         <% end %>
       <% end %>
 
-      <div style="margin-top: 30px;">
-        <%= paginate @notifications %>
-      </div>
+      <!-- Pagination -->
+      <% if @notifications.total_pages > 1 %>
+        <div style="margin-top: 30px;">
+          <%= paginate @notifications %>
+        </div>
+      <% end %>
     <% else %>
+      <!-- Empty State -->
       <div class="empty-state">
         <div class="empty-icon">🔔</div>
-        <h2 style="color: #666; margin-bottom: 10px;">通知はありません</h2>
-        <p style="color: #999;">新しい通知が届くとここに表示されます</p>
+        <h2>通知はありません</h2>
+        <p>新しい通知が届くとここに表示されます</p>
       </div>
     <% end %>
   </div>
-  <%= render 'pages/footer'%>
+
+  <%= render 'pages/footer' %>
 
   <script>
+    // Mark individual notification as read
     async function markAsReadOnClick(notificationId, event) {
       if (event) event.preventDefault();
       
@@ -77,13 +96,127 @@
 
         const data = await response.json();
         
-        if (data.success && data.redirect_url) {
-          window.location.href = data.redirect_url;
+        if (data.success) {
+          // Update UI immediately
+          const card = document.querySelector(`[data-notification-id="${notificationId}"]`);
+          if (card) {
+            card.classList.remove('unread');
+            card.classList.add('read');
+            const indicator = card.querySelector('[style*="background"]');
+            if (indicator && indicator.style.width === '12px') {
+              indicator.remove();
+            }
+          }
+          
+          // Redirect after a short delay
+          if (data.redirect_url) {
+            setTimeout(() => {
+              window.location.href = data.redirect_url;
+            }, 200);
+          }
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    }
+
+    // Mark all notifications as read
+    async function markAllNotificationsAsRead() {
+      if (!confirm('すべての通知を既読にしますか？')) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/notifications/mark_all_as_read', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Update UI
+          document.querySelectorAll('.notification-card.unread').forEach(card => {
+            card.classList.remove('unread');
+            card.classList.add('read');
+            const indicator = card.querySelector('[style*="background"]');
+            if (indicator && indicator.style.width === '12px') {
+              indicator.remove();
+            }
+          });
+
+          // Hide "mark all as read" button
+          const markAllBtn = document.querySelector('.mark-all-read');
+          if (markAllBtn) {
+            markAllBtn.style.display = 'none';
+          }
+
+          // Show success toast
+          showToast('すべて既読にしました', 'success');
         }
       } catch (error) {
         console.error('Error:', error);
+        showToast('エラーが発生しました', 'error');
       }
     }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `notification-toast ${type}`;
+      toast.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease-out;
+        font-weight: 500;
+      `;
+      toast.textContent = `${type === 'success' ? '✓' : '✗'} ${message}`;
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideInRight {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>

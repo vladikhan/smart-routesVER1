@@ -1,84 +1,36 @@
   <header class="header">
-    <div class="container">
-      <a href="/" class="logo">SmartRoutes</a>
+  <div class="container">
+    <a href="/" class="logo">SmartRoutes</a>
 
-      <ul class="nav-links">
-        <li><%= link_to "ルート一覧", routes_path %></li>
-        <li><%= link_to "場所を探す", venues_path %></li>
-        <li><%= link_to "メッセージ", dm_rooms_path, title: "メッセージ" %></li>  
-        <li><%= link_to "ユーザー", users_path, title: "ユーザー" %></li>
-        <li><%= link_to "通知", notifications_path, title: "通知" %></li>
-      </ul>
+    <ul class="nav-links">
+      <li><%= link_to "ルート一覧", routes_path %></li>
+      <li><%= link_to "場所を探す", venues_path %></li>
+      <li><%= link_to "メッセージ", dm_rooms_path %></li>  
+      <li><%= link_to "ユーザー", users_path %></li>
+      <li><%= link_to "通知", notifications_path, title: "通知" %></li>
+    </ul>
 
+    <div class="auth-links">
       <% if user_signed_in? %>
+        <%= render 'pages/notification_bell' %>
 
-      
-      
-      <div class="auth-links">
+        <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
 
-
-      <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
-        <% if current_user.avatar.present? %>
-        <%= image_tag current_user.avatar.thumb.url %>
-      <% else %>
-          👤
-        <% end %>
-      <% end %>
-      <%= link_to "💾", "#", class: "page-nav-icon", title: "保存済み" %>
-      <div class="notifications-dropdown">
-      <%# Notifications dropdown %>
-        <button class="page-nav-icon notification-toggle" onclick="toggleNotifications(event)" id="notificationBell">
-          🔔
-          <% unread_count = current_user.unread_notifications_count %>
-          <% if unread_count > 0 %>
-          <span class="notification-badge" id="notificationBadge"><%= unread_count %></span>
+        <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
+          <% if current_user.avatar.present? %>
+            <%= image_tag current_user.avatar.thumb.url %>
+          <% else %>
+            👤
           <% end %>
-        </button>
+        <% end %>
 
-        <div class="notifications-panel" id="notificationsPanel">
-          <div class="notifications-header">
-            <h3>通知</h3>
-            <% if unread_count > 0 %>
-              <button onclick="markAllAsRead(event)" class="mark-all-read">
-                すべて既読
-              </button>
-            <% end %>
-          </div>
-
-          <div class="notifications-list" id="notificationsList">
-            <% notifications = current_user.notifications.includes(:actor).order(created_at: :desc).limit(8)%>
-
-            <% if notifications.any? %>
-              <% notifications.each do |notification| %>
-              <a href="javascript:void(0)" 
-              onclick="markAsReadAndRedirect(<%= notification.id %>, event )"
-              class="notification-item <%= 'unread' unless notification.is_read? %>"
-              data-notification-id="<%= notification.id %>">
-              <div class="notification-icon"><%= notification.message %></div>
-              <div class="notification-time"><%= time_ago_in_words(notification.created_at) %>前</div>
-              <% unless notification.is_read? %>
-                <div class="unread-dot"></div>
-                <% end %>
-              </a>
-            <% end %>
-
-            <%= link_to "すべて見る", notifications_path, class: "view-all-notifications" %>
-            <% else %>
-              <div class="no-notification">
-                <div style="font-size: 48px; margin-bottom: 10px;">🔔</div>
-                <div>通知はありません</div>
-                <% end %>
-              </div>
-          </div>
-      </div>
-      <%= link_to "ログアウト", logout_confirm_path, class: "login-btn", title: "ログアウト" %>
-  <% else %>
-    <%= link_to "ログイン", new_user_session_path, class: "login-btn"  %>
-    <% end %>
-  
-      </div>
+        <%= link_to "ログアウト", logout_confirm_path, class: "login-btn" %>
+      <% else %>
+        <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
+      <% end %>
     </div>
-  </header>
+  </div>
+</header>
 
   
 

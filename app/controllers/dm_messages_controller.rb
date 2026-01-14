@@ -1,6 +1,7 @@
 class DmMessagesController < ApplicationController
   before_action :authenticate_user!
   before_action :sent_dm_room
+  before_action :authorize_room_access
 
   def index
     @dm_messages = DmMessage
@@ -10,34 +11,58 @@ class DmMessagesController < ApplicationController
   end
 
   def create
+    # 1. Проверка доступа
     return render json: { error: 'Access denied' }, status: :forbidden unless @dm_room.participant?(current_user)
 
     @dm_message = @dm_room.dm_messages.build(dm_message_params)
     @dm_message.user = current_user
 
     if @dm_message.save
-      @dm_room.touch(:last_message_at)
-      @dm_room.increment_unread_for(current_user)
-      receiver = @dm_room.sender
+      @dm_room.touch(:updated_at)
+
+      # 3. Увеличиваем счетчик ТОЛЬКО для получателя
+      receiver = @dm_room.other_user(current_user)
       @dm_room.increment_unread_for(receiver) if receiver
+
+      # 4. Создаем уведомление через наш новый сервис
+      NotificationService.notify_new_message(@dm_message)
+
+      html = render_to_string(partial: 'dm_messages/message', locals: { message: @dm_message })
+
+      ActionCable.server.broadcast("dm_room_#{dm_room.id}", {
+                                     message: html,
+                                     sender_id: current_user.id
+                                   })
+
+      # 5. Отправляем сообщение в ActionCable (Real-time)
+      # Предполагается, что у тебя настроен бродкаст в модели или здесь
+      # DmChannel.broadcast_to(@dm_room, @dm_message)
 
       respond_to do |format|
         format.html { redirect_to dm_room_path(@dm_room) }
-        format.json do
-          render json: {
-            message: @dm_message,
-            html: render_to_string(partial: 'dm_messages/message',
-                                   locals: { dm_message: @dm_message, user: current_user },
-                                   formats: [:html])
-          }, status: :created
-        end
+        format.js # Ожидает файл create.js.erb
+        format.json { render json: @dm_message, status: :created }
       end
     else
+      error_msg = @dm_message.errors.full_messages.join(', ')
+
       respond_to do |format|
-        format.html { redirect_to dm_room_path(@dm_room), alert: 'メッセージの送信に失敗しました' }
+        format.html { redirect_to dm_room_path(@dm_room), alert: "送信エラー: #{error_msg}" }
+        format.js   { render js: "alert('#{error_msg}');" }
         format.json { render json: { errors: @dm_message.errors.full_messages }, status: :unprocessable_entity }
       end
     end
+  end
+
+  def destroy
+    @dm_message = @dm_room.dm_messages.find(params[:id])
+
+    return if @dm_message.user == current_user
+
+    redirect_to dm_room_path(@dm_room), alert: '削除権限がありません'
+
+    @dm_message.destroy
+    redirect_to dm_room_path(@dm_room), notice: 'メッセージを削除しました'
   end
 
   private
@@ -45,11 +70,18 @@ class DmMessagesController < ApplicationController
   def sent_dm_room
     @dm_room = DmRoom.find(params[:dm_room_id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to dm_rooms_path, alert: 'Room not found'
+    redirect_to dm_rooms_path, alert: '部屋が見つかりません
+'
   end
 
   def dm_message_params
     permitted_params = params.permit(:content)
     { message: permitted_params[:content] }
+  end
+
+  def authorize_room_access
+    return if @dm_room.sender_id == current_user.id || @dm_room.receiver_id == current_user.id
+
+    redirect_to dm_rooms_path, alert: 'アクセス権限がありません'
   end
 end

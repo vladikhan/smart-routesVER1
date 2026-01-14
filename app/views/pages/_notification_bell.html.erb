@@ -1,0 +1,50 @@
+<div class="notifications-dropdown">
+  <button class="page-nav-icon notification-toggle" onclick="toggleNotifications(event)" id="notificationBell">
+    🔔
+    <% unread_count = current_user.unread_notifications_count %>
+    <% if unread_count > 0 %>
+      <span class="notification-badge" id="notificationBadge">
+        <%= unread_count > 99 ? '99+' : unread_count %>
+      </span>
+    <% end %>
+  </button>
+
+  <div class="notifications-panel" id="notificationsPanel">
+    <div class="notifications-header">
+      <h3>通知</h3>
+      <% if unread_count > 0 %>
+        <button onclick="markAllNotificationsAsRead(event)" class="mark-all-read">
+          すべて既読
+        </button>
+      <% end %>
+    </div>
+
+    <div class="notifications-list" id="notificationsList">
+      <% notifications = current_user.notifications.includes(:actor).recent.limit(8) %>
+      <% if notifications.any? %>
+        <% notifications.each do |notification| %>
+          <%= link_to notification.target_url, 
+                      class: "notification-item #{'unread' unless notification.is_read?}",
+                      data: { notification_id: notification.id } do %>
+            <div class="notification-icon"><%= notification.icon %></div>
+            <div class="notification-content">
+              <div class="notification-message"><%= notification.notification_text %></div>
+              <div class="notification-time"><%= time_ago_in_words(notification.created_at) %>前</div>
+            </div>
+            <% unless notification.is_read? %>
+              <div class="unread-dot"></div>
+            <% end %>
+          <% end %>
+        <% end %>
+        <div class="notifications-footer">
+          <%= link_to "すべて見る", notifications_path, class: "view-all-link" %>
+        </div>
+      <% else %>
+        <div class="no-notifications">
+          <div class="empty-icon">🔔</div>
+          <p>通知はありません</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

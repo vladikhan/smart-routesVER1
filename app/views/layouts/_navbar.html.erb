@@ -7,16 +7,27 @@
     </button>
     
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <% if user_signed_in? %>
+          <li class="nav-item me-2">
+            <%= link_to notifications_path, class: "nav-link position-relative px-2" do %>
+            <i class="fas fa-bell"></i>
+            <% unread_notifications = current_user.unread_notifications.count %>
+            <% if unread_notifications > 0 %>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <%= unread_notifications > 99 ? '99+' : unread_notifications %>
+              </span>
+        <% end %>
+        <% end %>
+          </li>
+
+        <li class="nav-item me-3">
           <%= link_to "ルート一覧", routes_path, class: "nav-link" %>
         </li>
         <li class="nav-item">
           <%= link_to "場所を探す", venues_path, class: "nav-link" %>
         </li>
-        <li class="nav-item">
-          <%= link_to "都市", cities_path, class: "nav-link" %>
-        </li>
+        
       </ul>
     </div>
   </div>

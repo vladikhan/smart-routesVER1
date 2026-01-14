@@ -4,27 +4,35 @@ class DmRoomsController < ApplicationController
   before_action :set_active_room, only: %i[show mark_all_as_read]
 
   def index
-    @active_room = params[:room_id] ? @dm_rooms.find_by(id: params[:room_id]) : @dm_rooms.first
+    @dm_rooms = DmRoom.for_user_with_preloads(current_user)
+    @active_room = @dm_rooms.first
 
-    prepare_active_room_data if @active_room
-  end
-
-  def show
-    redirect_to dm_rooms_path, alert: 'アクセス権がありません' unless @active_room.participant?(current_user)
-
-    prepare_active_room_data
-
-    respond_to do |format|
-      format.html { render :index }
-      format.json { render json: @messages }
+    if @active_room
+      @messages = load_messages_for_room(@active_room)
+      @active_room.mark_all_as_read_for(current_user)
+    else
+      @messages = []
     end
   end
 
-  def create
-    other_user = User.find(params[:user_id])
-    @dm_room = DmRoom.find_or_create_between(current_user, other_user)
+  def show
+    @dm_rooms = DmRoom.for_user_with_preloads(current_user)
+    @messages = load_messages_for_room(@active_room)
 
-    redirect_to dm_room_path(@dm_room)
+    @active_room.mark_all_as_read_for(current_user)
+    render :index
+  end
+
+  def create
+    receiver = User.find(params[:receiver_id])
+
+    @dm_room = DmRoom.find_or_create_between(current_user, receiver)
+
+    redirect_to dm_room_path(@dm_room), notice: 'チャットを開始しました'
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path, alert: 'ユーザーが見つかりません'
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to root_path, alert: e.message
   end
 
   def mark_all_as_read
@@ -33,10 +41,9 @@ class DmRoomsController < ApplicationController
   end
 
   def sent
-    sent_dm_rooms
-
-    @active_room = @dm_rooms.first
-    prepare_active_room_data if @active_room
+    @dm_rooms = DmRoom.where(sender_id: current_user.id)
+                      .includes(:sender, :receiver, dm_messages: [:user])
+                      .recent
     render :index
   end
 
@@ -65,4 +72,17 @@ class DmRoomsController < ApplicationController
       read_at: Time.current
     )
   end
+
+  def authorize_room_access
+    return if @active_room.sender_id == current_user.id || @active_room.receiver_id == current_user.id
+
+    redirect_to dm_rooms_path, alert: 'アクセス権限がありません'
+  end
+end
+
+def load_messages_for_room(room)
+  room.dm_messages
+      .includes(:user)
+      .order(created_at: :asc)
+      .limit(100)
 end

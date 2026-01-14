@@ -17,3 +17,4 @@
 //= link flashMessages.css
 //= link emailVerifications.css
 //= link dmRooms.css
+//= link bell.css
