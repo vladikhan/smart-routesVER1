@@ -31,7 +31,9 @@ Rails.application.routes.draw do
   get 'logout_confirm', to: 'pages#logout_confirm'
 
   # Users
-  resources :users, only: %i[index show edit update]
+  resources :users, only: %i[index show edit update] do
+    resource :follower, only: %i[create destroy], controller: 'follows'
+  end
 
   # Email verification
   get 'email_verification', to: 'email_verifications#new'
@@ -45,7 +47,6 @@ Rails.application.routes.draw do
   resources :routes
   resources :venues
   resources :cities, only: %i[index show]
-  resources :users
 
   resources :dm_rooms, only: %i[index show create] do
     collection do

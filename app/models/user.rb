@@ -27,7 +27,7 @@ class User < ApplicationRecord
   has_many :received_dm_rooms, class_name: 'DmRoom', foreign_key: 'receiver_id', dependent: :destroy
   has_many :dm_messages, dependent: :destroy
 
-  # === Ассоциации: Follow (Твоя структура) ===
+  # === Ассоциации: Follow  ===
   has_many :following_relationships, class_name: 'Follower', foreign_key: 'follower_id', dependent: :destroy
   has_many :following, through: :following_relationships, source: :following_user
 
@@ -75,14 +75,16 @@ class User < ApplicationRecord
   end
 
   # === Follow system ===
-  def following?(user)
-    following.include?(user)
+  def following?(other_user)
+    following.include?(other_user)
   end
 
   def follow(other_user)
     return false if self == other_user
 
-    following_relationships.find_or_create_by(following_id: other_user.id)
+    following_relationships.find_or_create_by(following_id: other_user.id) do |f|
+      f.status = 'active'
+    end
   end
 
   def unfollow(other_user)

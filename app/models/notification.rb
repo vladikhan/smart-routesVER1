@@ -59,6 +59,8 @@ class Notification < ApplicationRecord
       "#{actor&.username || '誰か'}さんがあなたをフォローしました"
     when :review
       "#{actor&.username || '誰か'}さんがあなたの場所をレビューしました"
+    when :new_post
+      "#{actor&.username || '誰か'}さんが新しいルートを投稿しました"
     else
       "#{actor&.username || '誰か'}さんから通知があります"
     end
@@ -82,13 +84,14 @@ class Notification < ApplicationRecord
       target.is_a?(Route) ? Rails.application.routes.url_helpers.route_path(target) : Rails.application.routes.url_helpers.venue_path(target)
     when 'User'
       Rails.application.routes.url_helpers.user_path(notifiable)
-    when 'Follow'
+    when 'Follower'
       actor ? helpers.user_path(actor) : helpers.root_path
     when 'Review'
-      route = notifiable.reviewable
-      helpers.route_path(route, anchor: "review-#{notifiable.id}")
-    else
-      helpers.root_path
+      if notifiable&.reviewable
+        helpers.route_path(notifiable.reviewable, anchor: "review-#{notifiable.id}")
+      else
+        helpers.root_path
+      end
     end
   rescue StandardError => e
     Rails.logger.error "❌ Notification URL error: #{e.message}"

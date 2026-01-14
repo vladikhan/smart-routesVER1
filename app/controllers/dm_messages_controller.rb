@@ -29,14 +29,10 @@ class DmMessagesController < ApplicationController
 
       html = render_to_string(partial: 'dm_messages/message', locals: { message: @dm_message })
 
-      ActionCable.server.broadcast("dm_room_#{dm_room.id}", {
+      ActionCable.server.broadcast("dm_room_#{@dm_room.id}", {
                                      message: html,
                                      sender_id: current_user.id
                                    })
-
-      # 5. Отправляем сообщение в ActionCable (Real-time)
-      # Предполагается, что у тебя настроен бродкаст в модели или здесь
-      # DmChannel.broadcast_to(@dm_room, @dm_message)
 
       respond_to do |format|
         format.html { redirect_to dm_room_path(@dm_room) }

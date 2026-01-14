@@ -15,50 +15,61 @@
 
   <!-- Profile Header -->
   <section class="profile-header">
-    <div class="profile-header-content">
-      <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+  <div class="profile-header-content">
+    <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
 
-      <div class="profile-info">
-        <h1>@<%= @user.username %></h1>
-        <p><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
+    <div class="profile-info">
+      <h1>@<%= @user.username %></h1>
+      <p><%= @user.bio.presence || "まだ自己紹介がありません" %></p>
 
-        <% if @user.location.present? %>
-          <p class="header-location">📍 <%= @user.location %></p>
-        <% end %>
+      <% if @user.location.present? %>
+        <p class="header-location">📍 <%= @user.location %></p>
+      <% end %>
 
-        <div class="profile-stats">
-          <div class="stat-box">
-            <span class="stat-number"><%= @user.routes.count %></span>
-            <span class="stat-label">ルート</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-number">12</span>
-            <span class="stat-label">フォロー</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-number">95</span>
-            <span class="stat-label">フォロワー</span>
-          </div>
+      <div class="profile-stats">
+        <div class="stat-box">
+          <span class="stat-number"><%= @user.routes.count %></span>
+          <span class="stat-label">ルート</span>
         </div>
+        <div class="stat-box">
+          <span class="stat-number"><%= @user.following_count %></span>
+          <span class="stat-label">フォロー</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number"><%= @user.followers_count %></span>
+          <span class="stat-label">フォロワー</span>
+        </div>
+      </div>
 
+      <div class="profile-actions mt-3">
         <% if current_user == @user %>
-          <div class="profile-actions">
-            <%= link_to edit_user_path(@user), class: "btn-edit" do %>
-              プロフィール編集
+          <%= link_to edit_user_path(@user), class: "btn-edit" do %>
+            プロフィール編集
+          <% end %>
+        <% else %>
+          <div class="d-flex gap-2">
+            <% if current_user.following?(@user) %>
+              <%= button_to 'フォロー解除', user_follower_path(@user), 
+                            method: :delete, 
+                            class: 'btn btn-outline-secondary btn-sm',
+                            data: { confirm: 'フォローを解除しますか？' } %>
+            <% else %>
+              <%= button_to 'フォローする', user_follower_path(@user), 
+                            method: :post, 
+                            class: 'btn btn-primary btn-sm' %>
+            <% end %>
+
+            <%= button_to dm_rooms_path(receiver_id: @user.id), 
+                          method: :post, 
+                          class: "btn btn-outline-primary btn-sm" do %>
+              <i class="fas fa-envelope"></i> メッセージ
             <% end %>
           </div>
         <% end %>
-        <% unless @user == current_user %>
-          <% link_to dm_rooms_path(receiver_id: @user.id),
-                     method: :post,
-                     class: "btn btn-primary" do%>
-            <i class="fas fa-envelope"></i> メッセージを送る
-            <% end %>
-          <% end %>
-
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Tabs Navigation -->
   <section class="profile-tabs">
