@@ -7,8 +7,11 @@ class LikesController < ApplicationController
 
     if @like.save
       respond_to do |format|
-        format.html { redirect_back fallback_location: root_path }
-        format.json { render json: { success: true, likes_count: @likeable.reload.likes_count } }
+        format.html { redirect_back fallback_location: root_path, notice: 'いいねしました！' }
+        format.json do
+          render json: { success: true, likes_count: @likeable.reload.likes_count,
+                         message: 'いいねしました！' }
+        end
       end
     else
       render_error
@@ -23,18 +26,27 @@ class LikesController < ApplicationController
 
     if @like&.destroy
       @likeable = @like.likeable
-      render json: { success: true, likes_count: @likeable.reload.likes_count }
+      respond_to do |format|
+        format.html { redirect_back fallback_location: root_path, notice: 'いいねを取り消しました' }
+        format.json do
+          render json: {
+            success: true,
+            likes_count: @likeable.reload.likes_count,
+            message: 'いいねを取り消しました'
+          }
+        end
+      end
     else
-      render json: { success: false, errors: ['Like not found'] }, status: :not_found
+      render_error('いいねが見つかりません')
     end
   end
 
   private
 
-  def render_error
+  def render_error(message)
     respond_to do |format|
-      format.html { redirect_back fallback_location: root_path, alert: 'エラーが発生しました' }
-      format.json { render json: { success: false }, status: :unprocessable_entity }
+      format.html { redirect_back fallback_location: root_path, alert: message }
+      format.json { render json: { success: false, error: message }, status: :unprocessable_entity }
     end
   end
 end

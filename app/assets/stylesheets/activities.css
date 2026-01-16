@@ -1,0 +1,143 @@
+/* Activities Timeline Styles */
+.activity-timeline-container {
+	max-width: 850px;
+	margin: 0 auto;
+}
+
+/* Сетка статистики (те самые цифры: маршруты, фолловеры) */
+.user-stats-row {
+	display: flex;
+	gap: 2rem;
+	justify-content: flex-start;
+	padding: 1rem 0;
+	border-bottom: 1px solid #edf2f7;
+	margin-bottom: 2rem;
+}
+
+.stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.stat-number {
+	font-size: 1.25rem;
+	font-weight: 700;
+}
+
+.stat-label {
+	font-size: 0.8rem;
+	color: #a0aec0;
+	text-transform: uppercase;
+}
+
+/* Разделитель по датам (Сегодня, Вчера...) */
+.date-divider {
+	position: relative;
+	text-align: center;
+	margin: 2rem 0 1rem;
+}
+
+.date-divider::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background: #e2e8f0;
+	z-index: 1;
+}
+
+.date-text {
+	position: relative;
+	z-index: 2;
+	background: #f8fafc; /* Цвет фона твоего таба */
+	padding: 0 1rem;
+	color: #718096;
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+
+/* Карточка отдельной активности */
+.activity-item {
+	display: flex;
+	gap: 1rem;
+	padding: 1.25rem;
+	background: white;
+	border-radius: 12px;
+	margin-bottom: 0.75rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+	transition: transform 0.2s ease;
+}
+
+.activity-icon {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	background: #2296f3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.2rem;
+	flex-shrink: 0;
+}
+
+.activity-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.activity-text {
+	font-size: 0.95rem;
+	font-weight: 500;
+	margin-bottom: 0.25rem;
+}
+
+.activity-time {
+	font-size: 0.8rem;
+	color: #a0aec0;
+	margin-bottom: 0.75rem;
+}
+
+/* Превью контента (ссылка на маршрут внутри активности) */
+.activity-preview {
+	display: block;
+	padding: 0.85rem;
+	background: #f7fafc;
+	border-radius: 8px;
+	border-left: 4px solid #2296f3;
+	text-decoration: none;
+	color: inherit;
+	transition: all 0.2s ease;
+}
+
+.activity-preview:hover {
+	background: #edf2f7;
+	transform: translateX(4px);
+	text-decoration: none;
+}
+
+.preview-content strong {
+	font-size: 0.9rem;
+	display: block;
+}
+
+.preview-content p {
+	font-size: 0.85rem;
+	color: #718096;
+	margin: 0.25rem 0 0;
+	line-height: 1.4;
+}
+
+/* Адаптивность для мобилок */
+@media (max-width: 640px) {
+	.user-stats-row {
+		gap: 1rem;
+		justify-content: space-around;
+	}
+
+	.activity-item {
+		padding: 1rem;
+	}
+}

@@ -1,0 +1,42 @@
+
+  <%= stylesheet_link_tag 'reviews', media: 'all' %>
+
+<div class="review-card shadow-sm position-relative"> 
+  <%# position-relative нужен ОБЯЗАТЕЛЬНО для работы stretched-link %>
+  
+  <div class="review-header">
+    <div class="review-info-group">
+      <%# 1. Рейтинг %>
+      <div class="review-rating text-warning">
+        <% review.total_score.to_i.times do %>⭐<% end %>
+        <span class="text-muted ms-1"><%= review.total_score %></span>
+      </div>
+      
+      <%# 2. Ссылка (stretched-link делает ВСЮ карточку кликабельной) %>
+      <% if review.reviewable %>
+        <div class="review-target-header small mt-1">
+          <%= link_to [review.reviewable], class: "text-decoration-none stretched-link" do %>
+            <span class="text-primary fw-bold">
+              <%= review.reviewable_type == 'Route' ? '🗺️' : '📍' %>
+              <%= review.reviewable.name %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    
+    <%# 3. Дата %>
+    <div class="review-date small text-muted">
+      <%= review.created_at.strftime('%Y/%m/%d') %>
+    </div>
+  </div>
+
+  <%# 4. Текст отзыва %>
+  <div class="review-content mt-2">
+    <div class="review-text-body" style="white-space: pre-wrap; position: relative; z-index: 2;">
+      <%= review.text %>
+    </div>
+  </div>
+</div>
+
+  

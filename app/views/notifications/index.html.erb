@@ -1,83 +1,104 @@
-<!-- app/views/notifications/index.html.erb -->
-
-<!DOCTYPE html>
-<html>
-<head>
-  <title>通知 - Smart Routes</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all' %>
   <%= stylesheet_link_tag 'notifications', media: 'all' %>
-</head>
-<body>
-  <%= render 'pages/header' %>
+  
+ 
 
-  <div class="notifications-page">
-    <!-- Page Header -->
-    <div class="page-header-section">
-      <h1 class="page-title">
-        <span>🔔</span>
-        通知
-      </h1>
-      
-      <% if @notifications.where(is_read: false).exists? %>
-        <button onclick="markAllNotificationsAsRead()" class="mark-all-read">
-          すべて既読にする
-        </button>
+<%= render 'pages/header' %>
+
+<div class="notifications-page">
+  <div class="page-header-section">
+    <h1 class="page-title">
+      <span>🔔</span>
+      通知
+      <% if @unread_count > 0 %>
+        <span class='unread-badge-header' id="unread-count-badge"><%= @unread_count %></span>
       <% end %>
-    </div>
+    </h1>
+    
+    <%# Проверяем наличие непрочитанных уведомлений %>
+    <% if @notifications.any? { |n| !n.is_read } %>
+      <%= button_to 'すべて既読にする', mark_all_as_read_notifications_path, 
+                    method: :patch, 
+                    class: "mark-all-read" %>
+    <% end %>
+  </div>
 
-    <!-- Notifications List -->
-    <% if @notifications.any? %>
-      <% @notifications.each do |notification| %>
-        <%= link_to notification.target_url, 
-            class: "notification-card #{notification.is_read? ? 'read' : 'unread'}",
-            data: { 
-              notification_id: notification.id,
-              redirect_url: notification.target_url 
-            },
-            onclick: "markAsReadOnClick(#{notification.id}, event)" do %>
+  <% if @notifications.any? %>
+    <%# Группируем по дате для красивого разделения %>
+    <% @notifications.group_by { |n| n.created_at.to_date }.each do |date, notifications_of_day| %>
+      
+      <div class="date-divider">
+        <span class="date-text">
+          <% if date == Date.today %> 今日
+          <% elsif date == Date.yesterday %> 昨日
+          <% elsif date > 7.days.ago.to_date %> <%= date.strftime('%m月%d日') %>
+          <% else %> <%= date.strftime('%Y年%m月%d日') %>
+          <% end %>
+        </span>
+      </div>
+
+      <%# Выводим уведомления только за этот день %>
+      <% notifications_of_day.each do |notification| %>
+        <%= link_to mark_as_read_notification_path(notification), 
+            method: :patch, 
+            class: "notification-card #{notification.is_read ? 'read' : 'unread'}" do %>
           
-          <!-- Icon -->
           <div class="notification-icon-large">
             <%= notification.icon %>
           </div>
           
-          <!-- Body -->
           <div class="notification-body">
-            <div class="notification-message">
-              <%= notification.message %>
-            </div>
-            <div class="notification-time">
-              <%= time_ago_in_words(notification.created_at) %>前
+            <% if notification.actor.present? %>
+              <div class="notification-actor-avatar">
+                <% if notification.actor.avatar.present? %>
+                  <%= image_tag notification.actor.avatar.url, class: 'avatar-small' %>
+                <% else %>
+                  <div class="avatar-placeholder-small">
+                    <%= notification.actor.username[0].upcase %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+            
+            <div class="notification-text-content">
+              <div class="notification-message"><%= notification.message %></div>
+              
+              <% if notification.respond_to?(:detail_text) && notification.detail_text.present? %>
+                <div class="notification-detail">"<%= notification.detail_text %>"</div>
+              <% end %>
+              
+              <div class="notification-time">
+                <%= time_ago_in_words(notification.created_at) %>前
+              </div>
             </div>
           </div>
           
-          <!-- Unread Indicator -->
-          <% unless notification.is_read? %>
-            <div style="width: 12px; height: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);"></div>
+          <% unless notification.is_read %>
+            <div class="notification-unread-dot"></div>
           <% end %>
         <% end %>
       <% end %>
-
-      <!-- Pagination -->
-      <% if @notifications.total_pages > 1 %>
-        <div style="margin-top: 30px;">
-          <%= paginate @notifications %>
-        </div>
-      <% end %>
-    <% else %>
-      <!-- Empty State -->
-      <div class="empty-state">
-        <div class="empty-icon">🔔</div>
-        <h2>通知はありません</h2>
-        <p>新しい通知が届くとここに表示されます</p>
-      </div>
     <% end %>
-  </div>
 
-  <%= render 'pages/footer' %>
+    <div class="pagination-wrapper mt-4">
+      <%= paginate @notifications %>
+    </div>
+
+  <% else %>
+    <%# Состояние, когда уведомлений совсем нет %>
+    <div class="empty-state">
+      <div class="empty-icon">🔔</div>
+      <h2><%= params[:filter].present? ? "該当する通知はありません" : "通知はありません" %></h2>
+      <p>新しいアクションがあるとここに表示されます</p>
+    </div>
+  <% end %>
+</div>
+
+<%= render 'pages/footer' %>
 
   <script>
     // Mark individual notification as read

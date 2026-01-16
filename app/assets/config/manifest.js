@@ -18,3 +18,5 @@
 //= link emailVerifications.css
 //= link dmRooms.css
 //= link bell.css
+//= link activities.css
+//= link reviews.css

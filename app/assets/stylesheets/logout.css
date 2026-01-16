@@ -109,6 +109,7 @@ body.logout-page {
 	text-decoration: none;
 	display: block;
 	text-align: center;
+	height: 56px;
 }
 
 .btn-logout:hover {

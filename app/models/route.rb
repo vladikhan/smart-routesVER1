@@ -6,8 +6,12 @@ class Route < ApplicationRecord
   has_many :venues, through: :route_items, source: :item, source_type: 'Venue'
 
   has_many :likes, as: :likeable, dependent: :destroy
+  has_many :likers, through: :likes, source: :user
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :reviews, as: :reviewable, dependent: :destroy
+
+  has_many :bookmarks, as: :item, dependent: :destroy
+  has_many :bookmarkers, through: :bookmarks, source: :user
 
   has_many :notifications, as: :notifiable, dependent: :destroy
 
@@ -31,6 +35,7 @@ class Route < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :trending, -> { order(view_count: :desc) }
   scope :by_city, ->(city_id) { where(city_id: city_id) }
+  scope :popular, -> { order(likes_count: :desc) }
 
   def increment_view_count!
     increment!(:view_count)
@@ -42,8 +47,17 @@ class Route < ApplicationRecord
     likes.exists?(user_id: user.id)
   end
 
+  def bookmarked_by?(user)
+    return false unless user
+
+    bookmarks.exists?(user_id: user.id)
+  end
+
+  def average_rating
+    reviews.average(:total_score)
+  end
+
   def update_average_rating
-    # У тебя в Review поле называется total_score
     avg = reviews.average(:total_score) || 0
     update_columns({ average_rating: avg.to_f.round(1),
                      reviews_count: reviews.count })
@@ -58,6 +72,6 @@ class Route < ApplicationRecord
   def notify_followers_about_new_route
     return unless is_public?
 
-    NotificationService.notify_new_route_from_following(self)
+    NotificationService.notify_new_route_from_following(self) if defined?(NotificationService)
   end
 end

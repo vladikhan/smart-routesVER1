@@ -1,0 +1,40 @@
+// 1. Проверяем наличие ошибок валидации
+<% if @review.errors.any? %>
+  alert("<%= j @review.errors.full_messages.join(', ') %>");
+<% else %>
+  // 2. Находим контейнер со списком отзывов
+  const reviewList = document.querySelector('.review-list') || document.querySelector('.reviews-list');
+  
+  // 3. Рендерим партиал отзыва (Rails сам прокинет @review в партиал _review.html.erb)
+  const newReviewHtml = "<%= j(render 'reviews/review', review: @review) %>";
+  
+  if (reviewList) {
+    // Добавляем новый отзыв в самое начало списка
+    reviewList.insertAdjacentHTML('afterbegin', newReviewHtml);
+    
+    // Если была надпись "Отзывов нет", удаляем её
+    const emptyState = document.querySelector('.empty-state');
+    if (emptyState) emptyState.remove();
+  } else {
+    // Если список не найден, просто перезагрузим страницу (fallback)
+    location.reload();
+  }
+
+  // 4. Очищаем форму
+  const form = document.getElementById('reviewForm');
+  if (form) {
+    form.reset();
+    // Сбрасываем счетчик символов и блокируем кнопку обратно
+    const charCount = document.getElementById('charCount');
+    if (charCount) charCount.textContent = '0';
+    
+    const submitBtn = document.getElementById('submitReviewBtn');
+    if (submitBtn) submitBtn.disabled = true;
+  }
+
+  // 5. Обновляем счетчик отзывов в заголовке (опционально, но круто)
+  const countBadge = document.querySelector('.section-title');
+  if (countBadge) {
+     // Здесь можно добавить логику обновления цифры, но пока оставим так
+  }
+<% end %>

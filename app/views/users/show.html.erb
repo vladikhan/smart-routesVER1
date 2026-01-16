@@ -62,7 +62,7 @@
             <%= button_to dm_rooms_path(receiver_id: @user.id), 
                           method: :post, 
                           class: "btn btn-outline-primary btn-sm" do %>
-              <i class="fas fa-envelope"></i> メッセージ
+               メッセージ
             <% end %>
           </div>
         <% end %>
@@ -73,164 +73,91 @@
 
   <!-- Tabs Navigation -->
   <section class="profile-tabs">
-    <div class="tabs-container">
-      <button class="tab-btn active" data-tab="routes">作成したルート</button>
-      <button class="tab-btn" data-tab="saved">保存したルート</button>
-      <button class="tab-btn" data-tab="reviews">レビュー</button>
-      <button class="tab-btn" data-tab="activity">アクティビティ</button>
-      <div class="tab-indicator"></div>
-    </div>
-  </section>
+  <div class="tabs-container">
+    <button class="tab-btn active" data-tab="routes">作成したルート</button>
+    <button class="tab-btn" data-tab="saved">保存したルート</button>
+    <button class="tab-btn" data-tab="reviews">レビュー</button>
+    <button class="tab-btn" data-tab="activity">アクティビティ</button> </div>
+</section>
 
-  <!-- Tab Content -->
-  <main class="profile-content">
-    <!-- Created Routes Tab -->
-    <div class="tab-content active" id="routes-tab">
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
-        作成したルート (<%= @routes.count %>)
-      </h2>
+<main class="profile-content">
+  
+  <div class="tab-content active" id="routes-tab">
+     <%= render partial: 'routes/route_card', collection: @routes, as: :route %>
+  </div>
 
-      <% if @routes.any? %>
-        <div class="routes-grid">
-          <% @routes.each do |route| %>
-            <%= link_to route_path(route), class: "route-card" do %>
+  <div class="tab-content" id="saved-tab">
+     <%= render partial: 'routes/route_card', collection: @saved_routes, as: :route %>
+  </div>
 
+  <div class="tab-content" id="reviews-tab">
+     <% @reviews.each do |review| %>
+       <%= render 'reviews/review', review: review %>
+     <% end %>
+  </div>
 
-              <div class="route-card-image">🗺️</div>
-              <div class="route-card-content">
-                <h3 class="route-card-title"><%= route.name %></h3>
-                <p class="route-card-desc"><%= truncate(route.description, length: 80) %></p>
-                <div class="route-card-meta">
-                  <span>💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
-                  <span>⏱️ <%= route.estimated_duration %>分</span>
-                </div>
-                <% if route.tags.any? %>
-                  <div class="route-card-tags">
-                    <% route.tags.first(3).each do |tag| %>
-                      <span class="tag-badge">#<%= tag.display_name %></span>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="empty-state">
-          <div class="empty-state-icon">📭</div>
-          <p class="empty-state-text">まだルートを作成していません</p>
-        </div>
-      <% end %>
-    </div>
+  <div class="tab-content" id="activity-tab">
+     <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px;">アクティビティ</h2>
+     <%= render 'notifications/activity_list', activities: @activities %>
+  </div>
 
-    <!-- Saved Routes Tab -->
-    <div class="tab-content" id="saved-tab">
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
-        保存したルート (0)
-      </h2>
-      <div class="empty-state">
-        <div class="empty-state-icon">💾</div>
-        <p class="empty-state-text">まだ保存されたルートがありません</p>
-      </div>
-    </div>
-
-    <!-- Reviews Tab -->
-    <div class="tab-content" id="reviews-tab">
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
-        レビュー (<%= @reviews.count %>)
-      </h2>
-
-      <% if @reviews.any? %>
-        <% @reviews.each do |review| %>
-          <% reviewable = review.reviewable %>
-          <div class="review-card">
-            <div class="review-header">
-              <% if reviewable %>
-                <% if reviewable.is_a?(Venue) %>
-                  <%= link_to reviewable.name, venue_path(reviewable), class: "review-venue" %>
-                <% elsif reviewable.is_a?(Route) %>
-                  <%= link_to reviewable.name, route_path(reviewable), class: "review-venue" %>
-                <% end %>
-              <% else %>
-                <span class="review-venue" style="color: #999;">削除されたアイテム</span>
-              <% end %>
-              <span class="review-rating">⭐ <%= review.total_score %></span>
-            </div>
-            <p class="review-text"><%= review.text %></p>
-            <span class="review-date"><%= review.created_at.strftime('%Y年%m月%d日') %></span>
-          </div>
-        <% end %>
-      <% else %>
-        <div class="empty-state">
-          <div class="empty-state-icon">📝</div>
-          <p class="empty-state-text">まだレビューがありません</p>
-        </div>
-      <% end %>
-    </div>
-
-    <!-- Activity Tab -->
-    <div class="tab-content" id="activity-tab">
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 25px; color: #333;">
-        アクティビティ
-      </h2>
-      <div class="empty-state">
-        <div class="empty-state-icon">📊</div>
-        <p class="empty-state-text">アクティビティがありません</p>
-      </div>
-    </div>
-  </main>
+</main>
 
   <%= render 'pages/route_make' %>
   <%= render 'pages/footer' %>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const tabs = document.querySelectorAll('.tab-btn');
-      const indicator = document.querySelector('.tab-indicator');
-      const contents = document.querySelectorAll('.tab-content');
+ <script>
+/**
+ * Функция инициализации табов.
+ * Мы выносим её отдельно, чтобы вызывать и при загрузке, и при смене страницы.
+ */
+function initProfileTabs() {
+  console.log("Checking for tabs..."); // Появится в консоли F12
+  const tabs = document.querySelectorAll('.tab-btn');
+  const contents = document.querySelectorAll('.tab-content');
 
-      // Initialize indicator position
-      updateIndicator(document.querySelector('.tab-btn.active'));
+  if (tabs.length === 0) return;
 
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          // Remove active class from all tabs and contents
-          tabs.forEach(t => t.classList.remove('active'));
-          contents.forEach(c => c.classList.remove('active'));
+  tabs.forEach(tab => {
+    // Убираем старые слушатели, чтобы не было дублей
+    tab.replaceWith(tab.cloneNode(true));
+  });
 
-          // Add active class to clicked tab
-          this.classList.add('active');
+  // Заново находим кнопки после клонирования
+  const freshTabs = document.querySelectorAll('.tab-btn');
 
-          // Show corresponding content
-          const tabName = this.getAttribute('data-tab');
-          const content = document.getElementById(tabName + '-tab');
-          if (content) {
-            content.classList.add('active');
-          }
+  freshTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      const target = this.getAttribute('data-tab');
+      console.log("Tab clicked: " + target);
 
-          // Update indicator position
-          updateIndicator(this);
-        });
+      // 1. Снимаем активный класс со всех кнопок
+      freshTabs.forEach(t => t.classList.remove('active'));
+      // 2. Скрываем весь контент через стили (надёжнее чем классы)
+      contents.forEach(c => {
+        c.classList.remove('active');
+        c.style.display = 'none';
       });
 
-      function updateIndicator(tab) {
-        const tabRect = tab.getBoundingClientRect();
-        const containerRect = tab.parentElement.getBoundingClientRect();
-        const left = tabRect.left - containerRect.left;
-        const width = tabRect.width;
-
-        indicator.style.width = width + 'px';
-        indicator.style.left = left + 'px';
+      // 3. Активируем нужную кнопку
+      this.classList.add('active');
+      // 4. Показываем нужный блок
+      const activeBox = document.getElementById(target + '-tab');
+      if (activeBox) {
+        activeBox.classList.add('active');
+        activeBox.style.display = 'block';
       }
-
-      // Update indicator on window resize
-      window.addEventListener('resize', function() {
-        const activeTab = document.querySelector('.tab-btn.active');
-        if (activeTab) {
-          updateIndicator(activeTab);
-        }
-      });
     });
-  </script>
+  });
+}
+
+// Слушаем событие Turbo (обязательно для Rails 7)
+document.addEventListener('turbo:load', initProfileTabs);
+
+// На всякий случай для обычных переходов
+document.addEventListener('DOMContentLoaded', initProfileTabs);
+</script>
+
+
 </body>
 </html>

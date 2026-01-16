@@ -21,7 +21,19 @@ class RoutesController < ApplicationController
                          .ordered
                          .includes(:item)
 
-    @reviews = @route.reviews.order(created_at: :desc)
+    @reviews = @route.reviews.includes(:user).order(created_at: :desc)
+
+    if user_signed_in?
+      @current_user_liked = current_user.liked?(@route)
+      @current_user_bookmarked = current_user.bookmarked?(@route)
+      @current_user_following = current_user.following?(@route.user)
+      @user_like = current_user.likes.find_by(likeable: @route)
+      @user_bookmark = current_user.bookmarks.find_by(item: @route)
+    else
+      @current_user_liked = false
+      @current_user_bookmarked = false
+      @current_user_following = false
+    end
 
     @map_items = @route_items.map do |item|
       {

@@ -1,114 +1,137 @@
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
-  # skip_before_action :verify_authenticity_token, raise: false
+
+  # GET /notifications
   def index
     @notifications = current_user.notifications
                                  .includes(:actor, :notifiable)
                                  .order(created_at: :desc)
-                                 .page(params[:page])
-                                 .per(20)
-  end
 
-  def unread_count
-    Rails.logger.info '=' * 80
-    Rails.logger.info '🔍 NOTIFICATIONS DEBUG:'
-    Rails.logger.info "  User authenticated: #{user_signed_in?}"
-    Rails.logger.info "  Current user: #{current_user.inspect}"
-    Rails.logger.info "  Session ID: #{session.id}"
-    Rails.logger.info "  Cookies present: #{cookies.to_h.keys}"
-    Rails.logger.info "  Request from: #{request.remote_ip}"
-    Rails.logger.info '=' * 80
-    # =====================================
+    case params[:filter]
+    when 'messages'     then @notifications = @notifications.message_notifications
+    when 'interactions' then @notifications = @notifications.interaction_notifications
+    when 'follows'      then @notifications = @notifications.follow_notifications
+    end
 
+    @notifications = @notifications.page(params[:page]).per(20)
     @unread_count = current_user.notifications.unread.count
 
-    respond_to do |format|
-      format.json do
-        render json: {
-          count: count,
-          authenticated: true,
-          user_id: current_user.id
-        }
+    if params[:view] == 'activity'
+      activity
+    else
+      # По умолчанию показываем Уведомления (твой текущий код)
+      @notifications = current_user.notifications
+                                   .includes(:actor, :notifiable)
+                                   .order(created_at: :desc)
+
+      case params[:filter]
+      when 'messages'     then @notifications = @notifications.message_notifications
+      when 'interactions' then @notifications = @notifications.interaction_notifications
+      when 'follows'      then @notifications = @notifications.follow_notifications
       end
+
+      @notifications = @notifications.page(params[:page]).per(20)
     end
+  end
+
+  # GET /notifications/unread_count
+  def unread_count
+    @unread_count = current_user.notifications.unread.count
+
+    render json: {
+      count: @unread_count,
+      authenticated: true,
+      user_id: current_user.id
+    }
   rescue StandardError => e
     Rails.logger.error "❌ Error in unread_count: #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
-
-    respond_to do |format|
-      format.json { render json: { count: 0, error: e.message }, status: :internal_server_error }
-      format.html { render json: { error: e.message }, status: :internal_server_error }
-    end
+    render json: { count: 0, error: e.message }, status: :internal_server_error
   end
 
   def mark_as_read
-    notification = current_user.notifications.find(params[:id])
+    @notification = current_user.notifications.find(params[:id])
 
-    if notification.update(is_read: true)
-      redirect_url = notification_target_path(notification)
-      new_count = current_user.notifications.unread.count
+    if @notification.mark_as_read!
+      # Используем метод target_url из модели Notification
+      redirect_url = @notification.target_url
 
       respond_to do |format|
         format.html { redirect_to redirect_url }
-        format.json { render json: { success: true, redirect_url: redirect_url } }
+        format.json do
+          render json: { success: true, redirect_url: redirect_url,
+                         unread_count: current_user.notifications.unread.count }
+        end
       end
     else
-      respond_to do |format|
-        format.html { redirect_back(fallback_location: notifications_path, alert: 'エラーが発生しました') }
-        format.json { render json: { success: false, error: 'Failed to update' }, status: :unprocessable_entity }
-      end
+      render_error('Failed to update')
     end
-  end
-rescue ActiveRecord::RecordNotFound
-  respond_to do |format|
-    format.html do
-      redirect_to notifications_path, alert: '通知が見つかりません'
-    end
-    format.json do
-      render json: {
-        success: false,
-        error: '通知が見つかりません'
-      }, status: :not_found
-    end
+  rescue ActiveRecord::RecordNotFound
+    render_error('通知が見つかりません', :not_found)
   end
 
+  # PATCH /notifications/mark_all_as_read
   def mark_all_as_read
-    updated_count = current_user.notifications.unread.count
     Notification.mark_all_as_read_for(current_user)
 
     respond_to do |format|
       format.html { redirect_back(fallback_location: notifications_path, notice: 'すべて既読にしました') }
-      format.json { render json: { success: true, message: 'すべて既読にしました', updated_count: updated_count } }
-    end
-  end
-rescue StandardError => e
-  Rails.logger.error "❌ mark_all_as_read でエラーが発生しました: #{e.message}\n"
-
-  respond_to do |format|
-    format.html do
-      redirect_back(fallback_location: notifications_path, alert: 'エラーが発生しました')
-    end
-    format.json do
-      render json: {
-        success: false,
-        error: e.message
-      }, status: :internal_server_error
-    end
-  end
-  private
-
-  def notification_target_path(notification)
-    notifiable = notification.notifiable
-    return root_path unless notifiable
-
-    case notifiable
-    when Route then route_path(notifiable)
-    when Venue then venue_path(notifiable)
-    when User then user_path(notifiable)
-    else root_path
+      format.json { render json: { success: true, unread_count: 0 } }
     end
   rescue StandardError => e
-    Rails.logger.error "Error in notification_target_path: #{e.message}"
-    root_path
+    render_error('エラーが発生しました')
+  end
+
+  # GET /notifications/activity
+  def activity
+    @user = params[:user_id] ? User.find(params[:user_id]) : current_user
+    @activities = []
+
+    # 1. Сбор созданных маршрутов
+    @user.routes.order(created_at: :desc).limit(10).each do |r|
+      @activities << {
+        type: 'route',
+        created_at: r.created_at,
+        icon: '🗺️',
+        text: "新しいルート「#{r.name}」を作成しました",
+        obj: r
+      }
+    end
+
+    # 2. Сбор лайков
+    @user.likes.includes(:likeable).order(created_at: :desc).limit(10).each do |l|
+      next unless l.likeable.respond_to?(:name)
+
+      @activities << {
+        type: 'like',
+        created_at: l.created_at,
+        icon: '❤️',
+        text: "「#{l.likeable.name}」にいいねしました",
+        obj: l.likeable
+      }
+    end
+
+    # 3. Сбор комментариев (рецензий)
+    @user.reviews.order(created_at: :desc).limit(10).each do |rev|
+      @activities << {
+        type: 'review',
+        created_at: rev.created_at,
+        icon: '📝',
+        text: 'ルートにレビューを投稿しました',
+        obj: rev
+      }
+    end
+
+    # Сортировка по времени (самые свежие вверху)
+    @activities = @activities.sort_by { |a| a[:created_at] }.reverse
+    @activities = Kaminari.paginate_array(@activities).page(params[:page]).per(20)
+  end
+
+  private
+
+  def render_error(message, status = :unprocessable_entity)
+    respond_to do |format|
+      format.html { redirect_back(fallback_location: notifications_path, alert: message) }
+      format.json { render json: { success: false, error: message }, status: status }
+    end
   end
 end

@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :bookmarks, dependent: :destroy
+  has_many :bookmarked_routes, through: :bookmarks, source: :item, source_type: 'Route'
 
   # === Ассоциации: Уведомления ===
   has_many :notifications, dependent: :destroy
@@ -114,5 +115,13 @@ class User < ApplicationRecord
 
   def active_for_authentication?
     super && email_verified
+  end
+
+  def liked?(likeable)
+    likes.exists?(likeable_type: likeable.class.name, likeable_id: likeable.id)
+  end
+
+  def bookmarked?(item)
+    bookmarks.exists?(item_type: item.class.name, item_id: item.id)
   end
 end

@@ -12,6 +12,8 @@ class Comment < ApplicationRecord
   after_create_commit :create_comment_notification
   after_destroy_commit :remove_comment_notification
 
+  scope :recent, -> { order(created_at: :desc) }
+
   private
 
   def create_comment_notification

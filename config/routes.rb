@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   # Action Cable
   mount ActionCable.server => '/cable'
 
-  get 'home/index'
+  # get 'home/index'
   get '/health/check', to: proc { [200, {}, ['OK']] }
 
   devise_for :users, path: '', path_names: {
@@ -41,10 +41,24 @@ Rails.application.routes.draw do
   post 'email_verification/resend', to: 'email_verifications#resend', as: 'email_verification_resend'
 
   # Logout confirmation
-  get 'logout_confirm', to: 'pages#logout_confirm'
+  # get 'logout_confirm', to: 'pages#logout_confirm'
 
   # Routes
-  resources :routes
+  resources :routes do
+    resources :comments, only: %i[create destroy]
+    resources :reviews, only: %i[create edit update destroy]
+    resources :likes, opacity: %i[create]
+    resources :bookmarks, only: %i[create]
+  end
+
+  resources :likes, only: %i[create]
+  delete 'likes', to: 'likes#destroy'
+
+  resources :bookmarks, only: %i[create index]
+  delete 'bookmarks', to: 'bookmarks#destroy'
+  get 'me_bookmarks', to: 'bookmarks#index', as: :user_bookmarks
+
+  # Locations
   resources :venues
   resources :cities, only: %i[index show]
 
@@ -56,18 +70,17 @@ Rails.application.routes.draw do
     member do
       post :mark_all_as_read
     end
-    resources :dm_messages, only: [:create]
+    resources :dm_messages, only: %i[create destroy]
   end
 
   # Notification routes
   resources :notifications, only: [:index] do
+    collection do
+      get :unread_count
+      patch :mark_all_as_read
+    end
     member do
       patch :mark_as_read
     end
-    collection do
-      patch :mark_all_as_read
-    end
   end
-
-  mount ActionCable.server => '/cable'
 end

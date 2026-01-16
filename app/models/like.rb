@@ -9,6 +9,8 @@ class Like < ApplicationRecord
 
   counter_culture :likeable, column_name: 'likes_count'
 
+  scope :recent, -> { order(created_at: :desc) }
+
   private
 
   def create_like_notification

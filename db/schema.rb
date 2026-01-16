@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_01_13_084719) do
+ActiveRecord::Schema.define(version: 2026_01_15_005406) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -279,6 +279,15 @@ ActiveRecord::Schema.define(version: 2026_01_13_084719) do
     t.index ["user_id"], name: "index_routes_on_user_id"
   end
 
+  create_table "shares", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "route_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["route_id"], name: "index_shares_on_route_id"
+    t.index ["user_id"], name: "index_shares_on_user_id"
+  end
+
   create_table "tags", force: :cascade do |t|
     t.string "parameter"
     t.datetime "created_at", precision: 6, null: false
@@ -393,6 +402,8 @@ ActiveRecord::Schema.define(version: 2026_01_13_084719) do
   add_foreign_key "route_items", "venues"
   add_foreign_key "routes", "cities"
   add_foreign_key "routes", "users"
+  add_foreign_key "shares", "routes"
+  add_foreign_key "shares", "users"
   add_foreign_key "venues", "districts"
   add_foreign_key "venues", "users"
 end

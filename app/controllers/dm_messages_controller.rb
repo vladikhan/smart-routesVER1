@@ -36,7 +36,6 @@ class DmMessagesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to dm_room_path(@dm_room) }
-        format.js # Ожидает файл create.js.erb
         format.json { render json: @dm_message, status: :created }
       end
     else
@@ -71,8 +70,8 @@ class DmMessagesController < ApplicationController
   end
 
   def dm_message_params
-    permitted_params = params.permit(:content)
-    { message: permitted_params[:content] }
+    permitted_params = params.permit(:text)
+    { message: permitted_params[:text] }
   end
 
   def authorize_room_access

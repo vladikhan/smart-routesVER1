@@ -1,0 +1,92 @@
+<div class="review-form-card shadow-sm p-4 rounded-3 bg-white">
+  <h5 class="mb-3 fw-bold">レビューを投稿する</h5>
+  
+  <%= form_with model: [reviewable, Review.new], 
+                local: false, 
+                html: { class: 'review-form', id: 'reviewForm' } do |f| %>
+    
+    <div class="form-group mb-3">
+      <label class="form-label fw-bold">評価 <span class="text-danger">*</span></label>
+      <div class="star-rating-input">
+        <% 5.downto(1) do |i| %>
+          <%= f.radio_button :total_score, i, id: "rating_#{i}", class: 'd-none' %>
+          <label for="rating_<%= i %>" class="star-label">⭐</label>
+        <% end %>
+      </div>
+      <small class="text-muted">クリックして星を選んでください</small>
+    </div>
+    
+    <div class="form-group mb-3">
+      <label class="form-label fw-bold">コメント</label>
+      <%= f.text_area :text, 
+                      rows: 4, 
+                      class: 'form-control border-2', 
+                      placeholder: '体験を共有しましょう...',
+                      maxlength: 1000,
+                      id: 'review_text_area' %>
+      <div class="text-end">
+        <small class="text-muted"><span id="charCount">0</span>/1000</small>
+      </div>
+    </div>
+    
+    <%= f.submit '投稿する', 
+                 class: 'btn btn-primary w-100 fw-bold py-2', 
+                 id: 'submitReviewBtn', 
+                 disabled: true %>
+  <% end %>
+</div>
+
+<style>
+  /* Стили для выбора звезд (справа налево для работы селектора ~) */
+  .star-rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    font-size: 2.5rem;
+  }
+  
+  .star-label {
+    cursor: pointer;
+    filter: grayscale(100%);
+    transition: transform 0.2s, filter 0.2s;
+  }
+  
+  /* Магия CSS: зажигаем все звезды до выбранной */
+  .star-rating-input input:checked ~ label,
+  .star-rating-input label:hover,
+  .star-rating-input label:hover ~ label {
+    filter: grayscale(0%);
+    transform: scale(1.1);
+  }
+
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: none;
+  }
+</style>
+
+<script>
+  // Важно: используем turbo:load для совместимости с Hotwire/Turbo
+  document.addEventListener('turbo:load', function() {
+    const form = document.getElementById('reviewForm');
+    if (!form) return;
+
+    const submitBtn = document.getElementById('submitReviewBtn');
+    const radios = form.querySelectorAll('input[name="review[total_score]"]');
+    const textarea = document.getElementById('review_text_area');
+    const charCount = document.getElementById('charCount');
+
+    // Активируем кнопку только после выбора рейтинга
+    radios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        submitBtn.disabled = false;
+      });
+    });
+
+    // Счетчик символов
+    textarea?.addEventListener('input', (e) => {
+      if (charCount) charCount.textContent = e.target.value.length;
+    });
+  });
+</script>

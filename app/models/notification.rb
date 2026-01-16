@@ -20,7 +20,9 @@ class Notification < ApplicationRecord
     new_post: 'new_post',
     bookmark: 'bookmark',
     route_liked: 'route_liked',
-    route_commented: 'route_commented'
+    route_commented: 'route_commented',
+    route_reviewed: 'route_reviewed',
+    mention: 'mention'
   }
 
   # === Scopes ===
@@ -32,7 +34,7 @@ class Notification < ApplicationRecord
 
   # === Методы иконки и текста ===
   def icon
-    case notification_type
+    case notification_type.to_sym
     when 'like', 'route_liked' then '❤️'
     when 'comment', 'route_commented' then '💬'
     when 'follow' then '👤'
@@ -48,21 +50,28 @@ class Notification < ApplicationRecord
   end
 
   def notification_text
+    actor_name = actor&.username || '誰か'
+
     case notification_type.to_sym
     when :new_message
-      "#{actor&.username || '誰か'}さんからメッセージが届きました"
+      "#{actor_name}さんからメッセージが届きました"
     when :route_liked, :like
-      "#{actor&.username || '誰か'}さんがあなたのルートにいいねしました"
+      target_name = get_notifiable_name
+      target_name ? "#{actor_name}さんがルート「#{target_name}」にいいねしました" : "#{actor_name}さんがあなたの投稿にいいねしました"
     when :route_commented, :comment
-      "#{actor&.username || '誰か'}さんがあなたのルートにコメントしました"
+      target_name = get_notifiable_name
+      target_name ? "#{actor_name}さんがルート「#{target_name}」にコメントしました" : "#{actor_name}さんがあなたの投稿にコメントしました"
     when :follow
-      "#{actor&.username || '誰か'}さんがあなたをフォローしました"
-    when :review
-      "#{actor&.username || '誰か'}さんがあなたの場所をレビューしました"
+      "#{actor_name}さんがあなたをフォローしました"
+    when :review, :route_reviewed
+      target_name = get_notifiable_name
+      target_name ? "#{actor_name}さんがルート「#{target_name}」にレビューを投稿しました" : "#{actor_name}さんがレビューを投稿しました"
     when :new_post
-      "#{actor&.username || '誰か'}さんが新しいルートを投稿しました"
+      "#{actor_name}さんが新しいルート「#{notifiable.name}」を投稿しました" if notifiable.is_a?(Route)
+    when :bookmark
+      "#{actor_name}さんがあなたのルートを保存しました"
     else
-      "#{actor&.username || '誰か'}さんから通知があります"
+      "#{actor_name}さんから通知があります"
     end
   end
 
@@ -73,17 +82,17 @@ class Notification < ApplicationRecord
 
     case notifiable_type
     when 'Route'
-      Rails.application.routes.url_helpers.route_path(notifiable)
+      helpers.route_path(notifiable)
     when 'Venue'
-      Rails.application.routes.url_helpers.venue_path(notifiable)
+      helpers.venue_path(notifiable)
     when 'DmMessage'
       room_id = notifiable.respond_to?(:dm_room_id) ? notifiable.dm_room_id : nil
-      room_id ? Rails.application.routes.url_helpers.dm_room_path(room_id) : '#'
+      room_id ? helpers.dm_room_path(room_id) : '#'
     when 'Comment'
       target = notifiable.commentable
-      target.is_a?(Route) ? Rails.application.routes.url_helpers.route_path(target) : Rails.application.routes.url_helpers.venue_path(target)
+      target.is_a?(Route) ? helpers.route_path(target) : helpers.venue_path(target)
     when 'User'
-      Rails.application.routes.url_helpers.user_path(notifiable)
+      helpers.user_path(notifiable)
     when 'Follower'
       actor ? helpers.user_path(actor) : helpers.root_path
     when 'Review'
@@ -112,7 +121,23 @@ class Notification < ApplicationRecord
     unread.for_user(user).update_all(is_read: true, read_at: Time.current)
   end
 
-  def self.unread_cont_for(user)
+  def self.unread_count_for(user)
     unread.for_user(user).count
+  end
+
+  private
+
+  def get_notifiable_name
+    if notifiable.respond_to?(:name)
+      notifiable.name
+    elsif notifiable.respond_to?(:likeable) && notifiable.likeable.respond_to?(:name)
+      notifiable.likeable.name
+    elsif notifiable.respond_to?(:commentable) && notifiable.commentable.respond_to?(:name)
+      notifiable.commentable.name
+    elsif notifiable.respond_to?(:reviewable) && notifiable.reviewable.respond_to?(:name)
+      notifiable.reviewable.name
+    elsif notifiable.respond_to?(:route) && notifiable.route.respond_to?(:name)
+      notifiable.route.name
+    end
   end
 end
