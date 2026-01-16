@@ -17,9 +17,11 @@ class VenuesController < ApplicationController
   def show
     @venue.increment_view_count
 
+    @venue = Venue.find(params[:id])
+
     @route = @venue.routes.joins(:route_items)
-                          .order("route_items.position ASC")
-                          .first
+                   .order('route_items.position ASC')
+                   .first
 
     # Если нет маршрута → пустой массив
     @route_items = @route ? @route.route_items.includes(:venue, :item) : []
@@ -27,10 +29,8 @@ class VenuesController < ApplicationController
     @reviews = @route ? @route.reviews.includes(:user).order(created_at: :desc).limit(10) : []
 
     @routes = @venue.routes.where(is_public: true).limit(5)
+    @reviews = @venue.reviews
   end
-
-
-
 
   private
 

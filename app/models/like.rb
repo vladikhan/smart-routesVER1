@@ -14,7 +14,7 @@ class Like < ApplicationRecord
   private
 
   def create_like_notification
-    return unless likeable.is_a?(Route)
+    return unless likeable.user_id == user_id
 
     NotificationService.notify_route_liked(self)
   end

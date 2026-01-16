@@ -7,6 +7,7 @@
   
  
 
+<!-- app/views/notifications/index.html.erb -->
 <%= render 'pages/header' %>
 
 <div class="notifications-page">
@@ -15,43 +16,48 @@
       <span>🔔</span>
       通知
       <% if @unread_count > 0 %>
-        <span class='unread-badge-header' id="unread-count-badge"><%= @unread_count %></span>
+        <span class="unread-badge-header"><%= @unread_count %></span>
       <% end %>
     </h1>
     
-    <%# Проверяем наличие непрочитанных уведомлений %>
-    <% if @notifications.any? { |n| !n.is_read } %>
-      <%= button_to 'すべて既読にする', mark_all_as_read_notifications_path, 
+    <% if @notifications.where(is_read: false).any? %>
+      <%= button_to 'すべて既読にする', 
+                    mark_all_as_read_notifications_path, 
                     method: :patch, 
                     class: "mark-all-read" %>
     <% end %>
   </div>
 
+  
+
   <% if @notifications.any? %>
-    <%# Группируем по дате для красивого разделения %>
+    <!-- Группировка по датам -->
     <% @notifications.group_by { |n| n.created_at.to_date }.each do |date, notifications_of_day| %>
-      
       <div class="date-divider">
         <span class="date-text">
-          <% if date == Date.today %> 今日
-          <% elsif date == Date.yesterday %> 昨日
-          <% elsif date > 7.days.ago.to_date %> <%= date.strftime('%m月%d日') %>
-          <% else %> <%= date.strftime('%Y年%m月%d日') %>
+          <% if date == Date.today %>
+            今日
+          <% elsif date == Date.yesterday %>
+            昨日
+          <% elsif date > 7.days.ago.to_date %>
+            <%= date.strftime('%m月%d日') %>
+          <% else %>
+            <%= date.strftime('%Y年%m月%d日') %>
           <% end %>
         </span>
       </div>
 
-      <%# Выводим уведомления только за этот день %>
+      <!-- Уведомления за этот день -->
       <% notifications_of_day.each do |notification| %>
         <%= link_to mark_as_read_notification_path(notification), 
-            method: :patch, 
-            class: "notification-card #{notification.is_read ? 'read' : 'unread'}" do %>
+                    class: "notification-card #{notification.is_read ? 'read' : 'unread'}" do %>
           
           <div class="notification-icon-large">
             <%= notification.icon %>
           </div>
           
           <div class="notification-body">
+            <!-- Аватар актора -->
             <% if notification.actor.present? %>
               <div class="notification-actor-avatar">
                 <% if notification.actor.avatar.present? %>
@@ -64,19 +70,20 @@
               </div>
             <% end %>
             
+            <!-- Текст уведомления -->
             <div class="notification-text-content">
-              <div class="notification-message"><%= notification.message %></div>
+              <div class="notification-message">
+                <%= notification.message %>
+              </div>
               
-              <% if notification.respond_to?(:detail_text) && notification.detail_text.present? %>
-                <div class="notification-detail">"<%= notification.detail_text %>"</div>
-              <% end %>
-              
+              <!-- Время -->
               <div class="notification-time">
                 <%= time_ago_in_words(notification.created_at) %>前
               </div>
             </div>
           </div>
           
+          <!-- Индикатор непрочитанного -->
           <% unless notification.is_read %>
             <div class="notification-unread-dot"></div>
           <% end %>
@@ -84,15 +91,18 @@
       <% end %>
     <% end %>
 
+    <!-- Пагинация -->
     <div class="pagination-wrapper mt-4">
       <%= paginate @notifications %>
     </div>
 
   <% else %>
-    <%# Состояние, когда уведомлений совсем нет %>
+    <!-- Пустое состояние -->
     <div class="empty-state">
       <div class="empty-icon">🔔</div>
-      <h2><%= params[:filter].present? ? "該当する通知はありません" : "通知はありません" %></h2>
+      <h2>
+        <%= params[:filter].present? ? "該当する通知はありません" : "通知はありません" %>
+      </h2>
       <p>新しいアクションがあるとここに表示されます</p>
     </div>
   <% end %>

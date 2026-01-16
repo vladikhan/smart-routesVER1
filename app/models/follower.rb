@@ -7,7 +7,27 @@ class Follower < ApplicationRecord
   after_destroy_commit :decrement_counters
   after_destroy_commit :remove_follow_notifications
 
+  validates :follower_id, presence: true
+  validates :following_id, presence: true
+  validates :follower_id, uniqueness: { scope: :following_id }
+  validate :cannot_follow_self
+
+  def self.notify_new_follower(follower, followed)
+    return if follower.id == followed.id
+
+    create_notification(
+      user: followed,
+      actor: follower,
+      notification_type: :follow,
+      notifiable: Relationship.find_by(follower: follower, following: followed) # Передаем объект связи
+    )
+  end
+
   private
+
+  def cannot_follow_self
+    errors.add(:follower_id, '自分自身をフォローすることはできません') if follower_id == following_id
+  end
 
   def increment_counters
     User.increment_counter(:following_count, follower_id)
@@ -20,19 +40,10 @@ class Follower < ApplicationRecord
   end
 
   def create_follow_notification
-    NotificationService.create_notification(
-      user: following_user,
-      actor: follower_user,
-      notification_type: :follow,
-      notifiable: self
-    )
+    NotificationService.notify_new_follower(follower, following)
   end
 
   def remove_follow_notifications
-    Notification.where(
-      notifiable_id: id,
-      notifiable_type: 'Follower',
-      notification_type: 'follow'
-    ).destroy_all
+    NotificationService.remove_notification(self)
   end
 end

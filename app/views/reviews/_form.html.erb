@@ -1,40 +1,4 @@
-<div class="review-form-card shadow-sm p-4 rounded-3 bg-white">
-  <h5 class="mb-3 fw-bold">レビューを投稿する</h5>
-  
-  <%= form_with model: [reviewable, Review.new], 
-                local: false, 
-                html: { class: 'review-form', id: 'reviewForm' } do |f| %>
-    
-    <div class="form-group mb-3">
-      <label class="form-label fw-bold">評価 <span class="text-danger">*</span></label>
-      <div class="star-rating-input">
-        <% 5.downto(1) do |i| %>
-          <%= f.radio_button :total_score, i, id: "rating_#{i}", class: 'd-none' %>
-          <label for="rating_<%= i %>" class="star-label">⭐</label>
-        <% end %>
-      </div>
-      <small class="text-muted">クリックして星を選んでください</small>
-    </div>
-    
-    <div class="form-group mb-3">
-      <label class="form-label fw-bold">コメント</label>
-      <%= f.text_area :text, 
-                      rows: 4, 
-                      class: 'form-control border-2', 
-                      placeholder: '体験を共有しましょう...',
-                      maxlength: 1000,
-                      id: 'review_text_area' %>
-      <div class="text-end">
-        <small class="text-muted"><span id="charCount">0</span>/1000</small>
-      </div>
-    </div>
-    
-    <%= f.submit '投稿する', 
-                 class: 'btn btn-primary w-100 fw-bold py-2', 
-                 id: 'submitReviewBtn', 
-                 disabled: true %>
-  <% end %>
-</div>
+
 
 <style>
   /* Стили для выбора звезд (справа налево для работы селектора ~) */

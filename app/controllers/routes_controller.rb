@@ -23,6 +23,11 @@ class RoutesController < ApplicationController
 
     @reviews = @route.reviews.includes(:user).order(created_at: :desc)
 
+    @related_routes = Route.where(city_id: @route.city_id)
+                           .where.not(id: @route.id)
+                           .where(is_public: true)
+                           .limit(3)
+
     if user_signed_in?
       @current_user_liked = current_user.liked?(@route)
       @current_user_bookmarked = current_user.bookmarked?(@route)

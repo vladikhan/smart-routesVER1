@@ -80,7 +80,7 @@ Rails.application.routes.draw do
       patch :mark_all_as_read
     end
     member do
-      patch :mark_as_read
+      get :mark_as_read
     end
   end
 end

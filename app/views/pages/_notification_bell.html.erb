@@ -28,7 +28,7 @@
                       data: { notification_id: notification.id } do %>
             <div class="notification-icon"><%= notification.icon %></div>
             <div class="notification-content">
-              <div class="notification-message"><%= notification.notification_text %></div>
+              <div class="notification-message"><%= notification.message %></div>
               <div class="notification-time"><%= time_ago_in_words(notification.created_at) %>前</div>
             </div>
             <% unless notification.is_read? %>

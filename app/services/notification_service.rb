@@ -62,11 +62,12 @@ class NotificationService
   def self.notify_review_added(review)
     return unless review.reviewable.is_a?(Route)
 
-    route_owner = review.reviewable.user
-    return if review.user_id == route_owner.id
+    recipient = review.reviewable.respond_to?(:user) ? review.reviewable.user : nil
+
+    return if recipient.nil? || review.user_id == recipient.id
 
     create_notification(
-      user: route_owner,
+      user: recipient,
       actor: review.user,
       notification_type: :review,
       notifiable: review
@@ -95,9 +96,12 @@ class NotificationService
     Rails.logger.info "✅ Bulk notifications for route #{route.id}"
   end
 
-  private
+  def self.create_notification(params)
+    user = params[:user]
+    actor = params[:actor]
+    notification_type = params[:notification_type]
+    notifiable = params[:notifiable]
 
-  def self.create_notification(user:, actor:, notification_type:, notifiable:)
     return if Notification.exists?(
       user: user,
       actor: actor,
@@ -106,19 +110,13 @@ class NotificationService
       created_at: 1.hour.ago..Time.current
     )
 
-    notification = Notification.create!(
-      user: user,
-      actor: actor,
-      notification_type: notification_type,
-      notifiable: notifiable,
-      is_read: false
-    )
+    notification = Notification.create!(params)
 
     ActionCable.server.broadcast("notifications_#{user.id}", {
                                    unread_count: user.unread_notifications_count,
                                    notification: {
                                      id: notification.id,
-                                     message: notification.notification_text,
+                                     message: notification.message,
                                      icon: notification.icon,
                                      url: notification.target_url,
                                      time: 'たった今'

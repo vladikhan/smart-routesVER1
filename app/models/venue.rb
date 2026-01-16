@@ -1,4 +1,3 @@
-
 class Venue < ApplicationRecord
   belongs_to :district
   belongs_to :user, optional: true
@@ -9,7 +8,7 @@ class Venue < ApplicationRecord
   has_many :venue_photos, dependent: :destroy
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
-  
+  has_many_attached :photos
 
   validates :name, presence: true, length: { maximum: 100 }
   validates :address, presence: true
@@ -66,6 +65,7 @@ class Venue < ApplicationRecord
 
   def bookmarked_by?(user)
     return false unless user
+
     bookmarks.exists?(user_id: user.id)
   end
 end
