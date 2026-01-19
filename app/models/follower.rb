@@ -3,7 +3,7 @@ class Follower < ApplicationRecord
   belongs_to :following_user, class_name: 'User', foreign_key: 'following_id'
 
   after_create_commit :increment_counters
-  after_create_commit :create_follow_notification
+  after_create_commit
   after_destroy_commit :decrement_counters
   after_destroy_commit :remove_follow_notifications
 
@@ -37,10 +37,6 @@ class Follower < ApplicationRecord
   def decrement_counters
     User.decrement_counter(:following_count, follower_id)
     User.decrement_counter(:followers_count, following_id)
-  end
-
-  def create_follow_notification
-    NotificationService.notify_new_follower(follower, following)
   end
 
   def remove_follow_notifications

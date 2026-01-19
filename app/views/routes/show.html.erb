@@ -1,5 +1,6 @@
 <% content_for :title, "#{@route.name} - Smart Routes" %>
 
+
 <%= render 'pages/header' %>
 
 <% if notice %>
@@ -144,12 +145,7 @@
                         <%= venue.cuisine_type %>
                       </span>
                     <% end %>
-                    <% if venue.district.present? %>
-                      <span class="tag-inline">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <%= venue.district %>
-                      </span>
-                    <% end %>
+                    
                     <% if venue.price_range.present? %>
                       <span class="tag-inline">
                         <i class="fas fa-yen-sign"></i>
@@ -244,7 +240,7 @@
               <div class="review-item">
                 <div class="review-header">
                   <div class="review-author">
-                    <div class="review-avatar">
+                    <div class="page-nav-icon">
                       <% if review.user.avatar.present? %>
                         <%= image_tag review.user.avatar.thumb.url, alt: review.user.username %>
                       <% else %>
@@ -257,12 +253,7 @@
                     </div>
                   </div>
                   
-                  <div class="review-rating">
-                    <% review.total_score.to_i.times do %>
-                      <i class="fas fa-star"></i>
-                    <% end %>
-                    <span class="review-rating-value"><%= review.total_score %></span>
-                  </div>
+                  
                 </div>
                 
                 <div class="review-content">
@@ -336,14 +327,24 @@
           </div>
           
           <% if user_signed_in? && current_user != @route.user %>
-            <button class="follow-btn <%= 'following' if current_user.following?(@route.user) %>"
-                    data-user-id="<%= @route.user.id %>">
-              <span>
-                <%= current_user.following?(@route.user) ? 'フォロー中' : 'フォローする' %>
-              </span>
-            </button>
-          <% end %>
-        </div>
+  <div id="follow_section_<%= @route.user.id %>">
+    <% if current_user.following?(@route.user) %>
+      <%= button_to unfollow_user_path(@route.user), 
+                    method: :delete, 
+                    remote: true, 
+                    class: "follow-btn following" do %>
+        <span>フォロー中</span>
+      <% end %>
+    <% else %>
+      <%= button_to follow_user_path(@route.user), 
+                    method: :post, 
+                    remote: true, 
+                    class: "follow-btn" do %>
+        <span>フォローする</span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
       </div>
 
       <!-- Related Routes -->
@@ -386,6 +387,7 @@
 
 <script>
 // 1. Безопасно передаем данные из Ruby в JS одной строкой JSON
+// 1. Данные из Ruby (оставляем как есть, тут всё четко)
 const routeItems = <%= raw @route_items.map { |ri| 
   venue = ri.item
   {
@@ -396,10 +398,11 @@ const routeItems = <%= raw @route_items.map { |ri|
   }
 }.to_json %>;
 
-// 2. Функция инициализации (вызовется сама через callback)
-function initMap() {
+// 2. Делаем функцию глобальной
+window.initMap = function() {
   const mapElement = document.getElementById("map");
-  if (!mapElement || routeItems.length === 0) return;
+  // Важно: если данных нет, карта не должна ломать весь JS на странице
+  if (!mapElement || !routeItems || routeItems.length === 0) return;
 
   const bounds = new google.maps.LatLngBounds();
   const map = new google.maps.Map(mapElement, {
@@ -427,7 +430,7 @@ function initMap() {
     });
 
     const infoWindow = new google.maps.InfoWindow({
-      content: `<div style="padding:5px"><strong>${item.name}</strong><br><small>${item.address}</small></div>`
+      content: `<div style="padding:5px; color: #333;"><strong>${item.name}</strong><br><small>${item.address}</small></div>`
     });
 
     marker.addListener("click", () => infoWindow.open(map, marker));
@@ -442,11 +445,18 @@ function initMap() {
       strokeWeight: 4
     });
     map.fitBounds(bounds);
-  } else {
+  } else if (routeItems.length === 1) {
     map.setCenter({ lat: routeItems[0].lat, lng: routeItems[0].lng });
     map.setZoom(15);
   }
-}
-</script>
+};
+
+// 3. Магия Turbolinks
+// Если страница загрузилась через Turbolinks и API уже есть — запускаем карту вручную
+document.addEventListener("turbolinks:load", () => {
+  if (typeof google !== 'undefined' && google.maps) {
+    window.initMap();
+  }
+});</script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap" async defer></script>

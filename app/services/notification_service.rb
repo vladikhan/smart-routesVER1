@@ -32,14 +32,20 @@ class NotificationService
   end
 
   # --- Подписки ---
-  def self.notify_new_follower(follower, followed)
-    return if follower.id == followed.id
+
+  def self.notify_new_follower(follower_id, followed_id) # <- Вот твои переменные
+    # Исправляем: сравниваем сами ID (они уже числа)
+    return if follower_id.to_i == followed_id.to_i
+
+    follower = User.find(follower_id)
+    followed = User.find(followed_id)
 
     create_notification(
       user: followed,
       actor: follower,
       notification_type: :follow,
-      notifiable: follower # Юзер, который подписался
+      notifiable_type: 'User',
+      notifiable: follower
     )
   end
 
@@ -97,31 +103,53 @@ class NotificationService
   end
 
   def self.create_notification(params)
-    user = params[:user]
-    actor = params[:actor]
-    notification_type = params[:notification_type]
-    notifiable = params[:notifiable]
+    # 1. Достаем объекты из params или ищем в базе
+    user = params[:user] || User.find(params[:user_id])
+    actor = params[:actor] || User.find(params[:actor_id])
 
+    # 2. ОПРЕДЕЛЯЕМ ПЕРЕМЕННУЮ type (Важнейший шаг!)
+    # Берем её из ключа :notification_type и превращаем в символ для case
+    type = params[:notification_type].to_sym
+
+    # 3. Генерируем текст сообщения
+    params[:message] ||= case type
+                         when :follow
+                           "#{actor.username} さんにフォローされました"
+                         when :like
+                           "#{actor.username} さんがあなたのルートに「いいね」しました"
+                         when :comment
+                           "#{actor.username} さんがコメントしました"
+                         else
+                           '新しい通知があります'
+                         end
+
+    # 4. Проверка на дубликаты (используем ключи напрямую из params)
     return if Notification.exists?(
       user: user,
       actor: actor,
-      notification_type: notification_type,
-      notifiable: notifiable,
+      notification_type: params[:notification_type],
+      notifiable: params[:notifiable],
       created_at: 1.hour.ago..Time.current
     )
 
+    # 5. Создаем запись
     notification = Notification.create!(params)
 
+    # 6. ActionCable отправка
     ActionCable.server.broadcast("notifications_#{user.id}", {
                                    unread_count: user.unread_notifications_count,
                                    notification: {
                                      id: notification.id,
                                      message: notification.message,
-                                     icon: notification.icon,
                                      url: notification.target_url,
-                                     time: 'たった今'
+                                     actor: {
+                                       username: actor.username,
+                                       avatar_url: actor.avatar_url
+                                     }
                                    }
                                  })
+  rescue StandardError => e
+    Rails.logger.error "❌ Notification Error: #{e.message}"
   end
 
   def self.remove_notification(notifiable)

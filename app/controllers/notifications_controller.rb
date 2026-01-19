@@ -28,7 +28,7 @@ class NotificationsController < ApplicationController
     redirect_url = @notification.target_url
 
     respond_to do |format|
-      format.html { redirect_to redirect_url }
+      format.html { redirect_back fallback_location: notifications_path }
       format.json do
         render json: {
           success: true,

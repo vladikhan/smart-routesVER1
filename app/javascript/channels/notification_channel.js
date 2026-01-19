@@ -72,41 +72,45 @@ const notificationChannel = consumer.subscriptions.create(
 			const list = document.getElementById('notificationsList')
 			if (!list) return
 
-			// Remove "no notifications" message
+			// 1. Удаляем сообщение "Нет уведомлений"
 			const noNotifications = list.querySelector('.no-notifications')
 			if (noNotifications) noNotifications.remove()
 
-			// Create notification element
-			const notifElement = document.createElement('div')
+			// 2. Создаем элемент-ссылку (как делает link_to в Rails)
+			const notifElement = document.createElement('a')
+			notifElement.href = notification.url // Используем URL из broadcast
 			notifElement.className = 'notification-item unread slide-in'
 			notifElement.dataset.notificationId = notification.id
-			notifElement.onclick = e =>
-				this.handleNotificationClick(notification.id, e)
 
-			const avatarHtml = notification.actor.avatar_url
-				? `<img src="${notification.actor.avatar_url}" class="notification-avatar" alt="${notification.actor.username}">`
-				: `<div class="notification-avatar-placeholder">${notification.actor.username[0].toUpperCase()}</div>`
-
-			notifElement.innerHTML = `
-      ${avatarHtml}
-      <div class="notification-content">
-        <div class="notification-message">${notification.message}</div>
-        <div class="notification-time">たった今</div>
-      </div>
-      <div class="unread-indicator"></div>
-    `
-
-			// Insert at top
-			const firstItem = list.querySelector('.notification-item')
-			if (firstItem) {
-				list.insertBefore(notifElement, firstItem)
-			} else {
-				list.appendChild(notifElement)
+			// Если у тебя есть специальный обработчик клика (например, для mark_as_read)
+			notifElement.onclick = e => {
+				if (this.handleNotificationClick) {
+					this.handleNotificationClick(notification.id, e)
+				}
 			}
 
-			// Keep only latest 10 notifications
+			// 3. Формируем аватар (проверяем наличие данных от актора)
+			const actor = notification.actor || {}
+			const avatarHtml = actor.avatar_url
+				? `<img src="${actor.avatar_url}" class="notification-avatar" alt="${actor.username}">`
+				: `<div class="notification-avatar-placeholder">${(actor.username || 'U')[0].toUpperCase()}</div>`
+
+			// 4. Наполняем контентом (строго по твоему CSS)
+			notifElement.innerHTML = `
+    <div class="notification-icon">${avatarHtml}</div>
+    <div class="notification-content">
+      <div class="notification-message">${notification.message}</div>
+      <div class="notification-time">たった今 (Только что)</div>
+    </div>
+    <div class="unread-dot"></div>
+  `
+
+			// 5. Вставляем в самое начало списка
+			list.prepend(notifElement)
+
+			// 6. Ограничиваем количество (держим последние 8, как в Ruby коде)
 			const items = list.querySelectorAll('.notification-item')
-			if (items.length > 10) {
+			if (items.length > 8) {
 				items[items.length - 1].remove()
 			}
 		},

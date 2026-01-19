@@ -68,13 +68,50 @@ class UsersController < ApplicationController
 
   def update
     if @user.update(user_params)
-      redirect_to user_path(@user), notice: 'プロフィールを更新しました'
+      redirect_to user_path(@user)
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
+  def follow
+    @user = User.find(params[:id])
+
+    return unless current_user.follow(@user)
+
+    respond_to do |format|
+      format.html { redirect_back fallback_location: user_path(@user), notice: 'フォローしました' }
+      format.js
+    end
+  end
+
+  def unfollow
+    @user = User.find_by(id: params[:id])
+
+    return redirect_back fallback_location: root_path, alert: 'ユーザーが見つかりませんでした' if @user.nil?
+    return unless current_user.unfollow(@user)
+
+    respond_to do |format|
+      format.html { redirect_back fallback_location: user_path(@user), notice: 'フォローを解除しました' }
+      format.js
+    end
+  end
+
   private
+
+  # Добавляем этот метод в секцию private
+  def create_follow_notification(follower, followed)
+    return if follower == followed
+
+    # Проверь названия колонок в db/schema.rb!
+    # Если у тебя нет колонки 'action', удали эту строку или замени на правильную
+    Notification.create(
+      user: followed,
+      actor: follower.id,
+      notifiable: follower, # или тот объект, который вызвал уведомление
+      message: "#{follower.username}さんがあなたをフォローしました"
+    )
+  end
 
   def set_user
     @user = User.find(params[:id])

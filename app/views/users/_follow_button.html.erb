@@ -1,0 +1,13 @@
+<div id="follow_section_<%= user.id %>" class="follow-button-wrapper">
+  <% if current_user.following?(user) %>
+  <%= button_to "フォロー解除", unfollow_user_path(user), 
+                method: :delete, 
+                remote: true, 
+                class: "btn btn-outline-secondary btn-sm px-3" %>
+<% else %>
+  <%= button_to "フォローする", follow_user_path(user), 
+                method: :post, 
+                remote: true, 
+                class: "btn btn-primary btn-sm px-4" %>
+<% end %>
+</div>

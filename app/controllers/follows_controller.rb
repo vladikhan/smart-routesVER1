@@ -1,41 +1,47 @@
 class FollowsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_user
 
   def create
     @user = User.find(params[:user_id])
+    current_user.follow(@user)
 
-    if current_user.follow(@user)
-      @user.reload
-      respond_to do |format|
-        format.html { redirect_back fallback_location: @user, notice: 'フォローしました' }
-        format.json { render json: { success: true, followers_count: @user.followers_count } }
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("follow_section_#{@user.id}",
+                                                  render_to_string(partial: 'users/follow_button',
+                                                                   locals: { user: @user }))
       end
-    else
-      render_error
+      format.html { redirect_back fallback_location: @user }
     end
   end
 
   def destroy
     @user = User.find(params[:user_id])
+    current_user.unfollow(@user)
 
-    if current_user.unfollow(@user)
-      @user.reload
-
-      respond_to do |format|
-        format.html { redirect_back fallback_location: @user, notice: 'フォローを解除しました' }
-        format.json { render json: { success: true, followers_count: @user.followers.count } }
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("follow_section_#{@user.id}",
+                                                  render_to_string(partial: 'users/follow_button',
+                                                                   locals: { user: @user }))
       end
-    else
-      render_error
+      format.html { redirect_back fallback_location: @user }
     end
   end
 
   private
 
+  def set_user
+    @user = User.find(params[:user_id])
+  rescue ActiveRecord::RecordNotFound
+    render_error
+  end
+
   def render_error
     respond_to do |format|
       format.html { redirect_back fallback_location: root_path, alert: 'エラーが発生しました' }
-      format.json { render json: { success: false, error: 'エラーが発生しました' } }
+      format.json { render json: { success: false, error: 'ユーザーが見つかりません' }, status: :not_found }
     end
   end
 end

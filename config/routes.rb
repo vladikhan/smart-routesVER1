@@ -31,8 +31,15 @@ Rails.application.routes.draw do
   get 'logout_confirm', to: 'pages#logout_confirm'
 
   # Users
-  resources :users, only: %i[index show edit update] do
-    resource :follower, only: %i[create destroy], controller: 'follows'
+  # resources :users, only: %i[index show edit update] do
+  #   resource :follow, only: %i[create destroy], controller: 'follows'
+  # end
+
+  resources :users do
+    member do
+      post :follow
+      delete :unfollow
+    end
   end
 
   # Email verification
@@ -74,7 +81,7 @@ Rails.application.routes.draw do
   end
 
   # Notification routes
-  resources :notifications, only: [:index] do
+  resources :notifications, only: %i[index show] do
     collection do
       get :unread_count
       patch :mark_all_as_read

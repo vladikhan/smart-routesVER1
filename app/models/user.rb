@@ -17,38 +17,38 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :bookmarks, dependent: :destroy
+  # source_type лучше писать строкой, как у тебя и сделано
   has_many :bookmarked_routes, through: :bookmarks, source: :item, source_type: 'Route'
 
   # === Ассоциации: Уведомления ===
   has_many :notifications, dependent: :destroy
   has_many :sent_notifications, class_name: 'Notification', foreign_key: :actor_id, dependent: :destroy
 
-  # === Ассоциации: DM  ===
+  # === Ассоциации: DM ===
+  # Используем scope для упрощения получения всех комнат
   has_many :sent_dm_rooms, class_name: 'DmRoom', foreign_key: 'sender_id', dependent: :destroy
   has_many :received_dm_rooms, class_name: 'DmRoom', foreign_key: 'receiver_id', dependent: :destroy
   has_many :dm_messages, dependent: :destroy
 
-  # === Ассоциации: Follow  ===
+  # === Ассоциации: Follow (FIXED) ===
+  # Те, на кого я подписан
   has_many :following_relationships, class_name: 'Follower', foreign_key: 'follower_id', dependent: :destroy
   has_many :following, through: :following_relationships, source: :following_user
+  belongs_to :following_user
 
+  # Мои подписчики
   has_many :follower_relationships, class_name: 'Follower', foreign_key: 'following_id', dependent: :destroy
   has_many :followers, through: :follower_relationships, source: :follower_user
+  belongs_to :follower_user
 
-  # === Бизнес-аккаунты ===
-  # has_many :place_owners, dependent: :destroy
-  # has_many :owned_venues, through: :place_owners, source: :venue
-
-  # === verification ===
+  # === Verification Logic ===
   VERIFICATION_CODE_LENGTH = 6
   VERIFICATION_CODE_EXPIRY = 15.minutes
 
   def generate_verification_code
-    self.verification_code = SecureRandom.random_number(10**VERIFICATION_CODE_LENGTH).to_s.rjust(
-      VERIFICATION_CODE_LENGTH, '0'
-    )
-    self.verification_code_sent_at = Time.current
-    save(validate: false)
+    code = SecureRandom.random_number(10**VERIFICATION_CODE_LENGTH).to_s.rjust(VERIFICATION_CODE_LENGTH, '0')
+    update_columns(verification_code: code, verification_code_sent_at: Time.current)
+    code
   end
 
   def verification_code_valid?(code)
@@ -57,34 +57,38 @@ class User < ApplicationRecord
     Time.current <= verification_code_sent_at + VERIFICATION_CODE_EXPIRY && verification_code == code
   end
 
+  # Переопределяем метод Devise, если используем свои коды
   def send_confirmation_instructions
     generate_verification_code
     UserMailer.verification_code_email(self).deliver_now
   end
 
-  # === messages and notifications ===
+  # === Messages and Notifications ===
   def unread_notifications_count
     notifications.unread.count
   end
 
   def unread_messages_count
-    sent_dm_rooms.sum(:unread_count_sender) + received_dm_rooms.sum(:unread_count_receiver)
+    # Используем &. для безопасности, если комнат нет
+    (sent_dm_rooms.sum(:unread_count_sender) || 0) + (received_dm_rooms.sum(:unread_count_receiver) || 0)
   end
 
   def dm_rooms
     DmRoom.where('sender_id = ? OR receiver_id = ?', id, id).order(last_message_at: :desc)
   end
 
-  # === Follow system ===
+  # === Follow System (FIXED) ===
   def following?(other_user)
-    following.include?(other_user)
+    # Используем exists?, это быстрее, чем загружать всю коллекцию include?
+    following_relationships.exists?(following_id: other_user.id)
   end
 
   def follow(other_user)
     return false if self == other_user
 
+    # Ставим статус 'accepted', как в твоей миграции
     following_relationships.find_or_create_by(following_id: other_user.id) do |f|
-      f.status = 'active'
+      f.status = 'accepted'
     end
   end
 
@@ -92,21 +96,21 @@ class User < ApplicationRecord
     following_relationships.find_by(following_id: other_user.id)&.destroy
   end
 
-  # Лента новостей: маршруты людей, на которых я подписан
   def feed_routes
-    Route.where(user_id: following.select(:id))
-         .or(Route.where(user_id: id))
+    # Оптимизированный запрос через ID
+    following_ids = following_relationships.pluck(:following_id)
+    Route.where(user_id: following_ids + [id])
          .public_routes
          .recent
   end
 
-  # === Helpers and status ===
+  # === Helpers ===
   def avatar_url
     avatar.present? ? avatar.url : '/images/default_avatar.png'
   end
 
   def admin?
-    is_admin
+    try(:is_admin) # Безопаснее, если колонки еще нет
   end
 
   def confirmed?
