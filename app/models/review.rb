@@ -6,13 +6,17 @@ class Review < ApplicationRecord
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
   has_one :review_response, dependent: :destroy
+  has_many_attached :images do |attachable|
+    attachable.variant :thumb, resize_to_limit: [200, 200]
+    has_many :review_images, dependent: :destroy
+  end
 
   accepts_nested_attributes_for :review_images, allow_destroy: true
 
   # バリデーション
   validates :text, presence: true, length: { minimum: 10, maximum: 5000 }
-  validates :total_score, presence: true, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
-  validates :user_id, uniqueness: { scope: %i[reviewable_type reviewable_id], message: 'すでにレビューを投稿しています' }
+  # validates :total_score, presence: true, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
+  # validates :user_id, uniqueness: { scope: %i[reviewable_type reviewable_id], message: 'すでにレビューを投稿しています' }
 
   # コールバック
   after_create_commit :create_review_notification

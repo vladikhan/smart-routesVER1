@@ -5,7 +5,11 @@
     <ul class="nav-links">
       <li><%= link_to "ルート一覧", routes_path %></li>
       <li><%= link_to "場所を探す", venues_path %></li>
-      <li><%= link_to "メッセージ", dm_rooms_path %></li>  
+     <li>
+  <%= link_to dm_rooms_path, class: "nav-icon-link" do %>
+    <%= image_tag "message-icon.svg", class: "nav-icon" %>
+  <% end %>
+</li>
       <li><%= link_to "ユーザー", users_path %></li>
       <li><%= link_to "通知", notifications_path, title: "通知" %></li>
     </ul>

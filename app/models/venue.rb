@@ -9,6 +9,8 @@ class Venue < ApplicationRecord
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
   has_many_attached :photos
+  has_many :likes, as: :likeable, dependent: :destroy
+  has_many :likers, through: :likes, source: :user
 
   validates :name, presence: true, length: { maximum: 100 }
   validates :address, presence: true
@@ -18,6 +20,7 @@ class Venue < ApplicationRecord
   scope :featured, -> { where(is_featured: true).order(featured_order: :asc) }
   scope :approved, -> { where(status: 'approved') }
   scope :popular, -> { order(popularity_score: :desc) }
+  scope :popular, -> { order(likes_count: :desc) }
 
   after_initialize :set_defaults, if: :new_record?
 
@@ -47,6 +50,12 @@ class Venue < ApplicationRecord
   def longitude=(value)
     self.geo_lng = value
     write_attribute(:longitude, value) if has_attribute?(:longitude)
+  end
+
+  def liked_by?(user)
+    return false unless user
+
+    likes.exists?(user_id: user.id)
   end
 
   def city

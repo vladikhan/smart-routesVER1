@@ -1,505 +1,566 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title><%= @venue.name %> - Smart Routes</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-  <%= stylesheet_link_tag "venues", "data-turbo-track": "reload" %>
-</head>
-<body>
+<% content_for :title, "#{@venue.name} - Smart Routes" %>
+
   <%= render 'pages/header' %>
 
-  <!-- Hero Section -->
-  <div class="venue-detail-header">
-    <div style="max-width: 1200px; width: 100%; position: relative; z-index: 2;">
-      <div class="venue-header-meta">
-        <div class="venue-meta-item">
-          <i class="fas fa-utensils"></i>
-          <span><%= @venue.cuisine_type %></span>
-        </div>
-        
-        <div class="venue-meta-item">
-          <i class="fas fa-yen-sign"></i>
-          <span><%= @venue.price_range %></span>
-        </div>
+   <!-- Hero Section -->
+<div class="venue-detail-header">
+  <div style="max-width: 1200px; width: 100%; position: relative; z-index: 2;">
+    <div class="venue-header-meta">
+      <div class="venue-meta-item">
+        <i class="fas fa-utensils"></i>
+        <span><%= @venue.cuisine_type %></span>
       </div>
-      
-      <h1><%= @venue.name %></h1>
-      
-      <div class="venue-quick-stats">
-        <div class="stat-badge stat-rating">
-          <i class="fas fa-star"></i>
-          <strong><%= number_with_precision(@venue.average_rating || 0, precision: 1) %></strong>
-          <span>(<%= @venue.reviews_count || 0 %>件)</span>
-        </div>
-        <div class="stat-badge">
-          <i class="fas fa-eye"></i>
-          <span><%= @venue.view_count || 0 %>回閲覧</span>
-        </div>
-        <div class="stat-badge">
-          <i class="fas fa-bookmark"></i>
-          <span><%= @venue.save_count || 0 %>保存</span>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="venue-action-buttons">
-        <% if user_signed_in? %>
-          <button class="venue-action-btn venue-action-btn-primary" onclick="bookmarkVenue()">
-            <i class="fas fa-bookmark"></i>
-            <span>保存する</span>
-          </button>
-          <button class="venue-action-btn venue-action-btn-secondary" onclick="addToRoute()">
-            <i class="fas fa-plus"></i>
-            <span>ルートに追加</span>
-          </button>
-        <% end %>
-        <button class="venue-action-btn venue-action-btn-secondary" onclick="shareVenue()">
-          <i class="fas fa-share-alt"></i>
-          <span>シェア</span>
-        </button>
+      <div class="venue-meta-item">
+        <i class="fas fa-yen-sign"></i>
+        <span><%= @venue.price_range %></span>
       </div>
     </div>
-  </div>
 
+    <h1><%= @venue.name %></h1>
+
+    <div class="venue-quick-stats">
+      <div class="stat-badge stat-rating">
+        <i class="fas fa-star"></i>
+        <strong><%= number_with_precision(@venue.average_rating || 0, precision: 1) %></strong>
+        <span>(<%= @venue.reviews_count || 0 %>件)</span>
+      </div>
+      <div class="stat-badge">
+        <i class="fas fa-eye"></i>
+        <span><%= @venue.view_count || 0 %>回閲覧</span>
+      </div>
+      <div class="stat-badge">
+        <i class="fas fa-bookmark"></i>
+        <span><%= @venue.save_count || 0 %>保存</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="venue-action-buttons">
+  <% if user_signed_in? && @venue.present? %>
+
+    <!-- Like Button -->
+    <% if current_user.liked?(@venue) %>
+      <% like = current_user.likes.find_by(likeable: @venue) %>
+      <%= button_to "/venues/#{@venue.id}/likes/#{like.id}",
+                    method: :delete,
+                    class: "action-btn btn-like active" do %>
+        <i class="fas fa-heart"></i>
+        <span>❤️ いいね</span>
+      <% end %>
+    <% else %>
+      <%= button_to venue_likes_path(@venue),
+                    params: { likeable_type: 'Venue', likeable_id: @venue.id },
+                    method: :post,
+                    class: "action-btn btn-like" do %>
+        <i class="far fa-heart"></i>
+        <span>❤️ いいね</span>
+      <% end %>
+    <% end %>
+
+    <!-- Bookmark Button -->
+    <% if current_user.bookmarked?(@venue) %>
+      <%= button_to venue_bookmark_path(@venue),
+                    method: :delete,
+                    params: { item_type: 'Venue', item_id: @venue.id },
+                    class: "action-btn btn-save active" do %>
+        <i class="fas fa-bookmark"></i>
+        <span>保存済み</span>
+      <% end %>
+    <% else %>
+      <%= button_to venue_bookmark_path(@venue),
+                    method: :post,
+                    params: { item_type: 'Venue', item_id: @venue.id },
+                    class: "action-btn btn-save" do %>
+        <i class="far fa-bookmark"></i>
+        <span>🔖 保存</span>
+      <% end %>
+    <% end %>
+
+  <% end %>
+
+  <!-- Share Button -->
+      <button class="action-btn btn-share" onclick="shareVenue()">
+        <i class="fas fa-share-alt"></i>
+        <span>シェア</span>
+      </button>
+      
+      <!-- Edit Button (Owner Only) -->
+      <% if user_signed_in? && current_user == @venue.user %>
+        <%= link_to edit_venue_path(@venue), class: "action-btn btn-edit" do %>
+          <i class="fas fa-edit"></i>
+          <span>編集</span>
+        <% end %>
+      <% end %>
+  </button>
+</div>
+  </div>
+</div>
+  
   <!-- Main Content -->
   <div class="venue-detail-content">
     <div class="venue-detail-grid">
-      <!-- Left Column: Main Content -->
-      <div>
-        <!-- Photos Section -->
-        <div class="venue-info-card">
-          <h2>
-            <i class="fas fa-images"></i>
-            写真ギャラリー
-          </h2>
-          
-          <% if @venue.photos.attached? %>
-            <div class="photo-grid">
+
+  <!-- Left Column -->
+  <div class='left-column'>
+    <div class="venue-info-card">
+
+    <!-- Header -->
+    
+    <div class="card-header-with-action"
+          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="margin:0;">
+          <i class="fas fa-images"></i>
+          写真ギャラリー
+        </h2>
+
+        <%= form_with(model: @venue, local: true, class: "upload-form") do |f| %>
+          <label class="btn-upload-photos"
+                style="cursor:pointer; background:#3b82f6; color:white; padding:5px 12px; border-radius:6px; font-size: 0.9rem;">
+            <i class="fas fa-plus"></i> 追加
+            <%= f.file_field :photos,
+                  multiple: true,
+                  accept: 'image/*',
+                  onchange: "this.form.submit()",
+                  style: "display:none;" %>
+          </label>
+        <% end %>
+      </div>
+
+  <!-- Body -->
+    <div class="card-body">
+      
+
+      <% if @venue.photos.attached? %>
+        <% if @venue.photos.count > 8 %>
+
+          <div class="swiper venueSwiper" style="padding-bottom: 2rem;">
+            <div class="swiper-wrapper">
               <% @venue.photos.each do |photo| %>
-                <div class="photo-item" onclick="openPhotoModal('<%= url_for(photo) %>')">
-                  <%= image_tag photo, alt: @venue.name %>
+                <div class="swiper-slide">
+                  <div class="photo-item"
+                      style="position:relative; aspect-ratio:1/1; overflow:hidden; border-radius:8px;">
+
+                    <button type="button"
+                            class="delete-photo-overlay"
+                            onclick="confirmDelete('<%= delete_photo_venue_path(@venue, photo_id: photo.id) %>')">
+                      <i class="fas fa-times" style="font-size: 12px;"></i>x
+                    </button>
+
+                    <div class="photo-click-area"
+                        onclick="openPhotoModal('<%= url_for(photo) %>')"
+                        style="cursor:pointer; width:100%; height:100%;">
+                      <% if photo.variable? %>
+                        <%= image_tag photo.variant(resize_to_limit: [400, 400]),
+                              style: "width:100%; height:100%; object-fit:cover;" %>
+                      <% else %>
+                        <%= image_tag photo,
+                              style: "width:100%; height:100%; object-fit:cover;" %>
+                      <% end %>
+                    </div>
+
+                  </div>
                 </div>
               <% end %>
             </div>
-          <% else %>
-            <div class="photo-grid">
-              <% 4.times do |i| %>
-                <div class="photo-item">
-                  <i class="fas fa-image"></i>
-                </div>
-              <% end %>
-            </div>
-            <p class="text-muted text-center mt-3">
-              <i class="fas fa-info-circle"></i>
-              写真はまだアップロードされていません
-            </p>
-          <% end %>
-        </div>
 
-        <!-- Overview Section -->
-        <div class="venue-info-card">
-          <h2>
-            <i class="fas fa-info-circle"></i>
-            基本情報
-          </h2>
-          
-          <div class="info-row">
-            <div class="info-label">
-              <i class="fas fa-align-left"></i>
-              説明
-            </div>
-            <div class="info-value">
-              <%= @venue.description.present? ? @venue.description : "説明はまだ追加されていません" %>
-            </div>
-          </div>
-          
-          <div class="info-row">
-            <div class="info-label">
-              <i class="fas fa-map-marked-alt"></i>
-              住所
-            </div>
-            <div class="info-value"><%= @venue.address %></div>
-          </div>
-          
-          <div class="info-row">
-            <div class="info-label">
-              <i class="fas fa-clock"></i>
-              営業時間
-            </div>
-            <div class="info-value">
-              <%= @venue.business_hours.present? ? @venue.business_hours : "未設定" %>
-            </div>
-          </div>
-          
-          <% if @venue.phone.present? %>
-            <div class="info-row">
-              <div class="info-label">
-                <i class="fas fa-phone"></i>
-                電話番号
-              </div>
-              <div class="info-value">
-                <a href="tel:<%= @venue.phone %>" style="color: #667eea; text-decoration: none;">
-                  <%= @venue.phone %>
-                </a>
-              </div>
-            </div>
-          <% end %>
-          
-          <% if @venue.website.present? %>
-            <div class="info-row">
-              <div class="info-label">
-                <i class="fas fa-globe"></i>
-                ウェブサイト
-              </div>
-              <div class="info-value">
-                <%= link_to @venue.website, @venue.website, 
-                    target: "_blank", 
-                    style: "color: #667eea; text-decoration: none;" %>
-              </div>
-            </div>
-          <% end %>
-          
-          <div class="info-row">
-            <div class="info-label">
-              <i class="fas fa-yen-sign"></i>
-              価格帯
-            </div>
-            <div class="info-value"><%= @venue.price_range %></div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
           </div>
 
-          <% if @venue.cuisine_type.present? %>
-            <div class="info-row">
-              <div class="info-label">
-                <i class="fas fa-utensils"></i>
-                料理タイプ
-              </div>
-              <div class="info-value"><%= @venue.cuisine_type %></div>
-            </div>
-          <% end %>
-        </div>
+        <% else %>
 
-        <!-- Reviews Section -->
-        <div class="venue-info-card reviews-section">
-          <div class="reviews-header">
-            <div class="total-rating-box">
-              <div class="rating-number">
-                <%= number_with_precision(@venue.average_rating || 0, precision: 1) %>
-              </div>
-              <div class="rating-stars">
-                <% (@venue.average_rating || 0).round.times do %>
-                  <i class="fas fa-star"></i>
-                <% end %>
-              </div>
-              <div class="rating-count">
-                <%= @reviews.count %>件のレビュー
-              </div>
-            </div>
-            
-            <% if user_signed_in? %>
-              <button class="write-review-btn" onclick="scrollToReviewForm()">
-                <i class="fas fa-pen"></i>
-                <span>レビューを書く</span>
-              </button>
-            <% end %>
-          </div>
+          <div class="photo-grid"
+              style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px;">
+            <% @venue.photos.each do |photo| %>
+              <div class="photo-item"
+                  style="position:relative; aspect-ratio:1/1; overflow:hidden; border-radius:8px;">
 
-          <!-- Rating Distribution -->
-          <% if @reviews.any? %>
-            <div class="rating-distribution">
-              <h4>評価の内訳</h4>
-              <% [5, 4, 3, 2, 1].each do |star| %>
-                <% count = @reviews.where(total_score: star).count %>
-                <% percentage = @reviews.count > 0 ? (count.to_f / @reviews.count * 100).round : 0 %>
-                <div class="rating-bar">
-                  <div class="rating-label">
-                    <i class="fas fa-star"></i>
-                    <%= star %>
-                  </div>
-                  <div class="progress">
-                    <div class="progress-bar" style="width: <%= percentage %>%"></div>
-                  </div>
-                  <div class="rating-count"><%= count %></div>
-                </div>
-              <% end %>
-            </div>
-          <% end %>
+                <button type="button"
+                        class="delete-photo-overlay"
+                        onclick="confirmDelete('<%= delete_photo_venue_path(@venue, photo_id: photo.id) %>')">
+                  <i class="fas fa-times" style="font-size: 12px;"></i>x
+                </button>
 
-          <!-- Review Form -->
-          <div id="review-form-section">
-            <% if user_signed_in? %>
-              <% existing_review = @reviews.find_by(user_id: current_user.id) %>
-              <% if existing_review %>
-                <div class="alert-card alert-info">
-                  <i class="fas fa-check-circle"></i>
-                  <div class="alert-content">
-                    <strong>あなたはすでにレビューを投稿しています</strong>
-                    <p>既存のレビューを編集できます</p>
-                  </div>
-                  <%= link_to edit_review_path(existing_review), class: 'btn btn-edit-review' do %>
-                    <i class="fas fa-edit"></i>
-                    編集する
+                <div class="photo-click-area"
+                    onclick="openPhotoModal('<%= url_for(photo) %>')"
+                    style="cursor:pointer; width:100%; height:100%;">
+                  <% if photo.variable? %>
+                    <%= image_tag photo.variant(resize_to_limit: [400, 400]),
+                          style: "width:100%; height:100%; object-fit:cover;" %>
+                  <% else %>
+                    <%= image_tag photo,
+                          style: "width:100%; height:100%; object-fit:cover;" %>
                   <% end %>
                 </div>
-              <% else %>
-                <%= render 'reviews/form', reviewable: @venue %>
-              <% end %>
-            <% else %>
-              <div class="alert-card alert-login">
-                <i class="fas fa-sign-in-alt"></i>
-                <div class="alert-content">
-                  <strong>レビューを投稿するにはログインが必要です</strong>
-                  <p>アカウントをお持ちの方はログインしてください</p>
-                </div>
-                <%= link_to new_user_session_path, class: 'btn btn-login' do %>
-                  <i class="fas fa-sign-in-alt"></i>
-                  ログイン
-                <% end %>
+
               </div>
             <% end %>
           </div>
 
-          <!-- Reviews List -->
-          <div class="reviews-list">
-            <h4 class="reviews-list-title">
-              <i class="fas fa-comments"></i>
-              最新のレビュー
-            </h4>
+        <% end %>
+      <% else %>
+
+        <p class="text-muted text-center"
+          style="padding:2rem; background:#f9f9f9; border-radius:8px;">
+          写真はまだアップロードされていません
+        </p>
+
+      <% end %>
+
+    </div>
+
+  <!-- /Left Column -->
+      
+                  <!-- Overview Section -->
+          <div class="venue-info-card">
+            <h2><i class="fas fa-info-circle"></i> 基本情報</h2>
+            <div class="info-row">
+              <div class="info-label"><i class="fas fa-align-left"></i> 説明</div>
+              <div class="info-value"><%= @venue.description.presence || "説明はまだ追加されていません" %></div>
+            </div>
+            <div class="info-row">
+              <div class="info-label"><i class="fas fa-map-marked-alt"></i> 住所</div>
+              <div class="info-value"><%= @venue.address %></div>
+            </div>
+          </div>
+
+          <div class="venue-info-card reviews-section">
+            <div class="reviews-header">
+              <h3>レビュー</h3>
+            </div>
+
+
+
+
             
-            <% if @reviews.any? %>
-              <% @reviews.order(created_at: :desc).limit(5).each do |review| %>
-                <div class="review-item">
-                  <div class="review-header">
-                    <div class="review-author">
-                      <div class="review-avatar">
-                        <% if review.user.avatar.present? %>
-                          <%= image_tag review.user.avatar.thumb.url, alt: review.user.username %>
-                        <% else %>
-                          <%= review.user.username[0].upcase %>
-                        <% end %>
-                      </div>
-                      <div class="review-author-info">
-                        <div class="review-author-name"><%= review.user.username %></div>
-                        <div class="review-author-username">@<%= review.user.username %></div>
-                      </div>
-                    </div>
-                    
-                    
-                  </div>
-                  
-                  <div class="review-content">
-                    <%= simple_format(review.text || review.comment) %>
-                  </div>
-                  
-                  <div class="review-footer">
-                    <div class="review-date">
-                      <i class="far fa-clock"></i>
-                      <%= time_ago_in_words(review.created_at) %>前
-                    </div>
-                    
-                    <div class="review-actions">
-                      <button class="review-action-btn" onclick="likeReview(<%= review.id %>)">
-                        <i class="far fa-thumbs-up"></i>
-                        <span>役に立った</span>
-                      </button>
-                      <button class="review-action-btn" onclick="shareReview(<%= review.id %>)">
-                        <i class="fas fa-share"></i>
-                        <span>共有</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+
+            <!-- Review Form Section -->
+  <!-- Review Form Section -->
+<div id="review-form-section" class="mb-4">
+
+<% if user_signed_in? %>
+  <div class="review-form-card mb-4 p-4 bg-white rounded-4 shadow-sm border">
+    <%= form_with(model: [@venue, @venue.reviews.build],
+                  local: true,
+                  class: 'review-form') do |f| %>
+
+      <div class="d-flex gap-3 align-items-start">
+
+        <div class="author-avatar-large flex-shrink-0 shadow-sm"
+             style="width:45px; height:45px; font-size:18px;">
+          <%= current_user.username&.at(0)&.upcase || "U" %>
+        </div>
+
+        <div class="flex-grow-1">
+
+          <div class="rating-select mb-2 d-flex align-items-center gap-2">
+            <br />
+            <div class="stars-input text-warning"
+                 style="cursor:pointer; font-size: 1.2rem;">
+              <% 5.times do |i| %>
+                <i class="far fa-star star-icon"
+                   data-value="<%= i + 1 %>"></i>
               <% end %>
-              
-              <% if @reviews.count > 5 %>
-                <div class="load-more-reviews">
-                  <button class="load-more-btn" onclick="loadMoreReviews()">
-                    <i class="fas fa-chevron-down"></i>
-                    <span>さらに読み込む</span>
-                  </button>
-                </div>
-              <% end %>
-            <% else %>
-              <div class="empty-state">
-                <i class="fas fa-comments"></i>
-                <h3>まだレビューがありません</h3>
-                <p>最初のレビューを投稿しましょう！</p>
-              </div>
-            <% end %>
+            </div>
+
+            <%= f.hidden_field :total_score,
+                               id: 'review_total_score',
+                               value: 5 %>
+          </div>
+
+          <div class="comment-input-wrapper rounded-3 border">
+
+            <%= f.text_area :text,
+                class: 'form-control border-0 shadow-none p-3',
+                rows: 1,
+                placeholder: 'あなたの感想を共有しましょう...',
+                oninput: 'this.style.height = ""; this.style.height = this.scrollHeight + "px"',
+                style: 'resize:none; background:transparent; width:100%; min-height:50px;' %>
+
+            <div class="d-flex justify-content-between align-items-center p-2 border-top bg-light-subtle rounded-bottom-3">
+              <%= f.submit 'レビューを書く',
+                    class: 'btn btn-primary rounded-pill px-4 fw-bold shadow-sm',
+                    id: 'submit-comment' %>
+            </div>
+
           </div>
         </div>
       </div>
+    <% end %>
+  </div>
 
-      <!-- Right Column: Sidebar -->
-      <div class="sidebar">
-        <!-- Map Section -->
-        <div class="venue-info-card">
-          <h3>
-            <i class="fas fa-map"></i>
-            地図
-          </h3>
-          <div id="map" class="map-preview" style="height: 300px; width: 100%;">
-            <div class="map-preview-placeholder">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>地図を読み込んでいます...</span>
+<% else %>
+
+  <div class="text-center py-4 mb-4 bg-light rounded-3 border">
+    <i class="fas fa-sign-in-alt fa-2x mb-2 text-muted opacity-50"></i>
+    <p class="mb-2 text-muted">
+      コメントを投稿するにはログインが必要です
+    </p>
+    <%= link_to 'ログイン',
+                new_user_session_path,
+                class: 'btn btn-outline-primary rounded-pill px-4' %>
+  </div>
+
+<% end %>
+
+</div>
+
+    <!-- Reviews List -->
+  <div class="reviews-list">
+    <% if @reviews.any? %>
+      <% @reviews.order(created_at: :desc).each_with_index do |review, index| %>
+        <div class="review-item py-3 <%= 'border-bottom' unless index == @reviews.count - 1 %>"
+            id="review-<%= review.id %>">
+
+          <div class="d-flex gap-3">
+            <!-- Avatar -->
+            <div class="author-avatar-large flex-shrink-0"
+                style="width:40px; height:40px; font-size:16px;">
+              <% if review.user.avatar.present? %>
+                <%= image_tag review.user.avatar.thumb.url,
+                      class: 'w-100 h-100 rounded-circle object-fit-cover' %>
+              <% else %>
+                <%= review.user.username.first.upcase %>
+              <% end %>
             </div>
-          </div>
-          
-        </div>
 
-        <!-- Routes Section -->
-        <div class="venue-info-card">
-          <h3>
-            <i class="fas fa-route"></i>
-            このスポットを含むルート (<%= @routes.count %>)
-          </h3>
-          
-          <% if @routes.any? %>
-            <div class="routes-section">
-              <% @routes.limit(5).each do |route| %>
-                <%= link_to route_path(route), class: "route-mini-card" do %>
-                  <div class="route-mini-card-header">
-                    <div class="route-mini-icon">
-                      <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <div class="route-mini-card-title"><%= route.name %></div>
+            
+
+
+
+
+            <!-- Content -->
+            <div class="flex-grow-1">
+              <!-- Header -->
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <strong><%= review.user.username %></strong>
+                  <div class="text-muted small">
+                    <%= time_ago_in_words(review.created_at) %>前
                   </div>
-                  <div class="route-mini-card-meta">
-                    <div class="route-mini-card-meta-item">
-                      <i class="fas fa-map-marker-alt"></i>
-                      <%= route.route_items.count %>場所
-                    </div>
-                    <% if route.estimated_duration.present? %>
-                      <div class="route-mini-card-meta-item">
-                        <i class="fas fa-clock"></i>
-                        <%= route.estimated_duration %>分
-                      </div>
-                    <% end %>
+                </div>
+
+                <% if user_signed_in? && review.user_id == current_user.id %>
+                  <div class="dropdown">
+                    <br />
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      
+                      
+                        <button class="dropdown-item"
+                                onclick="toggleEditReview(<%= review.id %>)">
+                          編集
+                        </button>
+                      
+                      
+                        <% delete_url =
+                            @venue.present? ?
+                              venue_review_path(@venue, review) :
+                              venue_review_path(@venue, review) %>
+
+                        <button type="button"
+                                class="dropdown-item text-danger"
+                                onclick="confirmDeleteReview('<%= delete_url %>')">
+                          削除
+                        </button>
+                      
+                    </ul>
+                        <br />
                   </div>
                 <% end %>
-              <% end %>
-            </div>
-            
-            <% if @routes.count > 5 %>
-              <%= link_to routes_path(venue_id: @venue.id), class: "view-all-link" do %>
-                すべて見る
-                <i class="fas fa-arrow-right"></i>
-              <% end %>
-            <% end %>
-          <% else %>
-            <div class="no-routes-message">
-              <i class="fas fa-route"></i>
-              <p>まだルートに追加されていません</p>
-            </div>
-          <% end %>
-        </div>
+              </div>
 
-        <!-- Nearby Venues -->
-        <% if @nearby_venues.present? && @nearby_venues.any? %>
-          <div class="venue-info-card">
-            <h3>
-              <i class="fas fa-map-pin"></i>
-              近くのスポット
-            </h3>
-            
-            <div class="nearby-venues-list">
-              <% @nearby_venues.limit(3).each do |venue| %>
-                <%= link_to venue_path(venue), class: "nearby-venue-item" do %>
-                  <div class="nearby-venue-icon">
-                    <i class="fas fa-store"></i>
-                  </div>
-                  <div class="nearby-venue-info">
-                    <div class="nearby-venue-name"><%= venue.name %></div>
-                    <div class="nearby-venue-meta">
-                      <i class="fas fa-star"></i>
-                      <%= number_with_precision(venue.average_rating || 0, precision: 1) %>
+              <!-- DISPLAY MODE -->
+              <div id="review-display-<%= review.id %>" class="review-content mt-2">
+                <%= simple_format(review.text) %>
+              </div>
+
+              <!-- EDIT MODE -->
+              <% if user_signed_in? && review.user_id == current_user.id %>
+                <% parent_resource = @route || @venue %>
+
+                <div id="review-edit-<%= review.id %>" style="display:none;" class="mt-2">
+                  <%= form_with(model: [parent_resource, review], local: true) do |f| %>
+                    <%= f.text_area :text, class: "form-control mb-2", rows: 3 %>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                      <%= f.submit '更新する',
+                            class: 'btn btn-primary btn-sm rounded-pill px-3' %>
+
+                      <button type="button"
+                              class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                              onclick="toggleEditReview(<%= review.id %>)">
+                        キャンセル
+                      </button>
                     </div>
-                  </div>
-                <% end %>
+                  <% end %>
+                </div>
               <% end %>
+
             </div>
           </div>
-        <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center text-muted py-4">
+        まだレビューはありません
+      </div>
+    <% end %>
+  </div>    
+</div>    
+</div>
+  
+
+          
+
+
+    <%# After this </div> starts right sidebar%>
+
+      
+  </div>
+  <%= render 'venues/sidebar' %>
       </div>
     </div>
   </div>
+
+<div id="photoModal" class="photo-modal" onclick="closePhotoModal()" style="display:none; position:fixed; z-index:9999; left:50%; top:50%; transform: translate(-50%, -50%); width:70%; height:90%; max-width: 900px; background-color: rgba(0,0,0,0.85); border-radius: 20px; align-items:center; justify-content:center; box-shadow: 0 0 100px rgba(0,0,0,0.5);">
+  
+  <span style="position:absolute; top:20px; right:35px; color:#fff; font-size:30px; font-weight:bold; cursor:pointer; opacity: 0.8;">&times;</span>
+  
+  <img id="modalImage" style="
+    max-width: 90%; 
+    max-height: 70vh; 
+    object-fit: contain; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.1);
+  ">
+</div>
+  
+  
+
+  
 
   <%= render 'pages/footer' %>
 
   <script>
-  // ========== Google Map Initialization ==========
+  // Глобальные переменные для контроля инициализации
+  let venueSwiperInstance = null;
+
+  // ========== 1. Google Map ==========
   function initMap() {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) return;
+
     <% if @venue.geo_lat.present? && @venue.geo_lng.present? %>
-      const venueLocation = { 
-        lat: <%= @venue.geo_lat %>, 
-        lng: <%= @venue.geo_lng %> 
-      };
-      
-      const mapOptions = {
+      const venueLocation = { lat: <%= @venue.geo_lat %>, lng: <%= @venue.geo_lng %> };
+      const map = new google.maps.Map(mapElement, {
         zoom: 15,
         center: venueLocation,
         mapTypeControl: true,
         streetViewControl: true,
         fullscreenControl: true
-      };
-      
-      const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+      });
       
       const marker = new google.maps.Marker({
         position: venueLocation,
         map: map,
         title: '<%= j @venue.name %>',
-        animation: google.maps.Animation.DROP,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          fillColor: "#667eea",
-          fillOpacity: 1,
-          strokeColor: "white",
-          strokeWeight: 3,
-          scale: 15,
-        }
+        animation: google.maps.Animation.DROP
       });
-      
-      // Info window при клике на маркер
+
       const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="padding: 10px;">
-            <h4 style="margin: 0 0 8px 0;"><%= j @venue.name %></h4>
-            <p style="margin: 0; color: #666;"><%= j @venue.address %></p>
-          </div>
-        `
+        content: `<div style="padding: 10px;"><h4><%= j @venue.name %></h4><p><%= j @venue.address %></p></div>`
       });
       
-      marker.addListener('click', () => {
-        infoWindow.open(map, marker);
-      });
-    <% else %>
-      console.warn('Venue coordinates not available');
+      marker.addListener('click', () => infoWindow.open(map, marker));
     <% end %>
   }
+
+  // ========== 2. Swiper Carousel ==========
+  function setupSwiper() {
+    const el = document.querySelector('.venueSwiper');
+    if (!el || venueSwiperInstance) return;
+
+    if (typeof Swiper !== 'undefined') {
+      venueSwiperInstance = new Swiper('.venueSwiper', {
+  slidesPerView: 2,       // Увеличили с 1.2 (фото станут чуть меньше по ширине, но выше)
+  spaceBetween: 10,
   
-  // Инициализация при загрузке страницы
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMap);
-  } else {
-    initMap();
-  }
+  pagination: { el: '.swiper-pagination', clickable: true },
+  navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
   
-  // ========== Other Functions ==========
-  function scrollToReviewForm() {
-    document.getElementById('review-form-section')?.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'center'
-    });
+  breakpoints: {
+    // Если ширина экрана больше или равна 768px (планшеты)
+    768: {
+      slidesPerView: 3,
+      spaceBetween: 15
+    },
+    // Если ширина экрана больше или равна 1024px (ноутбуки/ПК)
+    1024: {
+      slidesPerView: 4, // Вот здесь ставим ровно 4
+      spaceBetween: 20  // Расстояние между слайдами
+    }
+  },
+  pagination: { el: '.swiper-pagination', clickable: true },
+  navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
+});
+    }
   }
 
+  // ========== 3. Photo Modal  ==========
+  function openPhotoModal(imgUrl) {
+    const modal = document.getElementById("photoModal");
+    const modalImg = document.getElementById("modalImage");
+    if (!modal || !modalImg) return;
+
+    modalImg.src = imgUrl;
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closePhotoModal() {
+    const modal = document.getElementById("photoModal");
+    if (modal) {
+      modal.style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+  }
+
+  // ========== 4. Event Listeners (Turbo & Global) ==========
+  
+  // Единый слушатель для Esc
+  document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") closePhotoModal();
+  });
+
+  // Очистка Swiper перед кэшированием (для Turbo)
+  document.addEventListener('turbo:before-cache', () => {
+    if (venueSwiperInstance) {
+      venueSwiperInstance.destroy();
+      venueSwiperInstance = null;
+    }
+  });
+
+  // Запуск всего при загрузке (Turbo и обычный)
+  function initAll() {
+    initMap();
+    setupSwiper();
+  }
+
+  document.addEventListener('turbo:load', initAll);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+
+  // ========== 5. UI Helpers ==========
   function shareVenue() {
     if (navigator.share) {
       navigator.share({
         title: '<%= j @venue.name %>',
-        text: '<%= j @venue.description %>',
         url: window.location.href
       });
     } else {
@@ -507,8 +568,92 @@
       alert('URLをコピーしました！');
     }
   }
+
+  window.toggleEditReview = function (reviewId) {
+  if (!reviewId) return;
+
+  const displayDiv = document.getElementById('review-display-' + reviewId);
+  const editDiv = document.getElementById('review-edit-' + reviewId);
+
+  if (!displayDiv || !editDiv) return;
+
+  const isHidden =
+    editDiv.style.display === 'none' || editDiv.style.display === '';
+
+  displayDiv.style.display = isHidden ? 'none' : 'block';
+  editDiv.style.display = isHidden ? 'block' : 'none';
+};
+
+
+// keep your existing listener EXACTLY as-is
+document.addEventListener("turbo:load", () => {
+  initMap();
+  }
+);
+
+
+
+  function scrollToReviewForm() {
+    document.getElementById('review-form-section')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function confirmDelete(url) {
+  Swal.fire({
+    title: '削除しますか？',
+    text: "この操作は取り消せません！",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'はい、削除します',
+    cancelButtonText: 'キャンセル',
+    focusCancel: true // Чтобы случайно не нажать "Удалить" энтером
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // 1. Ищем CSRF токен (Rails без него не примет запрос)
+      const token = document.querySelector('meta[name="csrf-token"]').content;
+
+      // 2. Создаем форму
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = url;
+
+      // 3. Добавляем скрытое поле _method=delete (нужно для Rails)
+      const methodInput = document.createElement('input');
+      methodInput.type = 'hidden';
+      methodInput.name = '_method';
+      methodInput.value = 'delete';
+      form.appendChild(methodInput);
+
+      // 4. Добавляем токен подлинности
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'authenticity_token';
+      csrfInput.value = token;
+      form.appendChild(csrfInput);
+
+      // 5. Отправляем
+      document.body.appendChild(form);
+      form.submit();
+    }
+  })
+}
+
+// чтобы кнопки не ломали страницу
+window.bookmarkVenue = function () {
+  console.log('bookmarkVenue — пока не реализовано');
+};
+
+window.addToRoute = function () {
+  console.log('addToRoute — пока не реализовано');
+};
+
+// алиас для удаления отзывов
+window.confirmDeleteReview = function (url) {
+  confirmDelete(url);
+};
 </script>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>"></script>
 
-</body>
-</html>
+

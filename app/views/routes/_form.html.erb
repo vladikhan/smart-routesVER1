@@ -1,0 +1,79 @@
+<%= form_with model: @route, local: true, html: { multipart: true }, data: { controller: "image-preview" } do |f| %>
+  <% if @route.errors.any? %>
+    <div class="alert alert-danger shadow-sm">
+      <h5 class="fw-bold"><%= @route.errors.count %>件のエラーが発生しました:</h5>
+      <ul class="mb-0">
+        <% @route.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-4">
+    <%= f.label :name, 'ルート名', class: 'form-label fw-bold' %>
+    <%= f.text_field :name, class: 'form-control form-control-lg', placeholder: '例: 京都1日観光ルート' %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :description, '説明', class: 'form-label fw-bold' %>
+    <%= f.text_area :description, rows: 5, class: 'form-control', 
+                    placeholder: 'このルートの見どころや注意点を記載してください' %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :images, '画像 (最大10枚)', class: 'form-label fw-bold' %>
+    <%= f.file_field :images, 
+                     multiple: true, 
+                     accept: 'image/*',
+                     class: 'form-control',
+                     data: { action: "change->image-preview#preview" } %>
+    <div class="form-text mt-2 text-muted">
+      <i class="bi bi-info-circle me-1"></i> JPEG, PNG, GIF対応。1枚あたり5MB以下。
+    </div>
+  </div>
+
+  <div id="image-preview-container" class="mb-4">
+    <div class="row g-3">
+      <% if @route.images.attached? %>
+        <% @route.images.each do |image| %>
+          <%# Проверяем, что картинка сохранилась в базе %>
+          <% if image.persisted? %>
+            <div class="col-6 col-md-3">
+              <div class="position-relative shadow-sm rounded overflow-hidden shadow-hover">
+                <%# Используем thumbnail метод, который мы обсуждали %>
+                <%= image_tag image.variant(resize_to_limit: [300, 300]), class: 'img-fluid w-100', style: "height: 150px; object-fit: cover;" %>
+                
+                <%# ВАЖНО: используем link_to вместо button_to внутри формы %>
+                <%= link_to delete_image_route_path(@route, image_id: image.id), 
+                            method: :delete,
+                            data: { confirm: 'この画像を削除しますか?' },
+                            class: 'btn btn-danger btn-sm position-absolute top-0 end-0 m-2 shadow' do %>
+                  <i class="bi bi-trash"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <div class="mb-4 form-check form-switch">
+    <%= f.check_box :is_public, class: 'form-check-input', id: 'flexSwitchCheckDefault' %>
+    <%= f.label :is_public, 'ルートを一般公開する', class: 'form-check-label', for: 'flexSwitchCheckDefault' %>
+  </div>
+
+  <div class="d-flex gap-2 pb-5">
+    <%= f.submit @route.new_record? ? 'ルートを作成' : '変更を保存', class: 'btn btn-primary btn-lg px-5 shadow-sm' %>
+    <%= link_to 'キャンセル', @route.new_record? ? routes_path : @route, class: 'btn btn-outline-secondary btn-lg px-4' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :images, "ルートの画像 (複数選択可)" %>
+    <%= f.file_field :images, multiple: true, class: "form-control-file", accept: 'image/*' %>
+    <small class='text-muted'>Shift キーまたは Ctrl キーを押しながら、複数の写真を選択できます。</small>
+  </div>
+<% end %>

@@ -164,23 +164,21 @@
             </button>
             
             <div class="input-container">
-              <%= f.text_area :text, 
-                             rows: 1,
-                             class: "message-textarea",
-                             placeholder: "メッセージを入力...",
-                             id: "message-content-input",
-                             autocomplete: "off",
-                             maxlength: 5000 %>
-              
-              <button type="button" class="emoji-btn" title="絵文字">😊</button>
-            </div>
-            
-            <%= f.submit class: "send-btn", id: "send-message-btn" do %>
-              <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
-              </svg>
-            <% end %>
-          </div>
+  <%= f.text_area :text, 
+                 rows: 1,
+                 class: "message-textarea",
+                 placeholder: "メッセージを入力...",
+                 id: "message-content-input",
+                 autocomplete: "off",
+                 maxlength: 5000 %>
+  
+  <button type="button" class="emoji-btn" title="絵文字">😊</button>
+</div>
+
+<%# Заменяем f.submit на f.button, чтобы вставить иконку внутрь %>
+<%= f.button :submit, class: "send-btn", id: "send-message-btn" do %>
+  <%= image_tag "send-icon.svg", class: "notification-svg-icon", alt: "Send" %>
+<% end %>
         <% end %>
       </div>
 

@@ -16,6 +16,8 @@ class BookmarksController < ApplicationController
   end
 
   def destroy
+    # Так как мы используем 'resource' (ед. число), ID в params[:id] не придет.
+    # Ищем закладку текущего пользователя для этого конкретного объекта.
     @bookmark = current_user.bookmarks.find_by(
       item_type: params[:item_type],
       item_id: params[:item_id]
@@ -25,7 +27,7 @@ class BookmarksController < ApplicationController
       @item = @bookmark.item
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path, notice: '保存を解除しました' }
-        format.json { render json: { success: true, bookmarks_count: @item.reload.bookmarks_count } }
+        format.json { render json: { success: true } }
       end
     else
       render_error('保存が見つかりません')

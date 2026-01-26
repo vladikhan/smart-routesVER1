@@ -65,6 +65,7 @@ class RoutesController < ApplicationController
   end
 
   def create
+    puts '!!! REQUEST RECEIVED !!!'
     @route = current_user.routes.build(route_params)
 
     process_google_maps_items(params[:route][:google_maps_items]) if params[:route][:google_maps_items].present?
@@ -81,13 +82,11 @@ class RoutesController < ApplicationController
   end
 
   def update
-    @route.tag_list = params[:route][:tag_list].split(',').map(&:strip) if params[:route][:tag_list].present?
-
-    if @route.update(route_params)
-      redirect_to @route, notice: 'ルートが更新されました'
+    if @route.update(route_params.except(:images))
+      # Если в параметрах есть новые картинки, добавляем их к существующим
+      @route.images.attach(route_params[:images]) if route_params[:images].present?
+      redirect_to @route, notice: 'ルートを更新しました'
     else
-      @cities = City.all.order(:name)
-      @venues = Venue.all.order(:name)
       render :edit, status: :unprocessable_entity
     end
   end
@@ -119,6 +118,9 @@ class RoutesController < ApplicationController
       :is_public,
       :start_date,
       :end_date,
+      :title,
+      :location,
+      images: [],
       route_items_attributes: %i[
         id
         venue_id
@@ -145,5 +147,12 @@ class RoutesController < ApplicationController
     end
   rescue JSON::ParserError
     # Игнорируем ошибки парсинга
+  end
+
+  def delete_image
+    @route = Route.find(params[:id])
+    image = @route.images.find(params[:image_id])
+    image.purge
+    redirect_back fallback_location: route_path(@route), notice: '画像が削除されました'
   end
 end

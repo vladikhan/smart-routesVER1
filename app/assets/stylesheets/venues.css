@@ -400,9 +400,10 @@
 /* === Grid Layout === */
 .venue-detail-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 32px;
-  margin-top: 40px;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+  /* margin-top: 40px; */
 }
 
 /* === Info Table === */
@@ -524,6 +525,7 @@
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  
 }
 
 .venue-action-btn:hover {
@@ -628,7 +630,7 @@
 .route-mini-card {
 	padding: 12px;
 	background: #f8f9fa;
-	border-radius: 10px;
+	border-radius: 20px;
 	margin-bottom: 10px;
 	transition: all 0.2s ease;
 }

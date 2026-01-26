@@ -1,11 +1,13 @@
 //@import "bootstrap";
 
 @use 'login';
-/* Smart Routes - Main Styles */ /* === Reset === */
+
+/* Smart Routes - Main Styles */
+/* === Reset === */
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* === Variables === */
@@ -20,658 +22,1098 @@ $card-border: #e0e0e0;
 
 main,
 .main-content {
-	flex: 1 0 auto;
-	padding-bottom: 50px;
+  flex: 1 0 auto;
+  padding-bottom: 50px;
 }
 
 /* === Body === */
 body {
-	font-family:
-		'Osaka',
-		-apple-system,
-		BlinkMacSystemFont,
-		'Segoe UI',
-		Roboto,
-		'Helvetica Neue',
-		Arial,
-		sans-serif;
-	background: $bg-color;
-	color: $text-color;
-	line-height: 1.6;
-	margin: 0;
-	overflow-y: scroll; /* Всегда резервирует место под скроллбар */
+  font-family:
+    'Osaka',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  background: $bg-color;
+  color: $text-color;
+  line-height: 1.6;
+  margin: 0;
+  overflow-y: scroll;
+  /* Всегда резервирует место под скроллбар */
 
-	min-height: 100%;
+  min-height: 100%;
 }
 
 /* === Header === */
 .auth-links {
-	display: flex;
-	align-items: center;
-	gap: 18px; /* расстояние между кнопками */
-	white-space: nowrap; /* запрещаем перенос строк */
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  /* расстояние между кнопками */
+  white-space: nowrap;
+  /* запрещаем перенос строк */
 }
 
 .auth-links a,
 .auth-links button {
-	display: inline-flex;
-	align-items: center;
-	white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 /* Чтобы иконка уведомлений не выпирала вверх */
 .notifications-toggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .header {
-	background: $primary-color;
-	padding: 15px 0;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	position: sticky;
-	top: 0;
-	z-index: 1000;
-	width: 100%;
+  background: $primary-color;
+  padding: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
 
-	.container {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 0 20px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		height: 50px;
-	}
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+  }
 
-	.logo {
-		color: white;
-		font-size: 34px;
-		font-weight: bolder;
-		text-decoration: none;
-		transition: opacity 0.3s;
-		line-height: 1;
-		display: flex;
-		align-items: center;
+  .logo {
+    color: white;
+    font-size: 34px;
+    font-weight: bolder;
+    text-decoration: none;
+    transition: opacity 0.3s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 
-		&:hover {
-			opacity: 0.9;
-		}
-	}
+    &:hover {
+      opacity: 0.9;
+    }
+  }
 
-	.nav-links {
-		display: flex;
-		gap: 30px;
-		list-style: none;
-		align-items: center; /* Vertical center alignment */
-		margin: 0;
-		padding: 0;
-		height: 50px;
+  .nav-links {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    align-items: center;
+    /* Vertical center alignment */
+    margin: 0;
+    padding: 0;
+    height: 50px;
 
-		a {
-			color: white;
-			text-decoration: none;
-			font-weight: 500;
-			transition: opacity 0.3s;
-			display: flex;
-			align-items: center;
+    a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: center;
 
-			&:hover {
-				opacity: 0.8;
-			}
-		}
-	}
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
 
-	.login-btn {
-		background: white;
-		color: $primary-color;
-		padding: 8px 20px;
-		border-radius: 4px;
-		text-decoration: none;
-		font-weight: 600;
-		transition: background 0.3s;
-		border: none;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
+  .login-btn {
+    background: white;
+    color: $primary-color;
+    padding: 8px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-		&:hover {
-			background: rgba(255, 255, 255, 0.9);
-		}
-	}
+    &:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+
+.nav-icon {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+.nav-icon-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  /* Область клика, чтобы пальцем/мышкой было удобно попадать */
+  min-height: 40px;
 }
 
 .resend-container {
-	display: flex;
-	justify-content: center; /* Центрирует по горизонтали */
-	width: 100%;
-	margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  /* Центрирует по горизонтали */
+  width: 100%;
+  margin-top: 20px;
 }
 
 .resend-button {
-	border: none;
-	border-radius: 10px;
-	color: #666;
-	background-color: #0cbdd1;
-	padding: 16px;
-	cursor: pointer;
-	transition: all 0.3s;
-	font-size: 15px;
-	font-weight: 500;
+  border: none;
+  border-radius: 10px;
+  color: #666;
+  background-color: #0cbdd1;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 15px;
+  font-weight: 500;
 
-	&:hover {
-		color: white;
-	}
+  &:hover {
+    color: white;
+  }
 }
+
 /* Notifications */
 .notifications-dropdown {
-	position: relative;
+  position: relative;
 }
 
 .notifications-toggle {
-	position: relative;
-	cursor: pointer;
-	background: none;
-	border: none;
-	font-size: 24px;
+  position: relative;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 24px;
 }
 
 .notification-badge {
-	position: absolute;
-	top: -8px;
-	right: -8px;
-	background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-	color: white;
-	font-size: 11px;
-	font-weight: 800;
-	padding: 3px 7px;
-	border-radius: 12px;
-	min-width: 20px;
-	height: 20px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 2px 8px rgba(244, 67, 54, 0.5);
-	animation: badgePulse 2s infinite;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 12px;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.5);
+  animation: badgePulse 2s infinite;
 }
 
 @keyframes badgePulse {
-	0%,
-	100% {
-		transform: scale(1);
-	}
-	50% {
-		transform: scale(1.1);
-	}
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .notifications-panel {
-	position: absolute;
-	top: 55px;
-	right: 0;
-	width: 380px;
-	max-height: 600px;
-	background: white;
-	border-radius: 16px;
-	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-	display: none;
-	z-index: 1000;
-	overflow: hidden;
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 380px;
+  height: 400px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  display: none;
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .notifications-panel.show {
-	display: block;
-	animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideDown {
-	from {
-		opacity: 0;
-		transform: translateY(-15px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .notifications-header {
-	padding: 20px;
-	border-bottom: 2px solid #f0f0f0;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 }
 
 .notifications-header h3 {
-	margin: 0;
-	font-size: 18px;
-	font-weight: 800;
-	color: #1a1a1a;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1a1a;
 }
 
 .mark-all-read {
-	color: #0288d1;
-	text-decoration: none;
-	font-size: 14px;
-	font-weight: 700;
-	padding: 6px 12px;
-	border-radius: 6px;
-	transition: all 0.2s;
+  color: #0288d1;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
 }
 
 .mark-all-read:hover {
-	background: #e3f2fd;
-	color: #01579b;
+  background: #e3f2fd;
+  color: #01579b;
 }
 
 .notifications-list {
-	max-height: 500px;
-	overflow-y: auto;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .notification-item {
-	display: flex;
-	gap: 15px;
-	padding: 16px 20px;
-	border-bottom: 1px solid #f5f5f5;
-	text-decoration: none;
-	color: inherit;
-	transition: all 0.2s;
-	align-items: center;
-	position: relative;
+  display: flex;
+  gap: 15px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  align-items: center;
+  position: relative;
 }
 
 .notification-item:hover {
-	background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
 }
 
 .notification-item.unread {
-	background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-	border-left: 4px solid #0288d1;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-left: 4px solid #0288d1;
 }
 
 .notification-icon {
-	font-size: 28px;
-	flex-shrink: 0;
-	width: 40px;
-	height: 40px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: white;
-	border-radius: 50%;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .notification-content {
-	flex: 1;
-	min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .notification-message {
-	font-size: 14px;
-	font-weight: 600;
-	color: #1a1a1a;
-	margin-bottom: 4px;
-	line-height: 1.4;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+  line-height: 1.4;
 }
 
 .notification-time {
-	font-size: 12px;
-	color: #999;
+  font-size: 12px;
+  color: #999;
 }
 
 .unread-dot {
-	width: 10px;
-	height: 10px;
-	background: #0288d1;
-	border-radius: 50%;
-	flex-shrink: 0;
-	box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.2);
-	animation: dotPulse 2s infinite;
+  width: 10px;
+  height: 10px;
+  background: #0288d1;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.2);
+  animation: dotPulse 2s infinite;
 }
 
 @keyframes dotPulse {
-	0%,
-	100% {
-		box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.2);
-	}
-	50% {
-		box-shadow: 0 0 0 6px rgba(2, 136, 209, 0.1);
-	}
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(2, 136, 209, 0.1);
+  }
 }
 
 .no-notifications {
-	text-align: center;
-	padding: 60px 20px;
-	color: #999;
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
 }
 
 .view-all-notifications {
-	display: block;
-	text-align: center;
-	padding: 16px;
-	color: #0288d1;
-	text-decoration: none;
-	font-weight: 700;
-	border-top: 2px solid #f0f0f0;
-	background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-	transition: all 0.2s;
+  display: block;
+  text-align: center;
+  padding: 16px;
+  color: #0288d1;
+  text-decoration: none;
+  font-weight: 700;
+  border-top: 2px solid #f0f0f0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  transition: all 0.2s;
 }
 
 .view-all-notifications:hover {
-	background: #e3f2fd;
-	color: #01579b;
+  background: #e3f2fd;
+  color: #01579b;
 }
 
 @media (max-width: 768px) {
-	.notifications-panel {
-		width: calc(100vw - 20px);
-		right: -10px;
-	}
+  .notifications-panel {
+    width: calc(100vw - 20px);
+    right: -10px;
+  }
 }
 
 /* Navigation Icons */
 .page-nav-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 42px;
-	height: 42px;
-	color: #3d2755;
-	cursor: pointer;
-	text-decoration: none;
-	font-size: 24px;
-	transition: all 0.2s ease;
-	flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #3d2755;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 24px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 
-	&:hover {
-		opacity: 0.8;
-		transform: translateY(-2px);
-	}
+  &:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+  }
 
-	/* Avatar image inside icon */
-	img {
-		width: 42px;
-		height: 42px;
-		border-radius: 50%;
-		object-fit: cover;
-		border: 2px solid white;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-		display: block;
+  /* Avatar image inside icon */
+  img {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    display: block;
 
-		&:hover {
-			border-color: rgba(255, 255, 255, 0.9);
-			transform: scale(1.05);
-			box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-		}
-	}
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.9);
+      transform: scale(1.05);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
 }
+
 /* === Hero Section === */
 .hero {
-	background: linear-gradient(135deg, #4dc9e6 0%, #fefbf6 100%);
-	padding: 80px 20px 100px;
-	text-align: center;
-	color: white;
+  background: linear-gradient(135deg, #4dc9e6 0%, #fefbf6 100%);
+  padding: 80px 20px 100px;
+  text-align: center;
+  color: white;
 
-	h1 {
-		font-size: 48px;
-		margin-bottom: 15px;
-		font-weight: 700;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
+  h1 {
+    font-size: 48px;
+    margin-bottom: 15px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 
-	p {
-		font-size: 20px;
-		margin-bottom: 40px;
-		opacity: 0.95;
-	}
+  p {
+    font-size: 20px;
+    margin-bottom: 40px;
+    opacity: 0.95;
+  }
+}
+
+/* --- Секция Фото (Общие стили) --- */
+.photo-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  /* Квадратные превью — это стандарт */
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Важно: чтобы фото не растягивалось */
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.photo-item:hover img {
+  transform: scale(1.05);
+  /* Легкий зум при наведении */
+}
+
+/* --- Кнопка удаления (Overlay) --- */
+.delete-photo-overlay {
+  position: absolute;
+  top: 8px;
+  /* Чуть больше отступ, чтобы не прилипало */
+  right: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  /* Белый полупрозрачный фон */
+  color: #444;
+  width: 26px;
+  /* Чуть больше размер для удобства клика пальцем */
+  height: 26px;
+  border-radius: 50%;
+  /* Делаем круглую кнопку */
+  border: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.delete-photo-overlay:hover {
+  background: #c43838;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* --- Настройки Swiper Карусели --- */
+.venueSwiper {
+  width: 700px;
+  max-height: 300px;
+  margin: 0 auto;
+  padding-bottom: 40px !important;
+  overflow: hidden;
+  padding: 10px 40px 45px 40px !important;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  /* Позволяем Swiper самому считать ширину */
+}
+
+/* Фото внутри слайда */
+.swiper-slide .photo-item {
+  width: 100%;
+  height: 100%;
+  /* Занимает всю высоту Swiper (300px) */
+  aspect-ratio: 1 / 1;
+  /* Оставляем квадратным */
+  max-width: 260px;
+  /* Ограничиваем ширину одного фото */
+  margin: 0 auto;
+}
+
+/* Делаем стрелки навигации меньше и аккуратнее */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #3b82f6 !important;
+  background: white;
+  /* Чистый белый фон лучше читается */
+  width: 35px !important;
+  height: 35px !important;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Тень, чтобы стрелка "парила" над фото */
+  z-index: 20 !important;
+  /* ВАЖНО: значение выше, чем у фото и кнопки удаления */
+  transition: all 0.2s ease;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+  /* Центрируем по вертикали */
+}
+
+.swiper-button-prev {
+  left: 5px !important;
+}
+
+.swiper-button-next {
+  right: 5px !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #3b82f6 !important;
+}
+
+/* --- Обычная сетка (когда фото <= 8) --- */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
 }
 
 /* === Search Container === */
 .search-container {
-	max-width: 900px;
-	margin: -50px auto 60px;
-	position: relative;
-	z-index: 10;
-	padding: 0 20px;
+  max-width: 900px;
+  margin: -50px auto 60px;
+  position: relative;
+  z-index: 10;
+  padding: 0 20px;
 }
 
 .search-box {
-	background: $search-bg;
-	border: 3px solid $secondary-color;
-	border-radius: 8px;
-	padding: 30px;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: $search-bg;
+  border: 3px solid $secondary-color;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .search-form {
-	display: flex;
-	gap: 15px;
-	align-items: center;
+  display: flex;
+  gap: 15px;
+  align-items: center;
 
-	@media (max-width: 768px) {
-		flex-direction: column;
-	}
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .search-input {
-	flex: 1;
-	padding: 15px 20px;
-	border: 2px solid white;
-	border-radius: 6px;
-	font-size: 16px;
-	background: white;
-	color: $text-color;
-	transition: border-color 0.3s;
+  flex: 1;
+  padding: 15px 20px;
+  border: 2px solid white;
+  border-radius: 6px;
+  font-size: 16px;
+  background: white;
+  color: $text-color;
+  transition: border-color 0.3s;
 
-	&:focus {
-		outline: none;
-		border-color: $primary-color;
-	}
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+  }
 
-	@media (max-width: 768px) {
-		width: 100%;
-	}
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 }
 
 .search-btn {
-	background: #64b5f7;
-	color: #fefefe;
-	padding: 15px 40px;
-	border: 2px solid #64b5f7;
-	border-radius: 6px;
-	font-size: 18px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: background 0.3s;
+  background: #64b5f7;
+  color: #fefefe;
+  padding: 15px 40px;
+  border: 2px solid #64b5f7;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
 
-	&:hover {
-		color: #fefefe;
-		background: #9ec8ea;
-	}
+  &:hover {
+    color: #fefefe;
+    background: #9ec8ea;
+  }
 
-	@media (max-width: 768px) {
-		width: 100%;
-	}
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+/* === buttons===*/
+
+/* Базовый стиль для кнопок-пунктов в выпадающем меню */
+button.dropdown-item {
+  width: auto;
+  /* Ширина по контенту */
+  min-width: 120px;
+  /* Минимальная ширина, чтобы кнопка не была слишком узкой */
+  margin: 4px auto;
+  /* Центрируем саму кнопку в контейнере */
+  padding: 6px 12px;
+  /* Уменьшенные отступы */
+
+  justify-content: center;
+  /* Текст и иконка строго по центру */
+  align-items: center;
+  gap: 8px;
+  /* Компактное расстояние между иконкой и текстом */
+
+  background: linear-gradient(135deg, #f0f7ff 0%, #e7f3ff 100%);
+  border: none;
+  border-radius: 20px;
+  /* Округлые края (pill-shape) для маленьких кнопок выглядят лучше */
+
+  color: #0d6efd;
+  font-size: 13px;
+  /* Уменьшенный шрифт */
+  font-weight: 600;
+  /* Чуть жирнее, чтобы читалось лучше при малом размере */
+  white-space: nowrap;
+  /* Запрещаем перенос текста */
+
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Эффект при наведении на кнопку "Редактировать" */
+button.dropdown-item:hover {
+  background: #0cbdd1;
+  color: white;
+  /* Текст становится синим */
+  transform: translateX(4px);
+  /* Легкий сдвиг вправо для динамики */
+}
+
+/* Стиль для иконки внутри кнопки */
+button.dropdown-item i {
+  font-size: 0.95rem;
+  width: 18px;
+  /* Фиксированная ширина иконки, чтобы текст не прыгал */
+  text-align: center;
+  color: #0d6efd;
+  /* Иконка всегда синяя (text-primary) */
+  transition: transform 0.2s ease;
+}
+
+/* Анимация иконки при наведении */
+button.dropdown-item:hover i {
+  transform: rotate(-10deg) scale(1.1);
+  /* Иконка карандаша немного наклоняется */
+}
+
+/* Убираем синюю рамку фокуса (от Bootstrap/браузеров) */
+button.dropdown-item:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Специальный стиль для кнопки удаления (text-danger) */
+button.dropdown-item.text-danger {
+  color: #dc3545;
+  /* Красный цвет текста по умолчанию */
+  background: linear-gradient(135deg,
+      #fff5f5 0%,
+      #ffe3e3 100%);
+  /* Нежно-розовый фон */
+}
+
+/* Иконка в кнопке удаления */
+button.dropdown-item.text-danger i {
+  color: #dc3545;
+}
+
+/* Эффект при наведении на кнопку "Удалить" */
+button.dropdown-item.text-danger:hover {
+  background: #dc3545;
+  /* Насыщенный красный при наведении */
+  color: white !important;
+  transform: translateX(4px);
+}
+
+/* Чтобы иконка тоже белела при наведении */
+button.dropdown-item.text-danger:hover i {
+  color: white !important;
+  animation: shake 0.3s ease-in-out;
+  /* Маленькая анимация тряски для иконки корзины */
+}
+
+/* Анимация "тряски" корзины (Senior UX touch) */
+@keyframes shake {
+  0% {
+    transform: rotate(0);
+  }
+
+  25% {
+    transform: rotate(10deg);
+  }
+
+  50% {
+    transform: rotate(-10deg);
+  }
+
+  75% {
+    transform: rotate(5deg);
+  }
+
+  100% {
+    transform: rotate(0);
+  }
+}
+
+/* === Update ===*/
+
+/* Основной стиль кнопки обновления */
+.btn-update-review {
+  background: linear-gradient(135deg,
+      #0d6efd 0%,
+      #0a58ca 100%);
+  /* Красивый синий градиент */
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 24px;
+  /* Больше горизонтальных отступов */
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+  /* Мягкая синяя тень */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Эффект при наведении */
+.btn-update-review:hover {
+  background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
+  transform: translateY(-2px);
+  /* Кнопка "всплывает" */
+  box-shadow: 0 6px 16px rgba(13, 110, 253, 0.35);
+  /* Тень становится глубже */
+  color: white;
+}
+
+/* Эффект при нажатии */
+.btn-update-review:active {
+  transform: translateY(0);
+  /* Кнопка опускается обратно */
+  box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+}
+
+/* Состояние Loading (если будешь добавлять через JS) */
+.btn-update-review:disabled {
+  opacity: 0.7;
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* placeholder*/
+/* Основные стили для поля ввода */
+#review_text {
+  width: 100%;
+  padding: 15px 20px;
+  /* Больше места внутри */
+  font-size: 15px;
+  line-height: 1.6;
+  /* Увеличиваем высоту строки */
+  letter-spacing: 0.5px;
+  /* Вот она — "ширина" текста */
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+  color: #344767;
+}
+
+/* Стили специально для Placeholder (когда поле пустое) */
+#review_text::placeholder {
+  color: #adb5bd;
+  letter-spacing: 1px;
+  /* Делаем подсказку еще более "широкой" и воздушной */
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Эффект при клике */
+#review_text:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+  outline: none;
+}
+
+/*=== Cancel===*/
+
+/* Базовый стиль для кнопки отмены */
+.btn-cancel-review {
+  background-color: #f8f9fa;
+  /* Очень светлый серый */
+  border: 1px solid #e9ecef;
+  /* Тонкая, почти незаметная граница */
+  color: #6c757d;
+  /* Спокойный серый цвет текста */
+  font-weight: 500;
+  font-size: 13px;
+  padding: 6px 20px;
+  /* Больше отступов по бокам для удобства */
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Эффект при наведении */
+.btn-cancel-review:hover {
+  background-color: #e9ecef;
+  /* Чуть темнее при наведении */
+  border-color: #dee2e6;
+  color: #495057;
+  /* Текст становится контрастнее */
+  transform: translateY(-1px);
+  /* Легкий эффект "нажатия" наоборот */
+}
+
+/* Эффект при клике (Active) */
+.btn-cancel-review:active {
+  background-color: #dee2e6;
+  transform: translateY(0);
+  /* Возвращается на место */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* Внутренняя тень */
+}
+
+/* Убираем синюю обводку фокуса */
+.btn-cancel-review:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
+}
+
+/*=== Comment === */
+
+/* Контейнер для отображения (режим просмотра) */
+.review-display-container {
+  padding-left: 4px;
+  /* Небольшой отступ слева, чтобы текст был на одной линии с именем */
+}
+
+/* Основной стиль текста отзыва */
+.review-content-body {
+  font-size: 15px;
+  /* Оптимально для длинного чтения */
+  line-height: 1.6;
+  /* Добавляем "воздух" между строками */
+  color: #344767;
+  /* Мягкий темно-серый, приятный глазу */
+  word-wrap: break-word;
+  /* Перенос длинных слов/ссылок */
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  /* Сохраняем переносы строк пользователя */
+
+  transition: opacity 0.3s ease;
+}
+
+.review-content-body p {
+  margin-bottom: 0.8rem;
+}
+
+.review-content-body p:last-child {
+  margin-bottom: 0;
+}
+
+.review-content-body {
+  position: relative;
 }
 
 /* === Container === */
 .container {
-	max-width: 700px;
-	margin: 0 auto;
-	padding: 0 20px;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* === Stats === */
 .stats {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 20px;
-	margin: 30px 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin: 30px 0;
 
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-	}
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {
-	text-align: center;
-	text-decoration: none;
-	color: inherit;
-	display: block;
-	padding: 10px;
-	background: white;
-	border-radius: 8px;
-	border: 1px solid $card-border;
-	transition:
-		transform 0.3s,
-		box-shadow 0.3s;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid $card-border;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
 
-	&:hover {
-		transform: translateY(-5px);
-		background-color: #f8f9fa;
-		cursor: pointer;
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-	}
+  &:hover {
+    transform: translateY(-5px);
+    background-color: #f8f9fa;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .stat-icon {
-	font-size: 30px;
+  font-size: 30px;
 }
 
 .stat-number {
-	font-size: 25px;
-	font-weight: 700;
-	color: $primary-color;
-	margin-bottom: 5px;
+  font-size: 25px;
+  font-weight: 700;
+  color: $primary-color;
+  margin-bottom: 5px;
 }
 
 .stat-label {
-	color: #666;
-	font-size: 16px;
+  color: #666;
+  font-size: 16px;
 }
 
 /* === Section Title === */
 .section-title {
-	text-align: center;
-	font-size: 32px;
-	font-weight: 700;
-	margin: 60px 0 40px;
-	color: $text-color;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 20px 0 40px;
+  color: $text-color;
 }
 
 .card {
-	background: white;
-	border-radius: 12px;
-	overflow: hidden;
-	border: 1px solid $card-border;
-	transition:
-		transform 0.3s,
-		box-shadow 0.3s;
-	cursor: pointer;
-	margin-bottom: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid $card-border;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  cursor: pointer;
+  margin-bottom: 20px;
 
-	&:hover {
-		transform: translateY(-8px);
-		box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-	}
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .card-image {
-	height: 180px;
-	background: linear-gradient(135deg, $secondary-color 0%, $primary-color 100%);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 64px;
-	color: white;
+  height: 180px;
+  background: linear-gradient(135deg, $secondary-color 0%, $primary-color 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  color: white;
 }
 
 .card-body {
-	padding: 20px;
+  padding: 20px;
 }
 
 .card-title {
-	font-size: 20px;
-	font-weight: 700;
-	margin-bottom: 10px;
-	color: $text-color;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: $text-color;
 }
 
 .card-description {
-	color: #666;
-	font-size: 14px;
-	line-height: 1.6;
-	margin-bottom: 15px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 15px;
 }
 
 .card-meta {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .badge {
-	background: $primary-color;
-	color: white;
-	padding: 5px 12px;
-	border-radius: 20px;
-	font-size: 12px;
-	font-weight: 600;
-	text-transform: capitalize;
+  background: $primary-color;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
 .duration {
-	color: #666;
-	font-size: 14px;
+  color: #666;
+  font-size: 14px;
 }
 
 .card-footer {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding-top: 15px;
-	border-top: 1px solid $card-border;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid $card-border;
 }
 
 .rating {
-	color: #f59e0b;
-	font-size: 14px;
+  color: #f59e0b;
+  font-size: 14px;
 }
 
 .view-btn {
-	background: $primary-color;
-	color: white;
-	padding: 8px 20px;
-	border-radius: 6px;
-	text-decoration: none;
-	font-size: 14px;
-	font-weight: 600;
-	transition: background 0.3s;
+  background: $primary-color;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s;
 
-	&:hover {
-		background: $primary-dark;
-	}
+  &:hover {
+    background: $primary-dark;
+  }
 }
 
 /*===Buttons===*/
 /* Контейнер для кнопок действий */
 .profile-actions {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-	margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
 }
 
 /* Общий стиль для кнопок формы (button_to генерирует форму) */
 .profile-actions form {
-	display: inline-block;
-	margin: 0;
+  display: inline-block;
+  margin: 0;
 }
 
 /* Базовый стиль кнопок */
@@ -679,201 +1121,202 @@ body {
 .btn-outline-primary,
 .btn-outline-secondary,
 .btn-edit {
-	padding: 10px 24px;
-	border-radius: 8px;
-	font-weight: 600;
-	font-size: 14px;
-	transition: all 0.2s ease-in-out;
-	cursor: pointer;
-	border: none;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	text-decoration: none;
-	height: 42px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  height: 42px;
 }
 
 /* Кнопка "Подписаться" и "Редактировать" (Основная) */
 .btn-primary,
 .btn-edit {
-	background-color: #2296f3;
-	color: white;
-	box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  background-color: #2296f3;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
 }
 
 .btn-primary:hover,
 .btn-edit:hover {
-	background-color: #64b5f7;
-	transform: translateY(-1px);
-	box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
-	color: white;
+  background-color: #64b5f7;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+  color: white;
 }
 
 /* Кнопка "Сообщение" (Outline) */
 .btn-outline-primary {
-	background-color: transparent;
-	color: white;
-	background-color: #4caf50;
+  background-color: transparent;
+  color: white;
+  background-color: #4caf50;
 }
 
 .btn-outline-primary:hover {
-	color: white;
-	background: #4ac550;
-	transform: translateY(-1px);
+  color: white;
+  background: #4ac550;
+  transform: translateY(-1px);
 }
 
 /* Кнопка "Отписаться" (Вторичная) */
 .btn-outline-secondary {
-	background-color: #3ccddd;
-	color: white;
+  background-color: #3ccddd;
+  color: white;
 }
 
 .btn-outline-secondary:hover {
-	background-color: #3bc4d3;
-	color: white;
-	transform: translateY(-1px);
+  background-color: #3bc4d3;
+  color: white;
+  transform: translateY(-1px);
 }
 
 /* Эффект нажатия (Active) */
 .btn-primary:active,
 .btn-outline-primary:active,
 .btn-outline-secondary:active {
-	transform: translateY(0);
-	filter: brightness(0.9);
+  transform: translateY(0);
+  filter: brightness(0.9);
 }
 
 /* Иконки внутри кнопок */
 .btn i {
-	font-size: 16px;
+  font-size: 16px;
 }
 
 /* === Features === */
 .features {
-	background: #f8f9fa;
-	margin: 0px 0;
+  background: #f8f9fa;
+  margin: 0px 0;
 }
 
 .features-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
 
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-	}
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .feature {
-	text-align: center;
-	padding: 30px;
+  text-align: center;
+  padding: 30px;
 }
 
 .feature-icon {
-	font-size: 64px;
-	margin-bottom: 20px;
+  font-size: 64px;
+  margin-bottom: 20px;
 }
 
 .feature h3 {
-	font-size: 22px;
-	margin-bottom: 15px;
-	color: $text-color;
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: $text-color;
 }
 
 .feature p {
-	color: #666;
-	line-height: 1.6;
+  color: #666;
+  line-height: 1.6;
 }
 
 /* === Footer === */
 .footer {
-	background: $footer-bg;
-	color: white;
-	padding: 40px 0 20px;
-	width: 100%;
-	flex-shrink: 0;
-	position: relative;
-	z-index: 10;
-	overflow: visible;
+  background: $footer-bg;
+  color: white;
+  padding: 40px 0 20px;
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  overflow: visible;
 }
 
 .footer-content {
-	display: block;
-	gap: 40px;
-	margin-bottom: 30px;
+  display: block;
+  gap: 40px;
+  margin-bottom: 30px;
 
-	@media (max-width: 768px) {
-		grid-template-columns: 1fr;
-	}
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .footer h5 {
-	margin-bottom: 15px;
-	font-size: 18px;
-	text-align: center;
+  margin-bottom: 15px;
+  font-size: 18px;
+  text-align: center;
 }
 
 .footer p {
-	text-align: center;
-	width: 100%;
-	color: rgba(255, 255, 255, 0.7);
-	line-height: 1.6;
-	&:last-child {
-		margin-bottom: 0;
-	}
+  text-align: center;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .footer-links {
-	list-style: none;
-	padding: 0;
+  list-style: none;
+  padding: 0;
 
-	li {
-		margin-bottom: 10px;
-	}
+  li {
+    margin-bottom: 10px;
+  }
 
-	a {
-		color: rgba(255, 255, 255, 0.7);
-		text-decoration: none;
-		transition: color 0.3s;
+  a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s;
 
-		&:hover {
-			color: white;
-		}
-	}
+    &:hover {
+      color: white;
+    }
+  }
 }
 
 .footer-bottom {
-	text-align: center;
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
-	color: rgba(255, 255, 255, 0.5);
-	margin-top: 20px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 20px;
 }
 
 /* === Alert === */
 .alert {
-	background: #e3f2fd;
-	border: 1px solid $secondary-color;
-	border-radius: 8px;
-	padding: 20px;
-	text-align: center;
-	color: $text-color;
-	margin: 40px 0;
+  background: #e3f2fd;
+  border: 1px solid $secondary-color;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: $text-color;
+  margin: 40px 0;
 }
 
 /* === Utilities === */
 .text-center {
-	text-align: center;
+  text-align: center;
 }
 
 .mt-5 {
-	margin-top: 3rem;
+  margin-top: 3rem;
 }
 
 .mb-5 {
-	margin-bottom: 3rem;
+  margin-bottom: 3rem;
 }
 
 .py-5 {
-	padding-top: 3rem;
-	padding-bottom: 3rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }

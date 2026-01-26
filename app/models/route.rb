@@ -18,6 +18,12 @@ class Route < ApplicationRecord
   has_many :entity_tags, as: :entity, dependent: :destroy
   has_many :tags, through: :entity_tags
 
+  has_many_attached :images do |attachable|
+    attachable.variant :thumb, resize_to_limit: [300, 300]
+    attachable.variant :medium, resize_to_limit: [800, 600]
+    attachable.variant :large, resize_to_limit: [1200, 900]
+  end
+
   accepts_nested_attributes_for :route_items, allow_destroy: true, reject_if: :all_blank
 
   validates :name, presence: true, length: { maximum: 100 }
@@ -25,6 +31,7 @@ class Route < ApplicationRecord
   validates :user, presence: true
   validates :city, presence: true
   validates :view_count, numericality: { greater_than_or_equal_to: 0 }
+  validate :images_count_within_limit
 
   # === Колбэки ===
   before_create :initialize_view_count
@@ -73,5 +80,24 @@ class Route < ApplicationRecord
     return unless is_public?
 
     NotificationService.notify_new_route_from_following(self) if defined?(NotificationService)
+  end
+
+  def acceptable_images
+    return unless images.attached?
+
+    images.each do |image|
+      errors.add(:images, 'は5MB以下である必要があります') unless image.byte_sizw <= 5.megabytes
+    end
+
+    acceptable_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+    return if acceptable_types.include?(image.content_type)
+
+    errors.add(:images, 'はJPEG, PNG, GIF形式である必要があります')
+  end
+
+  def images_count_within_limit
+    return unless images.attached? && images.count > 10
+
+    errors.add(:images, 'は最大10枚までです')
   end
 end

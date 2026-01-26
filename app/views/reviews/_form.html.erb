@@ -1,56 +1,24 @@
+<%= form_with(model: [reviewable, review], local: true, class: "review-form") do |f| %>
+  <%# Скрытое поле для полиморфизма, если форма используется отдельно %>
+  <%= f.hidden_field :reviewable_type, value: reviewable.class.name %>
+  <%= f.hidden_field :reviewable_id, value: reviewable.id %>
 
-
-<style>
-  /* Стили для выбора звезд (справа налево для работы селектора ~) */
-  .star-rating-input {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    font-size: 2.5rem;
-  }
-  
-  .star-label {
-    cursor: pointer;
-    filter: grayscale(100%);
-    transition: transform 0.2s, filter 0.2s;
-  }
-  
-  /* Магия CSS: зажигаем все звезды до выбранной */
-  .star-rating-input input:checked ~ label,
-  .star-rating-input label:hover,
-  .star-rating-input label:hover ~ label {
-    filter: grayscale(0%);
-    transform: scale(1.1);
-  }
-
-  .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: none;
-  }
-</style>
-
-<script>
-  // Важно: используем turbo:load для совместимости с Hotwire/Turbo
-  document.addEventListener('turbo:load', function() {
-    const form = document.getElementById('reviewForm');
-    if (!form) return;
-
-    const submitBtn = document.getElementById('submitReviewBtn');
-    const radios = form.querySelectorAll('input[name="review[total_score]"]');
-    const textarea = document.getElementById('review_text_area');
-    const charCount = document.getElementById('charCount');
-
-    // Активируем кнопку только после выбора рейтинга
-    radios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        submitBtn.disabled = false;
-      });
-    });
-
-    // Счетчик символов
-    textarea?.addEventListener('input', (e) => {
-      if (charCount) charCount.textContent = e.target.value.length;
-    });
-  });
-</script>
+  <div class="comment-input-wrapper rounded-3 border shadow-sm bg-white overflow-hidden">
+    <%= f.text_area :text, 
+        class: 'form-control border-0 shadow-none p-3', 
+        rows: 1,
+        placeholder: 'あなたの感想を共有しましょう...',
+        oninput: 'this.style.height = ""; this.style.height = this.scrollHeight + "px"',
+        style: 'resize: none; background: transparent; width: 100%; min-height: 80px;' %>
+    
+    <div class="d-flex justify-content-between align-items-center p-2 border-top bg-light-subtle">
+      <div class="ms-2 text-muted small">
+        <i class="fas fa-pen-nib me-1"></i> 丁寧な言葉遣いを心がけましょう
+      </div>
+      
+      <%= f.submit 'レビューを書く', 
+          class: 'btn btn-primary rounded-pill px-4 fw-bold shadow-sm',
+          id: 'submit-comment' %>
+    </div>
+  </div>
+<% end %>

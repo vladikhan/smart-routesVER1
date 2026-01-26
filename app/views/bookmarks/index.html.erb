@@ -1,0 +1,29 @@
+<div class="container my-5">
+  <h1 class="mb-4">保存したアイテム (Saved Items)</h1>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <% if @bookmarked_items.any? %>
+      <% @bookmarked_items.each do |bookmark| %>
+        <% item = bookmark.item %>
+        <div class="col">
+          <% if item.is_a?(Route) %>
+            <%# Используем твой существующий паршиал для маршрутов %>
+            <%= render 'routes/route_card', route: item %>
+          <% elsif item.is_a?(Venue) %>
+            <%# Используем паршиал для заведений %>
+            <%= render 'venues/venue_card', venue: item %>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-12 text-center py-5">
+        <p class="text-muted">保存されたアイテムはありません。</p>
+        <%= link_to '探索を始める', root_path, class: 'btn btn-primary' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-4">
+    <%= paginate @bookmarked_items %>
+  </div>
+</div>

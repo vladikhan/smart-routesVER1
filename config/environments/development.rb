@@ -1,98 +1,41 @@
 require 'active_support/core_ext/integer/time'
 
 Rails.application.configure do
-  # Основные настройки
+  # --- Инфраструктура ---
   config.cache_classes = false
   config.eager_load = false
   config.consider_all_requests_local = true
 
-  # Кэширование
-  if Rails.root.join('tmp/caching-dev.txt').exist?
-    config.action_controller.perform_caching = true
-    config.action_controller.enable_fragment_cache_logging = true
-    config.cache_store = :memory_store
-    config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.to_i}"
-    }
-  else
-    config.action_controller.perform_caching = false
-    config.cache_store = :null_store
-  end
-
-  # Active Storage
+  # --- Настройка Active Storage ---
+  # Указываем использовать сервис 'local' из config/storage.yml
   config.active_storage.service = :local
 
-  # Разрешаем Docker IP диапазоны
-  config.action_dispatch.trusted_proxies = [
-    '127.0.0.1',
-    '::1',
-    /^172\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,
-    /^192\.168\.\d{1,3}\.\d{1,3}$/
-  ]
+  # Процессор изображений (оставь vips, если он есть в Docker, или закомментируй пока)
+  # config.active_storage.variant_processor = :vips
 
-  # Разрешаем Web Console для Docker
-  config.web_console.permissions = [
-    '127.0.0.1',
-    '::1',
-    '172.16.0.0/12',
-    '192.168.0.0/16', # Это убирет ошибку "Cannot render console"
-    '10.0.0.0/8' #  for AWS
-  ]
+  # --- Настройка REDIS (Docker Ready) ---
+  # Используем порт 6379, как в твоем docker-compose.yml
+  redis_url = ENV.fetch('REDIS_URL') { 'redis://redis:6379/1' }
 
-  # Подробное логирование для debugging
-  config.log_level = :debug
-  config.hosts << '192.168.10.22'
-  config.hosts << 'localhost'
-  config.hosts << '.local'
-  config.hosts << /172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+/
-  config.log_level = :debug
-  # Action Mailer для разработки
+  # Настраиваем cache_store на Redis ВСЕГДА.
+  # perform_caching просто определяет, будет ли Rails записывать туда фрагменты видов.
+  config.cache_store = :redis_cache_store, { url: redis_url }
+
+  config.action_controller.perform_caching = (Rails.root.join('tmp/caching-dev.txt').exist? || false)
+
+  # Сессии: используем встроенный в Rails механизм через cache_store (Redis)
+  config.session_store :cache_store, key: '_smartroutes_session'
+
+  # --- Очереди Sidekiq ---
+  # Указываем Rails использовать Sidekiq для фоновых задач
+  config.active_job.queue_adapter = :sidekiq
+
+  # --- Почта (GMAIL через ENV) ---
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.perform_caching = false
-
-  # test
-
-  # For EC2
-  config.action_mailer.default_url_options = { host: 'smartroutes.learning.datora.org', protocol: 'https' }
-
-  # config.action_mailer.default_url_options = { host: '52.195.115.255' }
-
-  # For local
-  # config.action_mailer.dedault_url_options = { host: 'localhost', port: 3000 }
-
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.perform_deliveries = true
-
-  # Логи и отладка
-  config.active_support.deprecation = :log
-  config.active_support.disallowed_deprecation = :raise
-  config.active_support.disallowed_deprecation_warnings = []
-  config.active_record.migration_error = :page_load
-  config.active_record.verbose_query_logs = true
-  config.assets.debug = true
-  config.assets.quiet = true
-  config.file_watcher = ActiveSupport::EventedFileUpdateChecker
-
-  # Настройки для Gmail SMTP
-  config.action_mailer.smtp_settings = {
-    address: 'smtp.gmail.com',
-    port: 587,
-    domain: 'gmail.com',
-    user_name: 'v.khan@datora.jp',
-    password: 'hmbuzoihkvfchhus',
-    authentication: 'plain',
-    enable_starttls_auto: true
-  }
   config.action_mailer.perform_deliveries = true
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.raise_delivery_errors = true
-
-  # config.action_mailer.default_url_options = { host: '52.195.115.255' }
-
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
-  config.hosts << 'smartroutes.learning.datora.org'
-  config.hosts << '52.195.115.255'
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
     port: 587,
@@ -102,4 +45,20 @@ Rails.application.configure do
     authentication: 'plain',
     enable_starttls_auto: true
   }
+
+  # --- Разрешенные хосты (для Docker и AWS) ---
+  config.hosts << 'smartroutes.learning.datora.org'
+  config.hosts << '52.195.115.255'
+  config.hosts << 'localhost'
+  config.hosts << 'web' # Важно для обращения внутри сети Docker
+  config.hosts << /.*\.amazonaws\.com/
+
+  # --- Безопасность и Web Console ---
+  config.action_dispatch.trusted_proxies = ['127.0.0.1', '::1', /^172\./, /^192\.168\./]
+  config.web_console.permissions = ['127.0.0.1', '::1', '172.16.0.0/12', '192.168.0.0/16', '10.0.0.0/8']
+
+  # --- Логирование ---
+  config.log_level = :debug
+  config.active_record.verbose_query_logs = true
+  config.assets.debug = true
 end

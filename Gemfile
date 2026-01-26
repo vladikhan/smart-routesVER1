@@ -32,8 +32,9 @@ gem 'devise-i18n'
 # --- Загрузка файлов и AWS ---
 # gem 'asset_sync'
 gem 'aws-sdk-s3', require: false
-gem 'carrierwave', '~> 2.2'
+gem 'carrierwave', '~> 2.2' # photo
 gem 'fog-aws'
+gem 'image_processing', '~> 1.2'
 gem 'mime-types'
 gem 'mini_magick', '~> 4.11'
 

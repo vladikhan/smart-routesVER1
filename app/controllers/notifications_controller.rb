@@ -7,6 +7,8 @@ class NotificationsController < ApplicationController
                                  .includes(:actor, :notifiable)
                                  .recent
 
+    @unread_count = current_user.notifications.where(is_read: false).count
+
     # Фильтрация
     case params[:filter]
     when 'messages'
@@ -18,7 +20,17 @@ class NotificationsController < ApplicationController
     end
 
     @notifications = @notifications.page(params[:page]).per(20)
-    @unread_count = current_user.notifications.unread.count
+    def unread_count
+      puts "Checking notifications for User: #{current_user.id}"
+
+      # Проверяем вообще все уведомления этого юзера
+      all_count = current_user.notifications.count
+      unread_count = current_user.notifications.where(is_read: false).count
+
+      puts "DEBUG: All: #{all_count}, Unread: #{unread_count}"
+
+      render json: { count: unread_count, authenticated: true }
+    end
   end
 
   def mark_as_read
@@ -28,7 +40,7 @@ class NotificationsController < ApplicationController
     redirect_url = @notification.target_url
 
     respond_to do |format|
-      format.html { redirect_back fallback_location: notifications_path }
+      format.html { redirect_to redirect_url }
       format.json do
         render json: {
           success: true,

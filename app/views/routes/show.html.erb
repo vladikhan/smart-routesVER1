@@ -1,14 +1,8 @@
+<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <% content_for :title, "#{@route.name} - Smart Routes" %>
 
 
 <%= render 'pages/header' %>
-
-<% if notice %>
-  <div class="flash-message flash-notice">
-    <i class="fas fa-check-circle"></i>
-    <%= notice %>
-  </div>
-<% end %>
 
 <% if alert %>
   <div class="flash-message flash-alert">
@@ -16,6 +10,7 @@
     <%= alert %>
   </div>
 <% end %>
+
 
 <!-- Hero Section -->
 <section class="route-hero">
@@ -39,15 +34,11 @@
       <div class="route-stats">
         <div class="stat-item">
           <i class="fas fa-eye"></i>
-          <span><%= @route.view_count || 0 %></span>
+          <span>👁 <%= @route.view_count || 0 %></span>
         </div>
         <div class="stat-item">
           <i class="fas fa-heart"></i>
-          <span><%= @route.likes_count || 0 %></span>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-bookmark"></i>
-          <span><%= @route.bookmarks_count || 0 %></span>
+          <span>❤️ <%= @route.likes_count || 0 %></span>
         </div>
       </div>
     </div>
@@ -83,19 +74,46 @@
     <div class="route-actions">
       <% if user_signed_in? %>
         <!-- Like Button -->
-        <button class="action-btn btn-like <%= 'active' if current_user.liked?(@route) %>" 
-                data-route-id="<%= @route.id %>">
-          <i class="<%= current_user.liked?(@route) ? 'fas' : 'far' %> fa-heart"></i>
-          <span>いいね</span>
-        </button>
-        
+       <% if current_user.liked?(@route) %>
+  <% like = current_user.likes.find_by(likeable: @route) %>
+  
+
+  <%= button_to "/routes/#{@route.id}/likes/#{like.id}", method: :delete,
+                class: "action-btn btn-like active" do %>
+    <i class="fas fa-heart"></i>
+    <span>❤️ いいね</span>
+  <% end %>
+<% else %>
+  <%= button_to route_likes_path(@route), 
+                params: { likeable_type: 'Route', likeable_id: @route.id }, 
+                method: :post, 
+                class: "action-btn btn-like" do %>
+    <i class="far fa-heart"></i>
+    <span>❤️ いいね</span>
+  <% end %>
+<% end %>
+
         <!-- Bookmark Button -->
-        <button class="action-btn btn-save <%= 'active' if current_user.bookmarked?(@route) %>"
-                data-route-id="<%= @route.id %>">
-          <i class="<%= current_user.bookmarked?(@route) ? 'fas' : 'far' %> fa-bookmark"></i>
-          <span>保存</span>
-        </button>
-      <% end %>
+        <% if current_user.bookmarked?(@route) %>
+  <%# Удаление закладки (Unlike style) %>
+  <%= button_to route_bookmark_path(@route), 
+                method: :delete,
+                params: { item_type: 'Route', item_id: @route.id },
+                class: "action-btn btn-save active" do %>
+    <i class="fas fa-bookmark"></i>
+    <span> 保存済み</span>
+  <% end %>
+<% else %>
+  <%# Создание закладки %>
+  <%= button_to route_bookmark_path(@route), 
+                method: :post,
+                params: { item_type: 'Route', item_id: @route.id },
+                class: "action-btn btn-save" do %>
+    <i class="far fa-bookmark"></i>
+    <span>🔖 保存</span>
+  <% end %>
+  <% end %>
+<% end %>
       
       <!-- Share Button -->
       <button class="action-btn btn-share" onclick="shareRoute()">
@@ -113,6 +131,8 @@
     </div>
   </div>
 </section>
+</div>
+
 
 <!-- Main Content -->
 <div class="route-detail-content">
@@ -180,127 +200,165 @@
       </div>
 
       <!-- Reviews Section -->
-      <div class="content-card reviews-section">
-        <div class="reviews-header">
-          
-          
-          <% if user_signed_in? %>
-            <button class="write-review-btn" onclick="scrollToReviewForm()">
-              <i class="fas fa-pen"></i>
-              <span>レビューを書く</span>
-            </button>
-          <% end %>
+<div class="venue-info-card reviews-section">
+  <div class="reviews-header">
+  <div class="d-flex align-items-center">
+    
+    <div class="reviews-header">
+      <h3>レビュー</h3>
+    </div>
+  </div>
+  
+  <div class="counter-badge shadow-sm">
+    <span class="count-num"><%= @route.reviews.count %></span>
+    <span class="count-label">件</span>
+  </div>
+</div>
+
+  <!-- Review Form for logged in users -->
+  <% if user_signed_in? %>
+  <div class="review-form-card mb-4 p-4 bg-white rounded-4 shadow-sm border">
+    <%= form_with(model: [@route, @route.reviews.build], local: true, class: 'review-form') do |f| %>
+      <div class="d-flex gap-3 align-items-start">
+        <div class="author-avatar-large flex-shrink-0 shadow-sm" style="width:45px; height:45px; font-size:18px;">
+          <%= current_user.username&.at(0)&.upcase || "U" %>
         </div>
 
-        
-
-        <!-- Review Form -->
-        <div class="user-review-action" id="review-form-section">
-          <% if user_signed_in? %>
-            <% existing_review = @route.reviews.find_by(user_id: current_user.id) %>
-            <% if existing_review %>
-              <div class="alert-card alert-info">
-                <i class="fas fa-check-circle"></i>
-                <div class="alert-content">
-                  <strong>あなたはすでにレビューを投稿しています。</strong>
-                  <p>既存のレビューを編集できます。</p>
-                </div>
-                <%= link_to edit_route_path(existing_review), class: 'btn btn-edit-review' do %>
-                  <i class="fas fa-edit"></i>
-                  編集する
-                <% end %>
-              </div>
-            <% else %>
-              <%= render 'reviews/form', reviewable: @route %>
-            <% end %>
-          <% else %>
-            <div class="alert-card alert-login">
-              <i class="fas fa-sign-in-alt"></i>
-              <div class="alert-content">
-                <strong>レビューを投稿するにはログインが必要です</strong>
-                <p>アカウントをお持ちの方はログインしてください。</p>
-              </div>
-              <%= link_to new_user_session_path, class: 'btn btn-login' do %>
-                <i class="fas fa-sign-in-alt"></i>
-                ログイン
+        <div class="flex-grow-1">
+          <div class="rating-select mb-2 d-flex align-items-center gap-2">
+            <br />
+            <div class="stars-input text-warning" style="cursor: pointer; font-size: 1.2rem;">
+              <% 5.times do |i| %>
+                <i class="far fa-star star-icon" data-value="<%= i + 1 %>"></i>
               <% end %>
             </div>
-          <% end %>
-        </div>
+            <%# Скрытое поле для total_score, которое база так ждет %>
+            <%= f.hidden_field :total_score, id: 'review_total_score', value: 5 %>
+          </div>
 
-        <!-- Reviews List -->
-        <div class="reviews-list">
-          <h4 class="reviews-list-title">
-            <i class="fas fa-comments"></i>
-            最新のレビュー
-          </h4>
-          
-          <% if @reviews.any? %>
-            <% @reviews.order(created_at: :desc).limit(10).each do |review| %>
-              <div class="review-item">
-                <div class="review-header">
-                  <div class="review-author">
-                    <div class="page-nav-icon">
-                      <% if review.user.avatar.present? %>
-                        <%= image_tag review.user.avatar.thumb.url, alt: review.user.username %>
-                      <% else %>
-                        <%= review.user.username[0].upcase %>
-                      <% end %>
-                    </div>
-                    <div class="review-author-info">
-                      <div class="review-author-name"><%= review.user.username %></div>
-                      <div class="review-author-username">@<%= review.user.username %></div>
-                    </div>
-                  </div>
-                  
-                  
-                </div>
-                
-                <div class="review-content">
-                  <%= simple_format(review.text) %>
-                </div>
-                
-                <div class="review-footer">
-                  <div class="review-date">
-                    <i class="far fa-clock"></i>
-                    <%= time_ago_in_words(review.created_at) %>前
-                  </div>
-                  
-                  <div class="review-actions">
-                    <button class="review-action-btn" onclick="likeReview(<%= review.id %>)">
-                      <i class="far fa-thumbs-up"></i>
-                      <span>役に立った</span>
-                    </button>
-                    <button class="review-action-btn" onclick="shareReview(<%= review.id %>)">
-                      <i class="fas fa-share"></i>
-                      <span>共有</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            <% end %>
+          <div class="comment-input-wrapper rounded-3 border">
+            <%= f.text_area :text, 
+                class: 'form-control border-0 shadow-none p-3', 
+                rows: 1,
+                placeholder: 'あなたの感想を共有しましょう...',
+                oninput: 'this.style.height = ""; this.style.height = this.scrollHeight + "px"',
+                style: 'resize: none; background: transparent; width: 100%; min-height: 50px;' %>
             
-            <% if @reviews.count > 10 %>
-              <div class="load-more-reviews">
-                <button class="load-more-btn" onclick="loadMoreReviews()">
-                  <i class="fas fa-chevron-down"></i>
-                  <span>さらに読み込む</span>
-                </button>
+            <div class="d-flex justify-content-between align-items-center p-2 border-top bg-light-subtle rounded-bottom-3">
+                
+              
+              <%= f.submit 'レビューを書く', 
+                  class: 'btn btn-primary rounded-pill px-4 fw-bold shadow-sm',
+                  id: 'submit-comment'
+                  %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+      
+      
+  <% else %>
+    <div class="text-center py-4 mb-4 bg-light rounded-3 border">
+      <i class="fas fa-sign-in-alt fa-2x mb-2 text-muted opacity-50"></i>
+      <p class="mb-2 text-muted">コメントを投稿するにはログインが必要です</p>
+      <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary rounded-pill px-4' %>
+    </div>
+  <% end %>
+
+        
+  <!-- Reviews List -->
+        <div class="reviews-list">
+  <% if @reviews.any? %>
+    <% @reviews.order(created_at: :desc).each_with_index do |review, index| %>
+      <%# Добавляем border-bottom всем, кроме последнего элемента %>
+      <div class="review-item py-3 <%= 'border-bottom' unless index == @reviews.count - 1 %>" id="review-<%= review.id %>">
+        <div class="d-flex gap-3">
+          
+          <div class="author-avatar-large flex-shrink-0" style="width:40px; height:40px; font-size:16px;">
+            <% if review.user.avatar.present? %>
+              <%= image_tag review.user.avatar.thumb.url, alt: review.user.username, class: 'w-100 h-100 rounded-circle object-fit-cover' %>
+            <% else %>
+              <%= review.user.username&.at(0)&.upcase || "U" %>
+            <% end %>
+          </div>
+
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <div class="fw-semibold"><%= review.user.username %></div>
+                <div class="text-muted small">
+                  <i class="far fa-clock me-1"></i>
+                  <%= time_ago_in_words(review.created_at) %>前
+                </div>
+              </div>
+
+              <div id="review-display-<%= review.id %>" class="review-display-container">
+                <br />
+                <div class="review-content mt-2">
+                  <%= simple_format(review.text, class: 'mb-0') %>
+                </div>
+              </div>
+
+              <% if user_signed_in? && review.user_id == current_user.id %>
+                <div class="dropdown">
+                  
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    
+                      <button class="dropdown-item" href="#" onclick="toggleEditReview(<%= review.id %>); return false;">
+                        <i class="fas fa-edit me-2 text-primary"></i>編集
+                      </button>
+                    
+                    
+                      <%# Кнопка удаления через SweetAlert2 %>
+                      <button type="button" class="dropdown-item text-danger" 
+                              onclick="confirmDeleteReview('<%= route_review_path(@route, review) %>')">
+                        <i class="fas fa-trash me-2"></i>削除
+                      </button>
+                    
+                  </ul>
+                </div>
+              <% end %>
+            </div>
+
+            
+
+            <% if user_signed_in? && review.user_id == current_user.id %>
+              <div id="review-edit-<%= review.id %>" style="display: none;" class="mt-2">
+                <%= form_with(model: [@route, review], local: true) do |f| %>
+                  <%= f.text_area :text, class: 'form-control mb-2', rows: 3, style: 'resize: none;' %>
+                  <div class="d-flex gap-2 justify-content-end">
+                    <%= f.button type: :submit, class: 'btn btn-update-review rounded-pill' do %>
+                      <i class="fas fa-check me-1"></i> 更新する
+                    <% end %>
+                    <button type="button" class="btn btn-cancel-review rounded-pill" onclick="toggleEditReview(<%= review.id %>)">
+                      <i class="fas fa-times me-1"></i>キャンセル</button>
+                  </div>
+                <% end %>
               </div>
             <% end %>
-          <% else %>
-            <div class="empty-state">
-              <i class="fas fa-comments"></i>
-              <h3>まだレビューがありません</h3>
-              <p>最初のレビューを投稿しましょう！</p>
-            </div>
-          <% end %>
+          </div>
         </div>
+      </div>
+    <% end %>
+  <% else %>
+    <%# Заглушка, если отзывов нет %>
+    <div class="text-center py-5 text-muted bg-light rounded-3 border-dashed mt-3">
+      <i class="far fa-comment-dots fa-3x mb-3 opacity-25"></i>
+      <p>まだレビューはありません。最初の感想を共有しませんか？</p>
+    </div>
+  <% end %>
+</div>
+
+
+
       </div>
     </div>
 
-    <!-- Right Column: Sidebar -->
     <div class="sidebar">
+      <div class="sidebar">
       <!-- Author Card -->
       <div class="content-card author-card">
         <div class="author-avatar-large">
@@ -337,15 +395,16 @@
       <% end %>
     <% else %>
       <%= button_to follow_user_path(@route.user), 
-                    method: :post, 
-                    remote: true, 
-                    class: "follow-btn" do %>
+              method: :post, 
+              data: { turbo: true }, 
+              class: "follow-btn" do %>
         <span>フォローする</span>
       <% end %>
     <% end %>
   </div>
 <% end %>
       </div>
+
 
       <!-- Related Routes -->
       <% if @related_routes.any? %>
@@ -359,9 +418,7 @@
             <% @related_routes.limit(5).each do |route| %>
               <%= link_to route_path(route), class: "route-mini-card" do %>
                 <div class="route-mini-card-header">
-                  <div class="route-mini-icon">
-                    <i class="fas fa-map-marked-alt"></i>
-                  </div>
+                  
                   <div class="route-mini-card-title"><%= route.name %></div>
                 </div>
                 <div class="route-mini-card-meta">
@@ -371,7 +428,7 @@
                   </div>
                   <div class="route-mini-card-meta-item">
                     <i class="fas fa-heart"></i>
-                    <%= route.likes_count || 0 %>
+                    <%= route.likes_count || 0 %> ❤️
                   </div>
                 </div>
               <% end %>
@@ -382,8 +439,14 @@
     </div>
   </div>
 </div>
+      </div>
+  </div>
+</div>
+
 
 <%= render 'pages/footer' %>
+      
+
 
 <script>
 // 1. Безопасно передаем данные из Ruby в JS одной строкой JSON
@@ -410,6 +473,46 @@ window.initMap = function() {
     streetViewControl: false,
     fullscreenControl: true,
   });
+
+  function showToast(message, type = 'success') {
+    console.log("Toast called:", message);
+    const toast = document.createElement('div');
+    toast.className = `notification-toast ${type}`;
+    toast.style.cssText = `
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background: ${type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'};
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10000;
+      font-weight: 500;
+      transition: opacity 0.3s ease;
+    `;
+    toast.textContent = `${type === 'success' ? '✓' : '✗'} ${message}`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // Эта функция будет проверять наличие Flash сообщений от Rails
+  const checkFlashAndShowToast = () => {
+    <% if flash[:notice] %>
+      showToast("<%= j flash[:notice] %>", "success");
+    <% elsif flash[:alert] %>
+      showToast("<%= j flash[:alert] %>", "error");
+    <% end %>
+  };
+
+  
+  document.addEventListener("DOMContentLoaded", checkFlashAndShowToast);
+  document.addEventListener("turbo:load", checkFlashAndShowToast);
+  document.addEventListener("turbolinks:load", checkFlashAndShowToast);
 
   const markers = routeItems.map((item, index) => {
     const position = { lat: item.lat, lng: item.lng };
@@ -450,6 +553,41 @@ window.initMap = function() {
     map.setZoom(15);
   }
 };
+
+
+function shareRoute() {
+  const url = window.location.href;
+  const btn = document.querySelector('.btn-share span');
+  const originalText = btn.innerText;
+
+  if (navigator.share) {
+    navigator.share({ title: 'SmartRoutes', url: url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      // Меняем текст кнопки на "Скопировано!" на 2 секунды
+      btn.innerText = 'コピー完了！';
+      setTimeout(() => {
+        btn.innerText = originalText;
+      }, 2000);
+    });
+  }
+}
+
+function toggleEditReview(reviewId) {
+      if (!reviewId) return;
+      const displayDiv = document.getElementById('review-display-' + reviewId);
+      const editDiv = document.getElementById('review-edit-' + reviewId);
+      
+      if (displayDiv && editDiv) {
+        if (editDiv.style.display === 'none') {
+          displayDiv.style.display = 'none';
+          editDiv.style.display = 'block';
+        } else {
+          displayDiv.style.display = 'block';
+          editDiv.style.display = 'none';
+        }
+      }
+    }
 
 // 3. Магия Turbolinks
 // Если страница загрузилась через Turbolinks и API уже есть — запускаем карту вручную

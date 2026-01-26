@@ -1,6 +1,11 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
   # Action Cable
   mount ActionCable.server => '/cable'
+
+  # SideKiq
+  mount Sidekiq::Web => '/sidekiq'
 
   # get 'home/index'
   get '/health/check', to: proc { [200, {}, ['OK']] }
@@ -37,6 +42,7 @@ Rails.application.routes.draw do
 
   resources :users do
     member do
+      get :comments
       post :follow
       delete :unfollow
     end
@@ -54,11 +60,14 @@ Rails.application.routes.draw do
   resources :routes do
     resources :comments, only: %i[create destroy]
     resources :reviews, only: %i[create edit update destroy]
-    resources :likes, opacity: %i[create]
-    resources :bookmarks, only: %i[create]
+    resources :likes, only: %i[create destroy]
+    resource :bookmark, only: %i[create destroy]
+
+    member do
+      delete 'delete_image/:image_id', to: 'routes#delete_image', as: :delete_image
+    end
   end
 
-  resources :likes, only: %i[create]
   delete 'likes', to: 'likes#destroy'
 
   resources :bookmarks, only: %i[create index]
@@ -66,8 +75,17 @@ Rails.application.routes.draw do
   get 'me_bookmarks', to: 'bookmarks#index', as: :user_bookmarks
 
   # Locations
-  resources :venues
+  resources :venues do
+    member do
+      delete :delete_photo
+    end
+    resources :reviews, only: %i[create edit update destroy]
+    resources :likes, only: %i[create destroy]
+    resource :bookmark, only: %i[create destroy]
+  end
+
   resources :cities, only: %i[index show]
+  resources :likes, only: %i[create destroy]
 
   resources :dm_rooms, only: %i[index show create] do
     collection do

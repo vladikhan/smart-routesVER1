@@ -1,4 +1,3 @@
-# app/models/notification.rb
 class Notification < ApplicationRecord
   include Rails.application.routes.url_helpers
   # === Ассоциации ===
@@ -30,6 +29,7 @@ class Notification < ApplicationRecord
   scope :read_list, -> { where(is_read: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :for_user, ->(user) { where(user_id: user.id) }
+  scope :follow_notifications, -> { where(notification_type: 'follow') }
 
   # Фильтры по типам
   scope :message_notifications, -> { where(notification_type: 'new_message') }
@@ -37,6 +37,8 @@ class Notification < ApplicationRecord
     where(notification_type: %w[like comment review route_liked route_commented route_reviewed])
   }
   scope :follow_notifications, -> { where(notification_type: 'follow') }
+
+  after_create_commit :broadcast_notification
 
   # === Методы для отображения ===
   def icon
@@ -182,5 +184,25 @@ class Notification < ApplicationRecord
     end
   rescue StandardError
     nil
+  end
+
+  def broadcast_notification
+    ActionCable.server.broadcast(
+      "notification_#{user_id}",
+      {
+        unread_count: user.notifications.unread.count,
+        notification: {
+          id: id,
+          message: message,
+          icon: icon,
+          url: target_url, # Твой метод target_url
+          created_at: created_at,
+          actor: {
+            username: actor&.username || '誰か',
+            avatar_url: actor&.avatar&.url || nil # Подставь свой путь к аватарке
+          }
+        }
+      }
+    )
   end
 end

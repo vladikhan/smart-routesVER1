@@ -293,6 +293,7 @@
 	color: white;
 	backdrop-filter: blur(20px);
 	border: 2px solid rgba(255, 255, 255, 0.4);
+	    height: 60px;
 
 	&:hover {
 		background: rgba(255, 255, 255, 0.35);
@@ -311,12 +312,20 @@
 }
 
 .btn-save {
-	background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+	background: rgba(255, 255, 255, 0.25);
 	color: white;
 	border: none;
+	    height: 60px;
+	
 
 	&:hover {
 		background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+	}
+	
+	&.active {
+		background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+	color: white;
+	border: none;
 	}
 }
 
@@ -325,6 +334,7 @@
 	color: white;
 	backdrop-filter: blur(20px);
 	border: 2px solid rgba(255, 255, 255, 0.4);
+	    height: 60px;
 
 	&:hover {
 		background: rgba(255, 255, 255, 0.35);
@@ -340,6 +350,92 @@
 		background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
 	}
 }
+
+/* Container for mini cards */
+.routes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+/* Base Mini Card Style */
+.route-mini-card {
+  display: block;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 20px;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+/* Hover Effect */
+.route-mini-card:hover {
+  background: #ffffff;
+  border-color: #007bff; /* Цвет бренда */
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+  transform: translateX(5px); /* Японский стиль: смещение вправо вместо увеличения */
+}
+
+/* Header & Icon */
+.route-mini-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.route-mini-icon {
+  color: #007bff;
+  font-size: 1.1rem;
+  background: rgba(0, 123, 255, 0.1);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* Title Styling */
+.route-mini-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Обрезает длинные названия красиво */
+  flex: 1;
+}
+
+/* Meta info (likes, places) */
+.route-mini-card-meta {
+  display: flex;
+  gap: 15px;
+  padding-left: 44px; /* Выравнивание под текстом заголовка */
+}
+
+.route-mini-card-meta-item {
+  font-size: 0.8rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.route-mini-card-meta-item i {
+  font-size: 0.75rem;
+}
+
+/* Акцент на иконку сердца при наведении */
+.route-mini-card:hover .fa-heart {
+  color: #dc3545;
+  transition: color 0.2s;
+}
+
+
 
 /* === Content Section with Card Animation === */
 .route-detail-content {
@@ -364,7 +460,7 @@
 /* === Premium Content Cards === */
 .content-card {
 	background: white;
-	padding: 32px;
+	padding: 10px 23px;
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 	margin-bottom: 28px;
 	border-radius: 20px;
@@ -702,17 +798,18 @@
 	height: 100px;
 	border-radius: 50%;
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	margin: 0 auto 20px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: 42px;
 	box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
 	overflow: hidden;
-	border: 5px solid white;
+	border: 2px solid white;
 	position: relative;
 	z-index: 1;
 	transition: all 0.4s ease;
+	font-weight: 600px;
+	cursor: pointer;
 }
 
 .author-avatar-large:hover {
@@ -785,7 +882,7 @@
 	font-weight: 700;
 	font-size: 15px;
 	cursor: pointer;
-	margin-top: 20px;
+	margin: 30px 0;
 	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
 	position: relative;
@@ -852,36 +949,6 @@
 	gap: 24px;
 }
 
-.total-rating-box {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	padding: 32px;
-	border-radius: 20px;
-	text-align: center;
-	color: white;
-	box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
-	min-width: 200px;
-}
-
-.rating-number {
-	font-size: 56px;
-	font-weight: 900;
-	line-height: 1;
-	margin-bottom: 8px;
-	text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.rating-stars {
-	font-size: 24px;
-	margin-bottom: 8px;
-	letter-spacing: 4px;
-}
-
-.rating-count {
-	font-size: 14px;
-	opacity: 0.9;
-	font-weight: 600;
-}
-
 .write-review-btn {
 	padding: 16px 32px;
 	background: white;
@@ -904,92 +971,6 @@
 	border-color: transparent;
 	transform: translateY(-3px);
 	box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-}
-
-/* === Rating Distribution === */
-.rating-distribution {
-	background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-	padding: 28px;
-	border-radius: 16px;
-	margin-bottom: 32px;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-	border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.rating-distribution h4 {
-	font-size: 18px;
-	font-weight: 800;
-	color: #2c3e50;
-	margin-bottom: 20px;
-}
-
-.rating-bar {
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	margin-bottom: 16px;
-	transition: all 0.3s ease;
-}
-
-.rating-bar:hover {
-	transform: translateX(4px);
-}
-
-.rating-label {
-	min-width: 70px;
-	font-weight: 700;
-	font-size: 14px;
-	color: #667eea;
-	display: flex;
-	align-items: center;
-	gap: 4px;
-}
-
-.rating-label i {
-	color: #fbbf24;
-}
-
-.progress {
-	flex: 1;
-	height: 12px;
-	background: #e9ecef;
-	border-radius: 20px;
-	overflow: hidden;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.progress-bar {
-	background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
-	height: 100%;
-	border-radius: 20px;
-	transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-	box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
-	position: relative;
-	overflow: hidden;
-}
-
-.progress-bar::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: linear-gradient(
-		90deg,
-		transparent,
-		rgba(255, 255, 255, 0.3),
-		transparent
-	);
-	animation: shimmer 2s infinite;
-}
-
-.rating-count {
-	min-width: 50px;
-	text-align: right;
-	font-weight: 700;
-	color: #666;
-	font-size: 14px;
 }
 
 /* === Review Cards === */
@@ -1164,6 +1145,49 @@
 
 .review-action-btn i {
 	font-size: 14px;
+}
+
+/* Бокс для иконки */
+.icon-box {
+	width: 42px;
+	height: 42px;
+	background: #f0f7ff; /* Очень светлый голубой */
+	border-radius: 12px;
+	font-size: 1.2rem;
+}
+
+/* Кастомный бейдж-счетчик */
+.counter-badge {
+	background: white;
+	padding: 6px 16px;
+	border-radius: 20px;
+	border: 1px solid #eef2f6;
+	display: flex;
+	align-items: baseline;
+	gap: 2px;
+}
+
+.count-num {
+	font-weight: 800;
+	color: #0d6efd;
+	font-size: 1.1rem;
+}
+
+.count-label {
+	font-size: 0.75rem;
+	color: #adb5bd;
+	font-weight: bold;
+}
+
+/* Линия под заголовком */
+.reviews-header {
+	border-bottom: 1px solid #f1f3f5 !important;
+}
+
+/* Анимация при наведении (UX фишка) */
+.reviews-header:hover .icon-box i {
+	transform: scale(1.1) rotate(-5deg);
+	transition: transform 0.2s ease;
 }
 
 /* === Tabs === */

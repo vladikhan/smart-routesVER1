@@ -5,19 +5,134 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %> 
     <%= csp_meta_tag %> 
+    
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= stylesheet_link_tag 'pages', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= stylesheet_link_tag 'routes', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>"></script>
+    <%= stylesheet_link_tag "venues", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag 'notifications', media: 'all' if controller_name == 'notifications' %>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+      
 
     <%= yield :extra_css %>
-
   </head>
 
   <body>
     <%= yield %>
 
+    <script>
+      // 1. Объявляем функцию
+      function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `notification-toast ${type}`;
+      toast.style.cssText = `
+        position: fixed; top: 80px; right: 20px;
+        background: ${type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'};
+        color: white; padding: 1rem 1.5rem; border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); z-index: 10000;
+        animation: slideInRight 0.3s ease-out; font-weight: 500;
+      `;
+      toast.textContent = `${type === 'success' ? '✓' : '✗'} ${message}`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // 2. Авто-запуск для сообщений от Rails (Flash)
+    function checkFlashMessages() {
+      <% if flash[:notice] %>
+        showToast("<%= j flash[:notice] %>", "success");
+      <% end %>
+      <% if flash[:alert] %>
+        showToast("<%= j flash[:alert] %>", "error");
+      <% end %>
+    }
+
+    // Слушаем загрузку страницы
+    document.addEventListener("DOMContentLoaded", checkFlashMessages);
+    document.addEventListener("turbo:load", checkFlashMessages);
+    document.addEventListener("turbolinks:load", checkFlashMessages);
+
+    // 3. Добавляем анимации один раз
+    if (!document.getElementById('toast-animations')) {
+      const style = document.createElement('style');
+      style.id = 'toast-animations';
+      style.textContent = `
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+      `;
+      document.head.appendChild(style);
+    }
+
+
+function confirmDeleteReview(url) {
+  Swal.fire({
+    title: 'コメントを削除しますか？',
+    text: "削除すると元に戻すことはできません。",
+    icon: 'warning',
     
+    // UX: Меняем стандартные кнопки на кастомные стили
+    showCancelButton: true,
+    cancelButtonText: 'キャンセル',
+    confirmButtonText: '<i class="fas fa-trash-alt me-2"></i>削除する',
+    
+    // Дизайн кнопок
+    confirmButtonColor: '#ff4d4f', // Мягкий красный (Danger)
+    cancelButtonColor: '#f0f0f0',   // Светло-серый (Neutral)
+    
+    // Добавляем кастомные CSS классы для тонкой настройки
+    customClass: {
+      confirmButton: 'rounded-pill px-4 fw-bold',
+      cancelButton: 'rounded-pill px-4 text-dark'
+    },
+    
+    // UX Фишки
+    buttonsStyling: true, 
+    reverseButtons: true, // В Японии и на мобайле кнопка "Отмена" обычно слева
+    focusCancel: true     // Фокус на "Отмену", чтобы избежать случайного удаления
+    
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Показываем лоадер, чтобы пользователь видел, что процесс пошел
+      Swal.fire({
+        title: '削除中...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = url;
+
+      // Исправил ошибку: type должен быть hidden
+      const methodInput = document.createElement('input');
+      methodInput.type = 'hidden'; 
+      methodInput.name = '_method';
+      methodInput.value = 'delete';
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'authenticity_token';
+      csrfInput.value = csrfToken;
+
+      form.appendChild(methodInput);
+      form.appendChild(csrfInput);
+      document.body.appendChild(form);
+      form.submit();
+    }
+  })
+}
+
+
+    </script>
+  </body>
 </html>

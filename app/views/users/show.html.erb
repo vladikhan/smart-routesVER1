@@ -13,6 +13,8 @@
   <%= render 'pages/header' %>
   
 
+
+
   
 
   <%# --- СЕКЦИЯ ХЕДЕРА С ФОЛЛОУИНГОМ --- %>
@@ -38,7 +40,7 @@
           <div class="stat-box">
             <%# Добавили target для мгновенного обновления цифры %>
             <span class="stat-number" data-follow-target="count"><%= @user.followers.count %></span>
-            <span class="stat-label">フォロワー</span>
+            <span data-follow-target="count"><%= @user.followers.count %></span> フォロワー
           </div>
         </div>
 
@@ -67,7 +69,7 @@
     <section class="profile-tabs">
       <div class="tabs-container">
         <button class="tab-btn active" data-profile-tabs-target="btn" data-action="click->profile-tabs#switch" data-tab="routes">作成したルート</button>
-        <button class="tab-btn" data-profile-tabs-target="btn" data-action="click->profile-tabs#switch" data-tab="saved">保存したルート</button>
+        <button class="tab-btn" data-profile-tabs-target="btn" data-action="click->profile-tabs#switch" data-tab="saved">保存した</button>
         <button class="tab-btn" data-profile-tabs-target="btn" data-action="click->profile-tabs#switch" data-tab="reviews">レビュー</button>
         <button class="tab-btn" data-profile-tabs-target="btn" data-action="click->profile-tabs#switch" data-tab="activity">アクティビティ</button>
       </div>
@@ -77,7 +79,28 @@
       <div class="tab-content active" id="routes-tab" data-profile-tabs-target="content">
          <%= render partial: 'routes/route_card', collection: @routes, as: :route %>
       </div>
-      <div class="tab-content" id="saved-tab" data-profile-tabs-target="content" style="display: none;">
+<div class="tab-content" id="saved-tab" data-profile-tabs-target="content" style="display: none;">
+  <div class="bookmarks-container">
+    <%# Получаем все закладки пользователя (и маршруты, и заведения) %>
+    <% all_saved_items = @user.bookmarks.includes(:item).order(created_at: :desc) %>
+
+    <% if all_saved_items.any? %>
+      <div class="row row-cols-1 row-cols-md-2 g-3">
+        <% all_saved_items.each do |bookmark| %>
+          <div class="col">
+            <% if bookmark.item.is_a?(Route) %>
+              <%= render 'routes/route_card', route: bookmark.item %>
+            <% elsif bookmark.item.is_a?(Venue) %>
+              <%= render 'venues/venue_card', venue: bookmark.item %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-center text-muted py-5">保存したアイテムはまだありません</p>
+    <% end %>
+  </div>
+</div>
          <%= render partial: 'routes/route_card', collection: @saved_routes, as: :route %>
       </div>
       <div class="tab-content" id="reviews-tab" data-profile-tabs-target="content" style="display: none;">

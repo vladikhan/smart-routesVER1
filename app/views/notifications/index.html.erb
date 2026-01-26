@@ -1,13 +1,6 @@
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+<%= stylesheet_link_tag 'notifications', media: 'all' %>
+<%= stylesheet_link_tag 'application', media: 'all' %>
 
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%= stylesheet_link_tag 'notifications', media: 'all' %>
-  
- 
-
-<!-- app/views/notifications/index.html.erb -->
 <%= render 'pages/header' %>
 
 <div class="notifications-page">
@@ -21,43 +14,37 @@
     </h1>
     
     <% if @notifications.where(is_read: false).any? %>
-      <%= button_to 'すべて既読にする', 
-                    mark_all_as_read_notifications_path, 
-                    method: :patch, 
-                    class: "mark-all-read" %>
+      <%# Исправлено: вызываем JS функцию напрямую через onclick %>
+      <button type="button" class="mark-all-read" onclick="markAllNotificationsAsRead()">
+        すべて既読にする
+      </button>
     <% end %>
   </div>
 
-  
-
   <% if @notifications.any? %>
-    <!-- Группировка по датам -->
     <% @notifications.group_by { |n| n.created_at.to_date }.each do |date, notifications_of_day| %>
       <div class="date-divider">
         <span class="date-text">
-          <% if date == Date.today %>
-            今日
-          <% elsif date == Date.yesterday %>
-            昨日
-          <% elsif date > 7.days.ago.to_date %>
-            <%= date.strftime('%m月%d日') %>
-          <% else %>
-            <%= date.strftime('%Y年%m月%d日') %>
+          <% if date == Date.today %> 今日
+          <% elsif date == Date.yesterday %> 昨日
+          <% elsif date > 7.days.ago.to_date %> <%= date.strftime('%m月%d日') %>
+          <% else %> <%= date.strftime('%Y年%m月%d日') %>
           <% end %>
         </span>
       </div>
 
-      <!-- Уведомления за этот день -->
       <% notifications_of_day.each do |notification| %>
+        
+      
         <%= link_to mark_as_read_notification_path(notification), 
-                    class: "notification-card #{notification.is_read ? 'read' : 'unread'}" do %>
+                    class: "notification-card #{notification.is_read ? 'read' : 'unread'}",
+                    data: { notification_id: notification.id } do %>
           
           <div class="notification-icon-large">
             <%= notification.icon %>
           </div>
           
           <div class="notification-body">
-            <!-- Аватар актора -->
             <% if notification.actor.present? %>
               <div class="notification-actor-avatar">
                 <% if notification.actor.avatar.present? %>
@@ -70,20 +57,12 @@
               </div>
             <% end %>
             
-            <!-- Текст уведомления -->
             <div class="notification-text-content">
-              <div class="notification-message">
-                <%= notification.message %>
-              </div>
-              
-              <!-- Время -->
-              <div class="notification-time">
-                <%= time_ago_in_words(notification.created_at) %>前
-              </div>
+              <div class="notification-message"><%= notification.message %></div>
+              <div class="notification-time"><%= time_ago_in_words(notification.created_at) %>前</div>
             </div>
           </div>
           
-          <!-- Индикатор непрочитанного -->
           <% unless notification.is_read %>
             <div class="notification-unread-dot"></div>
           <% end %>
@@ -91,18 +70,14 @@
       <% end %>
     <% end %>
 
-    <!-- Пагинация -->
     <div class="pagination-wrapper mt-4">
       <%= paginate @notifications %>
     </div>
 
   <% else %>
-    <!-- Пустое состояние -->
     <div class="empty-state">
       <div class="empty-icon">🔔</div>
-      <h2>
-        <%= params[:filter].present? ? "該当する通知はありません" : "通知はありません" %>
-      </h2>
+      <h2><%= params[:filter].present? ? "該当する通知はありません" : "通知はありません" %></h2>
       <p>新しいアクションがあるとここに表示されます</p>
     </div>
   <% end %>
@@ -110,144 +85,91 @@
 
 <%= render 'pages/footer' %>
 
-  <script>
-    // Mark individual notification as read
-    async function markAsReadOnClick(notificationId, event) {
-      if (event) event.preventDefault();
-      
-      try {
-        const response = await fetch(`/notifications/${notificationId}/mark_as_read`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
-          }
-        });
+<script>
+  /**
+   * Отметить одно уведомление как прочитанное и перейти по ссылке
+   */
+  async function markAsReadOnClick(notificationId, event) {
+    if (event) event.preventDefault();
 
-        const data = await response.json();
-        
-        if (data.success) {
-          // Update UI immediately
-          const card = document.querySelector(`[data-notification-id="${notificationId}"]`);
-          if (card) {
-            card.classList.remove('unread');
-            card.classList.add('read');
-            const indicator = card.querySelector('[style*="background"]');
-            if (indicator && indicator.style.width === '12px') {
-              indicator.remove();
-            }
-          }
-          
-          // Redirect after a short delay
-          if (data.redirect_url) {
-            setTimeout(() => {
-              window.location.href = data.redirect_url;
-            }, 200);
-          }
+    try {
+      const response = await fetch(`/notifications/${notificationId}/mark_as_read`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept': 'application/json'
         }
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Мгновенно обновляем UI карточки
+        const card = document.querySelector(`[data-notification-id="${notificationId}"]`);
+        if (card) {
+          card.classList.remove('unread');
+          card.classList.add('read');
+          // Удаляем точку уведомления, если она есть
+          const dot = card.querySelector('.notification-unread-dot');
+          if (dot) dot.remove();
+        }
+
+        // Переходим по адресу уведомления (на маршрут, лайк и т.д.)
+        if (data.redirect_url) {
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 200);
+        }
       }
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
+  }
 
-    // Mark all notifications as read
-    async function markAllNotificationsAsRead() {
-      if (!confirm('すべての通知を既読にしますか？')) {
-        return;
-      }
+  /**
+   * Отметить ВСЕ уведомления как прочитанные
+   */
+  async function markAllNotificationsAsRead() {
+    if (!confirm('すべての通知を既読にしますか？')) return;
 
-      try {
-        const response = await fetch('/notifications/mark_all_as_read', {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json'
-          }
+    try {
+      const response = await fetch('<%= mark_all_as_read_notifications_path %>', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Обновляем все карточки на странице
+        document.querySelectorAll('.notification-card.unread').forEach(card => {
+          card.classList.remove('unread');
+          card.classList.add('read');
+          const dot = card.querySelector('.notification-unread-dot');
+          if (dot) dot.remove();
         });
 
-        const data = await response.json();
-        
-        if (data.success) {
-          // Update UI
-          document.querySelectorAll('.notification-card.unread').forEach(card => {
-            card.classList.remove('unread');
-            card.classList.add('read');
-            const indicator = card.querySelector('[style*="background"]');
-            if (indicator && indicator.style.width === '12px') {
-              indicator.remove();
-            }
-          });
+        // Прячем кнопку "Прочитать все"
+        const markAllBtn = document.querySelector('.mark-all-read');
+        if (markAllBtn) markAllBtn.remove();
 
-          // Hide "mark all as read" button
-          const markAllBtn = document.querySelector('.mark-all-read');
-          if (markAllBtn) {
-            markAllBtn.style.display = 'none';
-          }
-
-          // Show success toast
+        // Вызываем глобальный тост (из application.html.erb)
+        if (typeof showToast === 'function') {
           showToast('すべて既読にしました', 'success');
         }
-      } catch (error) {
-        console.error('Error:', error);
+      }
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+      if (typeof showToast === 'function') {
         showToast('エラーが発生しました', 'error');
       }
     }
+  }
+</script>
 
-    // Show toast notification
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `notification-toast ${type}`;
-      toast.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: ${type === 'success' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        z-index: 10000;
-        animation: slideInRight 0.3s ease-out;
-        font-weight: 500;
-      `;
-      toast.textContent = `${type === 'success' ? '✓' : '✗'} ${message}`;
 
-      document.body.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    // Animations
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideInRight {
-        from {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideOutRight {
-        from {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  </script>
-</body>
-</html>

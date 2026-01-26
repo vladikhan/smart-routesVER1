@@ -21,9 +21,19 @@ class NotificationManager {
 		this.fetchUnreadCount()
 
 		// Poll every 30 seconds
-		setInterval(() => {
-			this.fetchUnreadCount()
-		}, this.updateInterval)
+		setInterval(async () => {
+			const response = await fetch('/notifications/unread_count')
+			const data = await response.json()
+			const badge = document.querySelector('.unread-badge-header')
+
+			if (data.count > 0) {
+				if (badge) {
+					badge.innerText = data.count
+				} else {
+					// Если баджа нет, можно его создать или обновить иконку колокольчика
+				}
+			}
+		}, 30000) // Проверка каждые 30 секунд
 	}
 
 	async fetchUnreadCount() {
@@ -152,7 +162,7 @@ class NotificationManager {
 						'X-CSRF-Token': this.getCsrfToken(),
 						'X-Requested-With': 'XMLHttpRequest',
 					},
-				}
+				},
 			)
 
 			if (!response.ok) throw new Error('Failed to mark as read')
@@ -199,7 +209,6 @@ class NotificationManager {
 		}
 	}
 
-	// ⭐ НОВОЕ: Получение CSRF токена (helper метод)
 	getCsrfToken() {
 		const token = document.querySelector('meta[name="csrf-token"]')
 		return token ? token.content : ''

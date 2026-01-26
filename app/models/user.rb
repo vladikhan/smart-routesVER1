@@ -104,6 +104,12 @@ class User < ApplicationRecord
          .recent
   end
 
+  def recent_comments(limit = 10)
+    comments.includes(:commentable)
+            .order(created_at: :desc)
+            .limit(limit)
+  end
+
   # === Helpers ===
   def avatar_url
     avatar.present? ? avatar.url : '/images/default_avatar.png'

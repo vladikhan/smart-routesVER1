@@ -17,9 +17,8 @@ class DmMessage < ApplicationRecord
   scope :unread_by, ->(user) { where(is_read: false).where.not(user_id: user.id) }
   scope :recent, -> { order(created_at: :desc) }
 
-  def mark_as_read
-    return if is_read?
-
+  def mark_as_read!
+    update!(is_read: true, read_at: Time.current)
     update_columns(is_read: true, read_at: Time.current)
     update_notifications_status
   end

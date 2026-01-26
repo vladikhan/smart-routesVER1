@@ -614,6 +614,7 @@ DEPENDENCIES
   fog-aws
   geocoder (~> 1.8)
   html2slim
+  image_processing (~> 1.2)
   jbuilder (~> 2.7)
   jsbundling-rails (~> 1.3)
   kaminari (~> 1.2.2)

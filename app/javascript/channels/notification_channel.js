@@ -17,6 +17,11 @@ const notificationChannel = consumer.subscriptions.create(
 
 			const notification = data.notification
 
+			const linkUrl = notification.url
+
+			const notifElement = document.createElement('a')
+			notifElement.href = linkUrl
+
 			// Update badge count
 			this.updateBadge(data.unread_count)
 

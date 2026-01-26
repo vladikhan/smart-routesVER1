@@ -4,6 +4,7 @@ import './channels'
 import './controllers'
 import './maps'
 import './notifications'
+import './notifications_poll'
 require('@rails/activestorage').start()
 require('@rails/ujs').start()
 require('turbolinks').start()

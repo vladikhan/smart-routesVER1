@@ -3,9 +3,10 @@ class LikesController < ApplicationController
 
   def create
     @likeable = params[:likeable_type].constantize.find(params[:likeable_id])
-    @like = @likeable.likes.build(user: current_user)
+    @like = @likeable.likes.find_or_initialize_by(user: current_user)
 
     if @like.save
+      NotificationService.notify_route_liked(@like) if @likeable.is_a?(Route)
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path, notice: 'いいねしました！' }
         format.json do
@@ -14,30 +15,20 @@ class LikesController < ApplicationController
         end
       end
     else
-      render_error
+      redirect_back fallback_location: root_path, alert: 'エラーが発生しました'
     end
   end
 
   def destroy
-    @like = current_user.likes.find_by(
-      likeable_type: params[:likeable_type],
-      likeable_id: params[:likeable_id]
-    )
+    # Находим лайк по ID, который пришел в URL
+    @like = current_user.likes.find(params[:id])
+    @likeable = @like.likeable
 
-    if @like&.destroy
-      @likeable = @like.likeable
-      respond_to do |format|
-        format.html { redirect_back fallback_location: root_path, notice: 'いいねを取り消しました' }
-        format.json do
-          render json: {
-            success: true,
-            likes_count: @likeable.reload.likes_count,
-            message: 'いいねを取り消しました'
-          }
-        end
-      end
-    else
-      render_error('いいねが見つかりません')
+    @like.destroy
+
+    respond_to do |format|
+      format.html { redirect_back fallback_location: root_path, notice: 'いいねを取り消しました' }
+      format.json { head :no_content }
     end
   end
 

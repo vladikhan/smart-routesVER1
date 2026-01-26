@@ -18,6 +18,7 @@ class VenuesController < ApplicationController
     @venue.increment_view_count
 
     @venue = Venue.find(params[:id])
+    AiAnalyzeVenueJob.perform_later(@venue.id)
 
     @route = @venue.routes.joins(:route_items)
                    .order('route_items.position ASC')
@@ -32,9 +33,42 @@ class VenuesController < ApplicationController
     @reviews = @venue.reviews
   end
 
+  def update
+    @venue = Venue.find(params[:id])
+
+    if params[:venue][:photos].present?
+      @venue.photos.attach(params[:venue][:photos])
+
+      redirect_to venue_path(@venue), notice: '写真をアップロードしました！'
+    elsif @venue.update(venue_params)
+      redirect_to venue_path(@venue), notice: '更新しました'
+    else
+      puts @venue.errors.full_messages
+      render :edit
+    end
+  end
+
+  def delete_photo
+    @venue = Venue.find(params[:id])
+    photo = @venue.photos.find_by(id: params[:photo_id])
+
+    if photo
+      photo.purge
+      flash[:notice] = '写真を削除しました'
+    else
+      flash[:alert] = '写真が見つかりませんでした'
+    end
+
+    redirect_back(fallback_location: venue_path(@venue))
+  end
+
   private
 
   def set_venue
     @venue = Venue.find(params[:id])
+  end
+
+  def venue_params
+    params.require(:venue).permit(:name, :description, :address, :venue_type, :district_id, photos: [])
   end
 end
