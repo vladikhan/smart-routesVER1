@@ -1,12 +1,11 @@
 <div class="container">
   <div class="stats">
-    
     <%= link_to routes_path, class: "stat-card" do %>
       <div class="stat-icon">🗺️</div>
       <div class="stat-number"><%= @routes_count %></div>
       <div class="stat-label">ルート</div>
     <% end %>
-    
+
     <%= link_to venues_path, class: "stat-card" do %>
       <div class="stat-icon">📍</div>
       <div class="stat-number"><%= @venues_count %></div>
@@ -20,9 +19,9 @@
     <% end %>
 
     <div class="stat-card">
-        <div class="stat-icon">⭐</div>
-        <div class="stat-number"><%= @reviews_count %></div>
-        <div class="stat-label">レビュー</div>
-      </div>
-
+      <div class="stat-icon">⭐</div>
+      <div class="stat-number"><%= @reviews_count %></div>
+      <div class="stat-label">レビュー</div>
+    </div>
+  </div>
 </div>

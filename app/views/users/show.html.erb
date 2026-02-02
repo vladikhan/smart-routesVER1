@@ -13,10 +13,6 @@
   <%= render 'pages/header' %>
   
 
-
-
-  
-
   <%# --- СЕКЦИЯ ХЕДЕРА С ФОЛЛОУИНГОМ --- %>
   <section class="profile-header" 
            data-controller="follow" 
@@ -108,9 +104,9 @@
       </div>
       <div class="tab-content" id="activity-tab" data-profile-tabs-target="content" style="display: none;">
          <%= render 'notifications/activity_list', activities: @activities %>
-      </div>
     </main>
   </div>
+      </div>
 
   <%= render 'pages/route_make' %>
   <%= render 'pages/footer' %>

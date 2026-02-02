@@ -1,0 +1,3 @@
+linters:
+  Html2Slim:
+    enabled: false

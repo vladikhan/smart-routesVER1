@@ -1,19 +1,17 @@
 <!-- Hero Banner -->
-  <section class="hero-banner">
-    <h1 class="hero-title">人気のルートを探す</h1>
-    <p class="hero-subtitle">みんなが作成した最高のルートを発見しよう</p>
+<section class="hero-banner">
+  <h1 class="hero-title">人気のルートを探す</h1>
+  <p class="hero-subtitle">みんなが作成した最高のルートを発見しよう</p>
 
-     
-    
-    <div class="search-box-container">
-      <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>
-        <%= f.text_field :q,
-            value: params[:q],
-            placeholder: "ルート名、場所、アクティビティで検索...",
-            class: "search-input" %>
-        <button type="submit" class="search-btn">
-          検索
-        </button>
-      <% end %>
-    </div>
-  </section>
+  <div class="search-box-container">
+    <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>
+      <%=
+        f.text_field :q,
+                     value: params[:q],
+                     placeholder: 'ルート名、場所、アクティビティで検索...',
+                     class: 'search-input'
+      %>
+      <button type="submit" class="search-btn">検索</button>
+    <% end %>
+  </div>
+</section>

@@ -1,149 +1,207 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>場所一覧 - Smart Routes</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%= stylesheet_link_tag 'venues', media: 'all' %>
-</head>
-<body>
-  <%= render 'pages/header' %>
-  <%= render 'pages/hero' %>
-  
-  
-  <!-- Filters -->
-  <section class="filters-section">
-    <div class="filters-container">
-      <%= form_with url: routes_path, method: :get, local: true do |f| %>
-        <%= f.hidden_field :q, value: params[:q] %>
-        
-        <%= f.select :difficulty,
-            options_for_select([
-              ['すべての難易度', ''],
-              ['簡単', 'easy'],
-              ['普通', 'medium'],
-              ['難しい', 'hard']
-            ], params[:difficulty]),
-            {},
-            class: "filter-select",
-            onchange: "this.form.submit()" %>
-        
-        <%= f.select :duration,
-            options_for_select([
-              ['すべての時間', ''],
-              ['短い (< 3時間)', 'short'],
-              ['普通 (3-6時間)', 'medium'],
-              ['長い (> 6時間)', 'long']
-            ], params[:duration]),
-            {},
-            class: "filter-select",
-            onchange: "this.form.submit()" %>
-        
-        <%= f.select :cost,
-            options_for_select([
-              ['すべての予算', ''],
-              ['安い (< ¥3,000)', 'budget'],
-              ['普通 (¥3,000-8,000)', 'medium'],
-              ['高い (> ¥8,000)', 'expensive']
-            ], params[:cost]),
-            {},
-            class: "filter-select",
-            onchange: "this.form.submit()" %>
-      <% end %>
-      
-      <!-- Active Filters -->
-      <% if params[:difficulty].present? %>
-        <div class="filter-tag">
-          <%= params[:difficulty] %>
-          <%= link_to '×', routes_path(q: params[:q], duration: params[:duration], cost: params[:cost]),
-              class: "filter-tag-close" %>
-        </div>
-      <% end %>
-      
-      <% if params[:duration].present? %>
-        <div class="filter-tag">
-          <%= params[:duration] %>
-          <%= link_to '×', routes_path(q: params[:q], difficulty: params[:difficulty], cost: params[:cost]),
-              class: "filter-tag-close" %>
-        </div>
-      <% end %>
-      
-      <% if params[:cost].present? %>
-        <div class="filter-tag">
-          <%= params[:cost] %>
-          <%= link_to '×', routes_path(q: params[:q], difficulty: params[:difficulty], duration: params[:duration]),
-              class: "filter-tag-close" %>
-        </div>
-      <% end %>
-    </div>
-  </section>
-  <style>
-  .venue-card-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
-  }
-</style>
-  
-  <div style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
-    <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">場所一覧</h1>
+  <head>
+    <title>場所一覧 - Smart Routes</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'venues', media: 'all' %>
+  </head>
+  <body>
+    <%= render 'pages/header' %>
+    <%= render 'pages/hero' %>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
-      <% @venues.each do |venue| %>
-        <%= link_to venue_path(venue), style: "text-decoration: none;" do %>
-          <div class='venue-card-hover' style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); transition: all 0.3s;">
-            <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #64b5f7, #0288d1); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;">
-              <%= venue.venue_type == 'restaurant' ? '🍽️' : '🏛️' %>
-            </div>
-            
-            <div style="padding: 20px;">
-              <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 10px 0; color: #333;">
-                <%= venue.name %>
-              </h3>
-              
-              <p style="font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 15px;">
-                <%= truncate(venue.description, length: 80) %>
-              </p>
-              
-              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
-                <% if venue.cuisine_type.present? %>
-                  <span style="background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
-                    <%= venue.cuisine_type %>
-                  </span>
-                <% end %>
-                
-                <% if venue.district %>
-                  <span style="background: #f3e5f5; color: #7b1fa2; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
-                    <%= venue.district.name %>
-                  </span>
-                <% end %>
-                
-                <% if venue.price_range.present? %>
-                  <span style="background: #e8f5e9; color: #388e3c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">
-                    <%= venue.price_range %>
-                  </span>
-                <% end %>
-              </div>
-              
-              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #999; margin-top: 10px;">
-                <span>⭐ <%= venue.average_rating || 0 %></span>
-                <span>👁️ <%= venue.view_count || 0 %></span>
-              </div>
-            </div>
+    <!-- Filters -->
+    <section class="filters-section">
+      <div class="filters-container">
+        <%= form_with url: routes_path, method: :get, local: true do |f| %>
+          <%= f.hidden_field :q, value: params[:q] %>
+
+          <%=
+            f.select :difficulty,
+                     options_for_select(
+                       [
+                         ['すべての難易度', ''],
+                         %w[簡単 easy],
+                         %w[普通 medium],
+                         %w[難しい hard],
+                       ],
+                       params[:difficulty],
+                     ),
+                     {},
+                     class: 'filter-select',
+                     onchange: 'this.form.submit()'
+          %>
+
+          <%=
+            f.select :duration,
+                     options_for_select(
+                       [
+                         ['すべての時間', ''],
+                         ['短い (< 3時間)', 'short'],
+                         ['普通 (3-6時間)', 'medium'],
+                         ['長い (> 6時間)', 'long'],
+                       ],
+                       params[:duration],
+                     ),
+                     {},
+                     class: 'filter-select',
+                     onchange: 'this.form.submit()'
+          %>
+
+          <%=
+            f.select :cost,
+                     options_for_select(
+                       [
+                         ['すべての予算', ''],
+                         ['安い (< ¥3,000)', 'budget'],
+                         ['普通 (¥3,000-8,000)', 'medium'],
+                         ['高い (> ¥8,000)', 'expensive'],
+                       ],
+                       params[:cost],
+                     ),
+                     {},
+                     class: 'filter-select',
+                     onchange: 'this.form.submit()'
+          %>
+        <% end %>
+
+        <!-- Active Filters -->
+        <% if params[:difficulty].present? %>
+          <div class="filter-tag">
+            <%= params[:difficulty] %>
+            <%=
+              link_to '×',
+                      routes_path(
+                        q: params[:q],
+                        duration: params[:duration],
+                        cost: params[:cost],
+                      ),
+                      class: 'filter-tag-close'
+            %>
           </div>
         <% end %>
+
+        <% if params[:duration].present? %>
+          <div class="filter-tag">
+            <%= params[:duration] %>
+            <%=
+              link_to '×',
+                      routes_path(
+                        q: params[:q],
+                        difficulty: params[:difficulty],
+                        cost: params[:cost],
+                      ),
+                      class: 'filter-tag-close'
+            %>
+          </div>
+        <% end %>
+
+        <% if params[:cost].present? %>
+          <div class="filter-tag">
+            <%= params[:cost] %>
+            <%=
+              link_to '×',
+                      routes_path(
+                        q: params[:q],
+                        difficulty: params[:difficulty],
+                        duration: params[:duration],
+                      ),
+                      class: 'filter-tag-close'
+            %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+    <style>
+      .venue-card-hover:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+      }
+    </style>
+
+    <div style="max-width: 1200px; margin: 30px auto; padding: 0 20px;">
+      <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 30px;">
+        場所一覧
+      </h1>
+
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;"
+      >
+        <% @venues.each do |venue| %>
+          <%= link_to venue_path(venue), style: "text-decoration: none;" do %>
+            <div
+              class="venue-card-hover"
+              style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); transition: all 0.3s;"
+            >
+              <div
+                style="width: 100%; height: 180px; background: linear-gradient(135deg, #64b5f7, #0288d1); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white;"
+              >
+                <%= venue.venue_type == 'restaurant' ? '🍽️' : '🏛️' %>
+              </div>
+
+              <div style="padding: 20px;">
+                <h3
+                  style="font-size: 18px; font-weight: 700; margin: 0 0 10px 0; color: #333;"
+                >
+                  <%= venue.name %>
+                </h3>
+
+                <p
+                  style="font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 15px;"
+                >
+                  <%= truncate(venue.description, length: 80) %>
+                </p>
+
+                <div
+                  style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;"
+                >
+                  <% if venue.cuisine_type.present? %>
+                    <span
+                      style="background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"
+                    >
+                      <%= venue.cuisine_type %>
+                    </span>
+                  <% end %>
+
+                  <% if venue.district %>
+                    <span
+                      style="background: #f3e5f5; color: #7b1fa2; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"
+                    >
+                      <%= venue.district.name %>
+                    </span>
+                  <% end %>
+
+                  <% if venue.price_range.present? %>
+                    <span
+                      style="background: #e8f5e9; color: #388e3c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;"
+                    >
+                      <%= venue.price_range %>
+                    </span>
+                  <% end %>
+                </div>
+
+                <div
+                  style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #999; margin-top: 10px;"
+                >
+                  <span>⭐ <%= venue.average_rating || 0 %></span>
+                  <span>👁️ <%= venue.view_count || 0 %></span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @venues.empty? %>
+        <div style="text-align: center; padding: 80px 20px; color: #999;">
+          <div style="font-size: 64px; margin-bottom: 20px;">📭</div>
+          <p style="font-size: 18px;">まだ場所が登録されていません</p>
+        </div>
       <% end %>
     </div>
 
-    <% if @venues.empty? %>
-      <div style="text-align: center; padding: 80px 20px; color: #999;">
-        <div style="font-size: 64px; margin-bottom: 20px;">📭</div>
-        <p style="font-size: 18px;">まだ場所が登録されていません</p>
-      </div>
-    <% end %>
-  </div>
-
-  <%= render 'pages/footer' %>
-</body>
+    <%= render 'pages/footer' %>
+  </body>
 </html>

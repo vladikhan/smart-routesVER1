@@ -1,4 +1,3 @@
-# app/controllers/notifications_controller.rb
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
 
@@ -7,30 +6,22 @@ class NotificationsController < ApplicationController
                                  .includes(:actor, :notifiable)
                                  .recent
 
-    @unread_count = current_user.notifications.where(is_read: false).count
-
-    # Фильтрация
-    case params[:filter]
-    when 'messages'
-      @notifications = @notifications.message_notifications
-    when 'interactions'
-      @notifications = @notifications.interaction_notifications
-    when 'follows'
-      @notifications = @notifications.follow_notifications
-    end
+    @notifications = case params[:filter]
+                     when 'messages'     then @notifications.message_notifications
+                     when 'interactions' then @notifications.interaction_notifications
+                     when 'follows'      then @notifications.follow_notifications
+                     else @notifications # Важно вернуть исходный список, если фильтр не совпал
+                     end
 
     @notifications = @notifications.page(params[:page]).per(20)
-    def unread_count
-      puts "Checking notifications for User: #{current_user.id}"
+  end
 
-      # Проверяем вообще все уведомления этого юзера
-      all_count = current_user.notifications.count
-      unread_count = current_user.notifications.where(is_read: false).count
-
-      puts "DEBUG: All: #{all_count}, Unread: #{unread_count}"
-
-      render json: { count: unread_count, authenticated: true }
-    end
+  # Этот метод должен быть один!
+  def unread_count
+    render json: { 
+      count: current_user.notifications.where(is_read: false).count, 
+      authenticated: true 
+    }
   end
 
   def mark_as_read
@@ -41,13 +32,7 @@ class NotificationsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to redirect_url }
-      format.json do
-        render json: {
-          success: true,
-          redirect_url: redirect_url,
-          unread_count: current_user.notifications.unread.count
-        }
-      end
+      format.json { render json: { success: true, redirect_url: redirect_url } }
     end
   rescue ActiveRecord::RecordNotFound
     redirect_to notifications_path, alert: '通知が見つかりません'
@@ -55,17 +40,6 @@ class NotificationsController < ApplicationController
 
   def mark_all_as_read
     Notification.mark_all_as_read_for(current_user)
-
-    respond_to do |format|
-      format.html { redirect_back(fallback_location: notifications_path, notice: 'すべて既読にしました') }
-      format.json { render json: { success: true, unread_count: 0 } }
-    end
-  end
-
-  def unread_count
-    render json: {
-      count: current_user.notifications.unread.count,
-      authenticated: true
-    }
+    redirect_back(fallback_location: notifications_path, notice: 'すべて既読にしました')
   end
 end

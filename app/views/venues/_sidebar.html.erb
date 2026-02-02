@@ -1,83 +1,84 @@
- <!-- Right Column: Sidebar -->
-      <div class="sidebar">
+<!-- Right Column: Sidebar -->
+<div class="sidebar">
+  <!-- Map Section -->
+  <div class="venue-info-card">
+    <h3><i class="fas fa-map"></i> 地図</h3>
+    <div id="map" style="height: 300px; background: #eee;"></div>
+  </div>
 
-        <!-- Map Section -->
-        <div class="venue-info-card">
-          <h3><i class="fas fa-map"></i> 地図</h3>
-          <div id="map" style="height: 300px; background: #eee;"></div>
-        </div>
+  <!-- Routes Section -->
+  <div class="venue-info-card">
+    <h3>
+      <i class="fas fa-route"></i>
+      このスポットを含むルート (<%= @routes.count %>)
+    </h3>
 
-        <!-- Routes Section -->
-        <div class="venue-info-card">
-          <h3>
-            <i class="fas fa-route"></i>
-            このスポットを含むルート (<%= @routes.count %>)
-          </h3>
-          
-          <% if @routes.any? %>
-            <div class="routes-section">
-              <% @routes.limit(5).each do |route| %>
-                <%= link_to route_path(route), class: "route-mini-card" do %>
-                  <div class="route-mini-card-header">
-                    <div class="route-mini-icon">
-                      <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <div class="route-mini-card-title"><%= route.name %></div>
-                  </div>
-                  <div class="route-mini-card-meta">
-                    <div class="route-mini-card-meta-item">
-                      <i class="fas fa-map-marker-alt"></i>
-                      <%= route.route_items.count %>場所
-                    </div>
-                    <% if route.estimated_duration.present? %>
-                      <div class="route-mini-card-meta-item">
-                        <i class="fas fa-clock"></i>
-                        <%= route.estimated_duration %>分
-                      </div>
-                    <% end %>
-                  </div>
-                <% end %>
-              <% end %>
+    <% if @routes.any? %>
+      <div class="routes-section">
+        <% @routes.limit(5).each do |route| %>
+          <%= link_to route_path(route), class: "route-mini-card" do %>
+            <div class="route-mini-card-header">
+              <div class="route-mini-icon">
+                <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <div class="route-mini-card-title"><%= route.name %></div>
             </div>
-            
-            <% if @routes.count > 5 %>
-              <%= link_to routes_path(venue_id: @venue.id), class: "view-all-link" do %>
-                すべて見る
-                <i class="fas fa-arrow-right"></i>
+            <div class="route-mini-card-meta">
+              <div class="route-mini-card-meta-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <%= route.route_items.count %>場所
+              </div>
+              <% if route.estimated_duration.present? %>
+                <div class="route-mini-card-meta-item">
+                  <i class="fas fa-clock"></i>
+                  <%= route.estimated_duration %>分
+                </div>
               <% end %>
-            <% end %>
-          <% else %>
-            <div class="no-routes-message">
-              <i class="fas fa-route"></i>
-              <p>まだルートに追加されていません</p>
             </div>
           <% end %>
-        </div>
-
-        <!-- Nearby Venues -->
-        <% if @nearby_venues.present? && @nearby_venues.any? %>
-          <div class="venue-info-card">
-            <h3>
-              <i class="fas fa-map-pin"></i>
-              近くのスポット
-            </h3>
-            
-            <div class="nearby-venues-list">
-              <% @nearby_venues.limit(3).each do |venue| %>
-                <%= link_to venue_path(venue), class: "nearby-venue-item" do %>
-                  <div class="nearby-venue-icon">
-                    <i class="fas fa-store"></i>
-                  </div>
-                  <div class="nearby-venue-info">
-                    <div class="nearby-venue-name"><%= venue.name %></div>
-                    <div class="nearby-venue-meta">
-                      <i class="fas fa-star"></i>
-                      <%= number_with_precision(venue.average_rating || 0, precision: 1) %>
-                    </div>
-                  </div>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
         <% end %>
       </div>
+
+      <% if @routes.count > 5 %>
+        <%= link_to routes_path(venue_id: @venue.id), class: "view-all-link" do %>
+          すべて見る
+          <i class="fas fa-arrow-right"></i>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="no-routes-message">
+        <i class="fas fa-route"></i>
+        <p>まだルートに追加されていません</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Nearby Venues -->
+  <% if @nearby_venues.present? && @nearby_venues.any? %>
+    <div class="venue-info-card">
+      <h3>
+        <i class="fas fa-map-pin"></i>
+        近くのスポット
+      </h3>
+
+      <div class="nearby-venues-list">
+        <% @nearby_venues.limit(3).each do |venue| %>
+          <%= link_to venue_path(venue), class: "nearby-venue-item" do %>
+            <div class="nearby-venue-icon">
+              <i class="fas fa-store"></i>
+            </div>
+            <div class="nearby-venue-info">
+              <div class="nearby-venue-name"><%= venue.name %></div>
+              <div class="nearby-venue-meta">
+                <i class="fas fa-star"></i>
+                <%=
+                  number_with_precision(venue.average_rating || 0, precision: 1)
+                %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,13 @@
+<div class="activity-item">
+  <% case activity.key %>
+  <% when 'route.create' %>
+    🗺️ 新しいルート「<%= activity.trackable.name %>」を作成しました
+  <% when 'like.create' %>
+    ❤️ 「<%= activity.trackable.likeable.name %>」にいいねしました
+  <% when 'review.create' %>
+    📝 レビューを投稿しました
+  <% when 'comment.create' %>
+  💬 コメントを投稿しました: "<%= truncate(activity.trackable.body, length: 30) %>"
+  <% end %>
+  <span class="text-muted"><%= l activity.created_at, format: :short %></span>
+</div>

@@ -4,21 +4,23 @@ class ReviewsController < ApplicationController
   before_action :set_review, only: %i[edit update destroy]
 
   def create
-    # return redirect_to @reviewable, alert: 'すでにレビューを投稿しています' if @reviewable.reviews.exists?(user_id: current_user.id)
+    result = Review::Operation::Create.call(
+      params: params.to_unsafe_h,
+      current_user: current_user,
+      reviewable: @reviewable
+    )
 
-    @review = @reviewable.reviews.build(review_params)
-    @review.user = current_user
-    @review.total_score ||= 5
-
-    if @review.save
-
-      NotificationService.notify_review_added(@review)
+    if result.success?
       redirect_back(
-        fallback_location: polymorphic_path(@reviewable), notice: 'レビューを投稿しました'
+        fallback_location: polymorphic_path(@reviewable),
+        notice: 'レビューを投稿しました'
       )
     else
-      redirect_back(fallback_location: polymorphic_path(@reviewable),
-                    alert: @review.errors.full_messages.to_sentence)
+      errors = result['contract.default'].errors.full_messages.to_sentence
+      redirect_back(
+        fallback_location: polymorphic_path(@reviewable),
+        alert: errors
+      )
     end
   end
 
@@ -27,10 +29,19 @@ class ReviewsController < ApplicationController
   end
 
   def update
-    if @review.update(review_params)
-      redirect_to @reviewable, notice: 'レビューを更新しました'
+    result = Review::Operation::Update.call(
+      params: params.to_unsafe_h,
+      current_user: current_user,
+      model: @review
+    )
+
+    if result.success?
+      redirect_back(fallback_location: polymorphic_path(@reviewable), notice: 'レビューの更新が正常に完了しました。
+')
     else
-      render :edit # Если ошибка, остаемся на форме редактирования
+
+      redirect_back(fallback_location: polymorphic_path(@reviewable), alert: '更新に失敗しました
+')
     end
   end
 
@@ -42,24 +53,17 @@ class ReviewsController < ApplicationController
   private
 
   def set_reviewable
-    if params[:venue_id]
-      @reviewable = Venue.find(params[:venue_id])
-    elsif params[:route_id]
-      @reviewable = Route.find(params[:route_id])
-    end
+    @reviewable = params[:venue_id] ? Venue.find(params[:venue_id]) : Route.find(params[:route_id])
   end
 
   def set_review
     # Ищем отзыв и сразу проверяем владельца
     @review = Review.find_by(id: params[:id])
 
-    return unless @review.nil? || @review.user_id != current_user.id
-
-    redirect_to @reviewable, alert: 'アクセス権限がありません。'
+    redirect_to @reviewable, alert: 'アクセス権限がありません。' if @review.nil? || @review.user_id != current_user.id
   end
 
   def review_params
-    # Важно: используем :text, так как это имя колонки в твоей БД
-    params.require(:review).permit(:total_score, :text)
+    params.require(:review).permit(:text, :score)
   end
 end

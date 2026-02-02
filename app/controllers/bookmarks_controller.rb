@@ -2,10 +2,10 @@ class BookmarksController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    @item = params[:item_type].constantize.find(params[:item_id])
-    @bookmark = current_user.bookmarks.build(item: @item)
+    result = Bookmark::Operation::Create.call(params: params, current_user: current_user)
 
-    if @bookmark.save
+    if result.success?
+      @item = result[:item]
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path, notice: '保存しました！' }
         format.json { render json: { success: true, bookmarks_count: @item.reload.bookmarks_count } }
@@ -16,18 +16,12 @@ class BookmarksController < ApplicationController
   end
 
   def destroy
-    # Так как мы используем 'resource' (ед. число), ID в params[:id] не придет.
-    # Ищем закладку текущего пользователя для этого конкретного объекта.
-    @bookmark = current_user.bookmarks.find_by(
-      item_type: params[:item_type],
-      item_id: params[:item_id]
-    )
+    result = Bookmark::Operation::Delete.call(params: params, current_user: current_user)
 
-    if @bookmark&.destroy
-      @item = @bookmark.item
+    if result.success?
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path, notice: '保存を解除しました' }
-        format.json { render json: { success: true } }
+        format.json { render json: { success: true, bookmarks_count: result[:item].reload.bookmarks_count } }
       end
     else
       render_error('保存が見つかりません')
@@ -35,7 +29,10 @@ class BookmarksController < ApplicationController
   end
 
   def index
-    @bookmarked_items = current_user.bookmarks.includes(:item).order(created_at: :desc).page(params[:page]).per(12)
+    @bookmarked_items = current_user.bookmarks
+                                    .includes(item: { images_attachments: :blob })
+                                    .order(created_at: :desc)
+                                    .page(params[:page]).per(12)
   end
 
   private

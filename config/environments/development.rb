@@ -55,7 +55,10 @@ Rails.application.configure do
 
   # --- Безопасность и Web Console ---
   config.action_dispatch.trusted_proxies = ['127.0.0.1', '::1', /^172\./, /^192\.168\./]
-  config.web_console.permissions = ['127.0.0.1', '::1', '172.16.0.0/12', '192.168.0.0/16', '10.0.0.0/8']
+
+  if config.respond_to?(:web_console)
+    config.web_console.permissions = ['127.0.0.1', '::1', '172.16.0.0/12', '192.168.0.0/16', '10.0.0.0/8']
+  end
 
   # --- Логирование ---
   config.log_level = :debug

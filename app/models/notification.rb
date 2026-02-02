@@ -1,208 +1,54 @@
 class Notification < ApplicationRecord
-  include Rails.application.routes.url_helpers
-  # === Ассоциации ===
   belongs_to :user
+  belongs_to :notifiable, polymorphic: true, optional: true
   belongs_to :actor, class_name: 'User', optional: true
   belongs_to :notifiable, polymorphic: true
 
-  # === Валидации ===
-  validates :notification_type, presence: true
-  validates :user_id, presence: true
+  validates :notification_type, :user_id, presence: true
 
-  # === Enum (использует строки) ===
   enum notification_type: {
-    follow: 'follow',
-    like: 'like',
-    comment: 'comment',
-    review: 'review',
-    new_message: 'new_message',
-    new_post: 'new_post',
-    bookmark: 'bookmark',
-    route_liked: 'route_liked',
-    route_commented: 'route_commented',
-    route_reviewed: 'route_reviewed',
-    mention: 'mention'
+    follow: 'follow', like: 'like', comment: 'comment', review: 'review',
+    new_message: 'new_message', new_post: 'new_post', bookmark: 'bookmark',
+    route_liked: 'route_liked', route_commented: 'route_commented',
+    route_reviewed: 'route_reviewed', mention: 'mention'
   }, _prefix: :type
 
-  # === Scopes ===
   scope :unread, -> { where(is_read: false) }
-  scope :read_list, -> { where(is_read: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :for_user, ->(user) { where(user_id: user.id) }
-  scope :follow_notifications, -> { where(notification_type: 'follow') }
-
-  # Фильтры по типам
-  scope :message_notifications, -> { where(notification_type: 'new_message') }
-  scope :interaction_notifications, lambda {
-    where(notification_type: %w[like comment review route_liked route_commented route_reviewed])
-  }
-  scope :follow_notifications, -> { where(notification_type: 'follow') }
-
-  after_create_commit :broadcast_notification
-
-  # === Методы для отображения ===
-  def icon
-    case notification_type
-    when 'like', 'route_liked' then '❤️'
-    when 'comment', 'route_commented' then '💬'
-    when 'follow' then '👤'
-    when 'bookmark' then '🔖'
-    when 'review', 'route_reviewed' then '⭐'
-    when 'new_message' then '✉️'
-    when 'new_post' then '📍'
-    when 'mention' then '🔔'
-    else '🔔'
-    end
-  end
-
-  def message
-    actor_name = actor&.username || '誰か'
-    target_name = get_target_name
-
-    case notification_type
-    when 'new_message'
-      "#{actor_name}さんからメッセージが届きました"
-
-    when 'like', 'route_liked'
-      if target_name
-        "#{actor_name}さんがルート「#{target_name}」にいいねしました"
-      else
-        "#{actor_name}さんがあなたの投稿にいいねしました"
-      end
-
-    when 'comment', 'route_commented'
-      if target_name
-        "#{actor_name}さんがルート「#{target_name}」にコメントしました"
-      else
-        "#{actor_name}さんがコメントしました"
-      end
-
-    when 'follow'
-      "#{actor_name}さんがあなたをフォローしました"
-
-    when 'review', 'route_reviewed'
-      if target_name
-        "#{actor_name}さんがルート「#{target_name}」にレビューを投稿しました"
-      else
-        "#{actor_name}さんがレビューを投稿しました"
-      end
-
-    when 'new_post'
-      if target_name
-        "#{actor_name}さんが新しいルート「#{target_name}」を投稿しました"
-      else
-        "#{actor_name}さんが新しいルートを投稿しました"
-      end
-
-    when 'bookmark'
-      if target_name
-        "#{actor_name}さんがルート「#{target_name}」を保存しました"
-      else
-        "#{actor_name}さんがあなたのルートを保存しました"
-      end
-
-    when 'mention'
-      "#{actor_name}さんがあなたをメンションしました"
-
-    else
-      "#{actor_name}さんから通知があります"
-    end
-  end
-
-  def target_url
-    return Rails.application.routes.url_helpers.root_path if notifiable.nil?
-
-    helpers = Rails.application.routes.url_helpers
-
-    case notifiable_type
-    when 'Route'
-      helpers.route_path(notifiable)
-
-    when 'Venue'
-      helpers.venue_path(notifiable)
-
-    when 'DmMessage'
-      room_id = notifiable.respond_to?(:dm_room_id) ? notifiable.dm_room_id : nil
-      room_id ? helpers.dm_room_path(room_id) : helpers.dm_rooms_path
-
-    when 'Comment'
-      target = notifiable.commentable
-      if target.is_a?(Route)
-        helpers.route_path(target, anchor: "comment-#{notifiable.id}")
-      elsif target.is_a?(Venue)
-        helpers.venue_path(target, anchor: "comment-#{notifiable.id}")
-      else
-        helpers.root_path
-      end
-
-    when 'Review'
-      if notifiable.reviewable
-        helpers.route_path(notifiable.reviewable, anchor: "review-#{notifiable.id}")
-      else
-        helpers.root_path
-      end
-
-    when 'Like'
-      target = notifiable.likeable
-      target.is_a?(Route) ? helpers.route_path(target) : helpers.root_path
-
-    when 'User'
-      helpers.user_path(notifiable)
-
-    else
-      helpers.root_path
-    end
-  rescue StandardError => e
-    Rails.logger.error "❌ Notification URL error: #{e.message}"
-    helpers.root_path
-  end
 
   def mark_as_read!
     update!(is_read: true, read_at: Time.current)
   end
 
-  def self.mark_all_as_read_for(user)
-    unread.for_user(user).update_all(is_read: true, read_at: Time.current)
+  def target_url
+  return "#" unless notifiable_id && notifiable_type
+  
+  helpers = Rails.application.routes.url_helpers
+  
+  case notification_type
+  when 'new_message'
+    # Используем &. (safe navigation), чтобы не упасть в 500
+    msg = DmMessage.find_by(id: notifiable_id)
+    msg ? helpers.dm_room_path(msg.dm_room_id) : "#"
+  when 'follow'
+    helpers.user_path(actor_id)
+  when 'like', 'new_route'
+    helpers.route_path(notifiable_id)
+  else
+    helpers.root_path
+  end
+  rescue => e
+    Rails.logger.error "Notification target_url error: #{e.message}"
+    "#"
   end
 
-  private
-
-  def get_target_name
-    case notifiable
-    when Route, Venue
-      notifiable.name
-    when Comment
-      notifiable.commentable&.name
-    when Review
-      notifiable.reviewable&.name
-    when Like
-      notifiable.likeable&.name
-    when DmMessage
-      notifiable.dm_room&.other_user(user)&.username
-    else
-      nil
+  def icon
+    case notification_type
+    when 'like' then '❤️'
+    when 'new_message' then '💬'
+    when 'follow' then '👤'
+    else '🔔'
     end
-  rescue StandardError
-    nil
-  end
-
-  def broadcast_notification
-    ActionCable.server.broadcast(
-      "notification_#{user_id}",
-      {
-        unread_count: user.notifications.unread.count,
-        notification: {
-          id: id,
-          message: message,
-          icon: icon,
-          url: target_url, # Твой метод target_url
-          created_at: created_at,
-          actor: {
-            username: actor&.username || '誰か',
-            avatar_url: actor&.avatar&.url || nil # Подставь свой путь к аватарке
-          }
-        }
-      }
-    )
   end
 end

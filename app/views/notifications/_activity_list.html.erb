@@ -1,5 +1,4 @@
-  <%= stylesheet_link_tag 'activities', media: 'all' %>
-
+<%= stylesheet_link_tag 'activities', media: 'all' %>
 
 <div class="activity-timeline-container">
   <div class="user-stats-row mb-4">
@@ -18,9 +17,12 @@
       <% activities.group_by { |a| a[:created_at].to_date }.each do |date, daily_activities| %>
         <div class="date-divider">
           <span class="date-text">
-            <% if date == Date.today %> 今日
-            <% elsif date == Date.yesterday %> 昨日
-            <% else %> <%= date.strftime('%Y年%m月%d日') %>
+            <% if date == Date.today %>
+              今日
+            <% elsif date == Date.yesterday %>
+              昨日
+            <% else %>
+              <%= date.strftime('%Y年%m月%d日') %>
             <% end %>
           </span>
         </div>
@@ -30,15 +32,19 @@
             <div class="activity-icon"><%= activity[:icon] %></div>
             <div class="activity-content">
               <div class="activity-text"><%= activity[:text] %></div>
-              <div class="activity-time"><%= time_ago_in_words(activity[:created_at]) %>前</div>
-              
+              <div class="activity-time">
+                <%= time_ago_in_words(activity[:created_at]) %>前
+              </div>
+
               <% if activity[:obj] %>
                 <% case activity[:type] %>
                 <% when 'route' %>
                   <%= link_to route_path(activity[:obj]), class: "activity-preview" do %>
                     <div class="preview-content">
                       <strong><%= activity[:obj].name %></strong>
-                      <p><%= truncate(activity[:obj].description, length: 60) %></p>
+                      <p>
+                        <%= truncate(activity[:obj].description, length: 60) %>
+                      </p>
                     </div>
                   <% end %>
                 <% when 'like', 'comment' %>
@@ -54,9 +60,13 @@
         <% end %>
       <% end %>
     </div>
-    
+
     <div class="mt-4">
-      <%= paginate activities, param_name: :activity_page if activities.respond_to?(:total_pages) %>
+      <%=
+        if activities.respond_to?(:total_pages)
+          paginate activities, param_name: :activity_page
+        end
+      %>
     </div>
   <% else %>
     <div class="empty-state">

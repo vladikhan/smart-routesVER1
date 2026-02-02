@@ -1,7 +1,6 @@
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <% content_for :title, "#{@route.name} - Smart Routes" %>
 
-
 <%= render 'pages/header' %>
 
 <% if alert %>
@@ -30,26 +29,23 @@
           <small><%= @route.created_at.strftime('%Y年%m月%d日') %>に作成</small>
         </div>
       </div>
-      
+
       <div class="route-stats">
-        <div class="stat-item">
-          <i class="fas fa-eye"></i>
-          <span>👁 <%= @route.view_count || 0 %></span>
-        </div>
+
         <div class="stat-item">
           <i class="fas fa-heart"></i>
           <span>❤️ <%= @route.likes_count || 0 %></span>
         </div>
       </div>
     </div>
-    
+
     <!-- Title Section -->
     <div class="route-title-section">
       <h1><%= @route.name %></h1>
       <% if @route.description.present? %>
         <p><%= @route.description %></p>
       <% end %>
-      
+
       <div class="route-quick-info">
         <div class="quick-info-item">
           <i class="fas fa-map-marker-alt"></i>
@@ -76,7 +72,7 @@
         <!-- Like Button -->
        <% if current_user.liked?(@route) %>
   <% like = current_user.likes.find_by(likeable: @route) %>
-  
+
 
   <%= button_to "/routes/#{@route.id}/likes/#{like.id}", method: :delete,
                 class: "action-btn btn-like active" do %>
@@ -84,9 +80,9 @@
     <span>❤️ いいね</span>
   <% end %>
 <% else %>
-  <%= button_to route_likes_path(@route), 
-                params: { likeable_type: 'Route', likeable_id: @route.id }, 
-                method: :post, 
+  <%= button_to route_likes_path(@route),
+                params: { likeable_type: 'Route', likeable_id: @route.id },
+                method: :post,
                 class: "action-btn btn-like" do %>
     <i class="far fa-heart"></i>
     <span>❤️ いいね</span>
@@ -96,7 +92,7 @@
         <!-- Bookmark Button -->
         <% if current_user.bookmarked?(@route) %>
   <%# Удаление закладки (Unlike style) %>
-  <%= button_to route_bookmark_path(@route), 
+  <%= button_to route_bookmark_path(@route),
                 method: :delete,
                 params: { item_type: 'Route', item_id: @route.id },
                 class: "action-btn btn-save active" do %>
@@ -105,7 +101,7 @@
   <% end %>
 <% else %>
   <%# Создание закладки %>
-  <%= button_to route_bookmark_path(@route), 
+  <%= button_to route_bookmark_path(@route),
                 method: :post,
                 params: { item_type: 'Route', item_id: @route.id },
                 class: "action-btn btn-save" do %>
@@ -114,13 +110,13 @@
   <% end %>
   <% end %>
 <% end %>
-      
+
       <!-- Share Button -->
       <button class="action-btn btn-share" onclick="shareRoute()">
         <i class="fas fa-share-alt"></i>
         <span>シェア</span>
       </button>
-      
+
       <!-- Edit Button (Owner Only) -->
       <% if user_signed_in? && current_user == @route.user %>
         <%= link_to edit_route_path(@route), class: "action-btn btn-edit" do %>
@@ -139,44 +135,50 @@
   <div class="route-detail-grid">
     <!-- Left Column: Main Content -->
     <div class="main-content">
-      
+
       <!-- Route Items List -->
       <div class="content-card">
         <h2 class="section-title">
           <i class="fas fa-route"></i>
           ルート詳細 (<%= @route_items.count %>場所)
         </h2>
-        
+
         <% if @route_items.any? %>
           <div class="venue-list">
-            <% @route_items.order(:position).each_with_index do |route_item, index| %>
-              <% venue = route_item.item %>
-              <%= link_to venue_path(venue), class: "venue-list-item" do %>
-                <div class="venue-number"><%= index + 1 %></div>
-                
-                <div class="venue-info">
-                  <h4><%= venue.name %></h4>
-                  <p><%= truncate(venue.description, length: 100) if venue.description.present? %></p>
-                  
-                  <div class="venue-tags-inline">
-                    <% if venue.cuisine_type.present? %>
-                      <span class="tag-inline">
-                        <i class="fas fa-utensils"></i>
-                        <%= venue.cuisine_type %>
-                      </span>
-                    <% end %>
-                    
-                    <% if venue.price_range.present? %>
-                      <span class="tag-inline">
-                        <i class="fas fa-yen-sign"></i>
-                        <%= venue.price_range %>
-                      </span>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
+  <% @route_items.each_with_index do |item_data, index| %>
+    <%# Определяем путь к заведению, если оно есть %>
+    <% target_path = item_data[:venue_id] ? venue_path(item_data[:venue_id]) : "#" %>
+
+    <%= link_to target_path, class: "venue-list-item" do %>
+      <div class="venue-number"><%= index + 1 %></div>
+
+      <div class="venue-info">
+        <%# В Ruby мы просто пишем [key], чтобы достать значение из хэша %>
+        <h4><%= item_data[:name] %></h4>
+
+        <% if item_data[:description].present? %>
+          <p><%= truncate(item_data[:description], length: 100) %></p>
+        <% end %>
+
+        <div class="venue-tags-inline">
+          <% if item_data[:cuisine_type].present? %>
+            <span class="tag-inline">
+              <i class="fas fa-utensils"></i>
+              <%= item_data[:cuisine_type] %>
+            </span>
+          <% end %>
+
+          <% if item_data[:price_range].present? %>
+            <span class="tag-inline">
+              <i class="fas fa-yen-sign"></i>
+              <%= item_data[:price_range] %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
         <% else %>
           <div class="empty-state">
             <i class="fas fa-map-marked-alt"></i>
@@ -203,12 +205,12 @@
 <div class="venue-info-card reviews-section">
   <div class="reviews-header">
   <div class="d-flex align-items-center">
-    
+
     <div class="reviews-header">
       <h3>レビュー</h3>
     </div>
   </div>
-  
+
   <div class="counter-badge shadow-sm">
     <span class="count-num"><%= @route.reviews.count %></span>
     <span class="count-label">件</span>
@@ -226,7 +228,7 @@
 
         <div class="flex-grow-1">
           <div class="rating-select mb-2 d-flex align-items-center gap-2">
-            <br />
+            <br>
             <div class="stars-input text-warning" style="cursor: pointer; font-size: 1.2rem;">
               <% 5.times do |i| %>
                 <i class="far fa-star star-icon" data-value="<%= i + 1 %>"></i>
@@ -237,17 +239,17 @@
           </div>
 
           <div class="comment-input-wrapper rounded-3 border">
-            <%= f.text_area :text, 
-                class: 'form-control border-0 shadow-none p-3', 
+            <%= f.text_area :text,
+                class: 'form-control border-0 shadow-none p-3',
                 rows: 1,
                 placeholder: 'あなたの感想を共有しましょう...',
                 oninput: 'this.style.height = ""; this.style.height = this.scrollHeight + "px"',
                 style: 'resize: none; background: transparent; width: 100%; min-height: 50px;' %>
-            
+
             <div class="d-flex justify-content-between align-items-center p-2 border-top bg-light-subtle rounded-bottom-3">
-                
-              
-              <%= f.submit 'レビューを書く', 
+
+
+              <%= f.submit 'レビューを書く',
                   class: 'btn btn-primary rounded-pill px-4 fw-bold shadow-sm',
                   id: 'submit-comment'
                   %>
@@ -258,8 +260,8 @@
     <% end %>
   </div>
 
-      
-      
+
+
   <% else %>
     <div class="text-center py-4 mb-4 bg-light rounded-3 border">
       <i class="fas fa-sign-in-alt fa-2x mb-2 text-muted opacity-50"></i>
@@ -268,15 +270,15 @@
     </div>
   <% end %>
 
-        
+
   <!-- Reviews List -->
         <div class="reviews-list">
-  <% if @reviews.any? %>
+  <% if @reviews&.any? %>
     <% @reviews.order(created_at: :desc).each_with_index do |review, index| %>
       <%# Добавляем border-bottom всем, кроме последнего элемента %>
       <div class="review-item py-3 <%= 'border-bottom' unless index == @reviews.count - 1 %>" id="review-<%= review.id %>">
         <div class="d-flex gap-3">
-          
+
           <div class="author-avatar-large flex-shrink-0" style="width:40px; height:40px; font-size:16px;">
             <% if review.user.avatar.present? %>
               <%= image_tag review.user.avatar.thumb.url, alt: review.user.username, class: 'w-100 h-100 rounded-circle object-fit-cover' %>
@@ -296,7 +298,7 @@
               </div>
 
               <div id="review-display-<%= review.id %>" class="review-display-container">
-                <br />
+                <br>
                 <div class="review-content mt-2">
                   <%= simple_format(review.text, class: 'mb-0') %>
                 </div>
@@ -304,26 +306,26 @@
 
               <% if user_signed_in? && review.user_id == current_user.id %>
                 <div class="dropdown">
-                  
+
                   <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                    
+
                       <button class="dropdown-item" href="#" onclick="toggleEditReview(<%= review.id %>); return false;">
                         <i class="fas fa-edit me-2 text-primary"></i>編集
                       </button>
-                    
-                    
+
+
                       <%# Кнопка удаления через SweetAlert2 %>
-                      <button type="button" class="dropdown-item text-danger" 
+                      <button type="button" class="dropdown-item text-danger"
                               onclick="confirmDeleteReview('<%= route_review_path(@route, review) %>')">
                         <i class="fas fa-trash me-2"></i>削除
                       </button>
-                    
+
                   </ul>
                 </div>
               <% end %>
             </div>
 
-            
+
 
             <% if user_signed_in? && review.user_id == current_user.id %>
               <div id="review-edit-<%= review.id %>" style="display: none;" class="mt-2">
@@ -368,11 +370,11 @@
             <%= @route.user.username[0].upcase %>
           <% end %>
         </div>
-        
+
         <div class="author-info">
           <h3 class="author-name"><%= @route.user.username %></h3>
           <p class="author-username">@<%= @route.user.username %></p>
-          
+
           <div class="author-stats">
             <div class="author-stat-item">
               <span class="author-stat-value"><%= @route.user.routes.count %></span>
@@ -383,20 +385,20 @@
               <span class="author-stat-label">フォロワー</span>
             </div>
           </div>
-          
+
           <% if user_signed_in? && current_user != @route.user %>
   <div id="follow_section_<%= @route.user.id %>">
     <% if current_user.following?(@route.user) %>
-      <%= button_to unfollow_user_path(@route.user), 
-                    method: :delete, 
-                    remote: true, 
+      <%= button_to unfollow_user_path(@route.user),
+                    method: :delete,
+                    data: { turbo_method: :delete },
                     class: "follow-btn following" do %>
         <span>フォロー中</span>
       <% end %>
     <% else %>
-      <%= button_to follow_user_path(@route.user), 
-              method: :post, 
-              data: { turbo: true }, 
+      <%= button_to follow_user_path(@route.user),
+              method: :post,
+              data: { turbo_method: :post },
               class: "follow-btn" do %>
         <span>フォローする</span>
       <% end %>
@@ -407,18 +409,18 @@
 
 
       <!-- Related Routes -->
-      <% if @related_routes.any? %>
+      <% if @related_routes&.any? %>
         <div class="content-card">
           <h3 class="section-title">
             <i class="fas fa-route"></i>
             関連ルート
           </h3>
-          
+
           <div class="routes-section">
             <% @related_routes.limit(5).each do |route| %>
               <%= link_to route_path(route), class: "route-mini-card" do %>
                 <div class="route-mini-card-header">
-                  
+
                   <div class="route-mini-card-title"><%= route.name %></div>
                 </div>
                 <div class="route-mini-card-meta">
@@ -445,21 +447,15 @@
 
 
 <%= render 'pages/footer' %>
-      
+
 
 
 <script>
 // 1. Безопасно передаем данные из Ruby в JS одной строкой JSON
 // 1. Данные из Ruby (оставляем как есть, тут всё четко)
-const routeItems = <%= raw @route_items.map { |ri| 
-  venue = ri.item
-  {
-    name: venue.name,
-    lat: (venue.respond_to?(:geo_lat) ? venue.geo_lat : venue.try(:latitude)).to_f,
-    lng: (venue.respond_to?(:geo_lng) ? venue.geo_lng : venue.try(:longitude)).to_f,
-    address: venue.try(:address) || ""
-  }
-}.to_json %>;
+// app/views/routes/show.html.erb
+
+const routeItems = <%= raw @route_items.to_json %>;
 
 // 2. Делаем функцию глобальной
 window.initMap = function() {
@@ -509,7 +505,7 @@ window.initMap = function() {
     <% end %>
   };
 
-  
+
   document.addEventListener("DOMContentLoaded", checkFlashAndShowToast);
   document.addEventListener("turbo:load", checkFlashAndShowToast);
   document.addEventListener("turbolinks:load", checkFlashAndShowToast);
@@ -577,7 +573,7 @@ function toggleEditReview(reviewId) {
       if (!reviewId) return;
       const displayDiv = document.getElementById('review-display-' + reviewId);
       const editDiv = document.getElementById('review-edit-' + reviewId);
-      
+
       if (displayDiv && editDiv) {
         if (editDiv.style.display === 'none') {
           displayDiv.style.display = 'none';

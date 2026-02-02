@@ -1,57 +1,54 @@
-
-
-<div class="review-card shadow-sm position-relative"> 
+<div class="review-card shadow-sm position-relative">
   <%# position-relative нужен ОБЯЗАТЕЛЬНО для работы stretched-link %>
-  
+
   <div class="review-header">
     <div class="review-info-group">
-      
-      
-                      
-<div class="review-header">
-                  <div class="review-author">
-                    <div class="page-nav-icon">
-                      <% if review.user.avatar.present? %>
-                        <%= image_tag review.user.avatar.thumb.url, alt: review.user.username %>
-                      <% else %>
-                        <%= review.user.username[0].upcase %>
-                      <% end %>
-                    </div>
-                    <div class="review-author-info">
-                      <div class="review-author-name"><%= review.user.username %></div>
-                      <div class="review-author-username">@<%= review.user.username %></div>
-                    </div>
-                  </div>
-                  
-                  <%# Ссылка (stretched-link делает ВСЮ карточку кликабельной) %>
-      <% if review.reviewable %>
-        <div class="review-target-header small mt-1">
-          <%= link_to [review.reviewable], class: "text-decoration-none stretched-link" do %>
-            <span class="text-primary fw-bold">
-              <%= review.reviewable_type == 'Route' ? '' : '📍' %>
-              <%= review.reviewable.name %>
-            </span>
-          <% end %>
+      <div class="review-header">
+        <div class="review-author">
+          <div class="page-nav-icon">
+            <% if review.user.avatar.present? %>
+              <%=
+                image_tag review.user.avatar.thumb.url,
+                          alt: review.user.username
+              %>
+            <% else %>
+              <%= review.user.username[0].upcase %>
+            <% end %>
+          </div>
+          <div class="review-author-info">
+            <div class="review-author-name"><%= review.user.username %></div>
+            <div class="review-author-username">
+              @<%= review.user.username %>
+            </div>
+          </div>
         </div>
-      <% end %>
-                </div>
-                
-      
-     <%# 3. Дата %>  
-    <div class="review-date small text-muted">
-      <%= review.created_at.strftime('%Y/%m/%d') %>
+
+        <%# Ссылка (stretched-link делает ВСЮ карточку кликабельной) %>
+        <% if review.reviewable %>
+          <div class="review-target-header small mt-1">
+            <%= link_to [review.reviewable], class: "text-decoration-none stretched-link" do %>
+              <span class="text-primary fw-bold">
+                <%= review.reviewable_type == 'Route' ? '' : '📍' %>
+                <%= review.reviewable.name %>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# 3. Дата %>
+      <div class="review-date small text-muted">
+        <%= review.created_at.strftime('%Y/%m/%d') %>
+      </div>
     </div>
-    </div>
-    
-   
   </div>
   <%# 4. Текст отзыва %>
   <div class="review-content mt-2">
-    <div class="review-text-body" style="white-space: pre-wrap; position: relative; z-index: 2;">
+    <div
+      class="review-text-body"
+      style="white-space: pre-wrap; position: relative; z-index: 2;"
+    >
       <%= review.text %>
     </div>
   </div>
-
 </div>
-
-  

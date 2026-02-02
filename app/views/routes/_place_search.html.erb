@@ -1,72 +1,106 @@
 <div class="place-search-container">
   <div class="search-input-wrapper">
-    <input 
-      type="text" 
-      id="place-search-<%= index %>" 
-      class="search-input place-autocomplete" 
+    <input
+      type="text"
+      id="place-search-<%= index %>"
+      class="search-input place-autocomplete"
       placeholder="🔍 場所を検索（Google Maps）..."
       data-index="<%= index %>"
-    >
+    />
     <span class="search-icon">🔍</span>
   </div>
-  
+
   <%# Скрытые поля для отправки в базу данных Rails %>
-  <input type="hidden" name="route_items[][venue_name]" id="venue-name-<%= index %>">
-  <input type="hidden" name="route_items[][venue_address]" id="venue-address-<%= index %>">
-  <input type="hidden" name="route_items[][venue_lat]" id="venue-lat-<%= index %>">
-  <input type="hidden" name="route_items[][venue_lng]" id="venue-lng-<%= index %>">
-  
+  <input
+    type="hidden"
+    name="route_items[][venue_name]"
+    id="venue-name-<%= index %>"
+  />
+  <input
+    type="hidden"
+    name="route_items[][venue_address]"
+    id="venue-address-<%= index %>"
+  />
+  <input
+    type="hidden"
+    name="route_items[][venue_lat]"
+    id="venue-lat-<%= index %>"
+  />
+  <input
+    type="hidden"
+    name="route_items[][venue_lng]"
+    id="venue-lng-<%= index %>"
+  />
+
   <%# Блок с деталями выбранного места (появляется после выбора) %>
-  <div id="place-details-<%= index %>" class="place-details" style="display: none;">
+  <div
+    id="place-details-<%= index %>"
+    class="place-details"
+    style="display: none;"
+  >
     <div class="place-info">
       <strong id="selected-place-name-<%= index %>"></strong>
-      <p id="selected-place-address-<%= index %>" style="color: #666; font-size: 13px; margin: 5px 0 0 0;"></p>
+      <p
+        id="selected-place-address-<%= index %>"
+        style="color: #666; font-size: 13px; margin: 5px 0 0 0;"
+      ></p>
     </div>
   </div>
 </div>
 
 <script>
-(function() {
-  function initPlaceAutocomplete_<%= index %>() {
-    const input = document.getElementById('place-search-<%= index %>');
-    if (!input) return;
+  (function () {
+    function initPlaceAutocomplete_<%= index %>() {
+      const input = document.getElementById("place-search-<%= index %>");
+      if (!input) return;
 
-    const autocomplete = new google.maps.places.Autocomplete(input, {
-      componentRestrictions: { country: 'jp' },
-      fields: ['name', 'formatted_address', 'geometry', 'place_id'],
-      types: ['establishment', 'geocode']
-    });
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        componentRestrictions: { country: "jp" },
+        fields: ["name", "formatted_address", "geometry", "place_id"],
+        types: ["establishment", "geocode"],
+      });
 
-    autocomplete.addListener('place_changed', function() {
-      const place = autocomplete.getPlace();
-      
-      if (!place.geometry) {
-        alert('場所の詳細が見つかりませんでした。');
-        return;
-      }
+      autocomplete.addListener("place_changed", function () {
+        const place = autocomplete.getPlace();
 
-      // Заполняем скрытые поля
-      document.getElementById('venue-name-<%= index %>').value = place.name || '';
-      document.getElementById('venue-address-<%= index %>').value = place.formatted_address || '';
-      document.getElementById('venue-lat-<%= index %>').value = place.geometry.location.lat();
-      document.getElementById('venue-lng-<%= index %>').value = place.geometry.location.lng();
+        if (!place.geometry) {
+          alert("場所の詳細が見つかりませんでした。");
+          return;
+        }
 
-      // Показываем превью
-      document.getElementById('selected-place-name-<%= index %>').textContent = place.name || '';
-      document.getElementById('selected-place-address-<%= index %>').textContent = place.formatted_address || '';
-      document.getElementById('place-details-<%= index %>').style.display = 'block';
+        // Заполняем скрытые поля
+        document.getElementById("venue-name-<%= index %>").value =
+          place.name || "";
+        document.getElementById("venue-address-<%= index %>").value =
+          place.formatted_address || "";
+        document.getElementById(
+          "venue-lat-<%= index %>"
+        ).value = place.geometry.location.lat();
+        document.getElementById(
+          "venue-lng-<%= index %>"
+        ).value = place.geometry.location.lng();
 
-      if (typeof updatePreview === 'function') {
-        updatePreview();
-      }
-    });
-  }
+        // Показываем превью
+        document.getElementById(
+          "selected-place-name-<%= index %>"
+        ).textContent = place.name || "";
+        document.getElementById(
+          "selected-place-address-<%= index %>"
+        ).textContent = place.formatted_address || "";
+        document.getElementById("place-details-<%= index %>").style.display =
+          "block";
 
-  // Запуск инициализации
-  if (typeof google !== 'undefined' && google.maps) {
-    initPlaceAutocomplete_<%= index %>();
-  } else {
-    window.addEventListener('load', initPlaceAutocomplete_<%= index %>);
-  }
-})();
+        if (typeof updatePreview === "function") {
+          updatePreview();
+        }
+      });
+    }
+
+    // Запуск инициализации
+    if (typeof google !== "undefined" && google.maps) {
+      initPlaceAutocomplete_<%= index %>();
+    } else {
+      window.addEventListener("load", initPlaceAutocomplete_<%= index %>);
+    }
+  })();
 </script>

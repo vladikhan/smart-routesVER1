@@ -1,13 +1,14 @@
 <% local_user = defined?(user) ? user : nil %>
 <% is_own_message = (message.user_id == local_user&.id) %>
 
-<div class="message-item <%= is_own_message ? 'message-sent' : 'message-received' %>"
-     data-message-id="<%= message.id %>">
-  
+<div
+  class="message-item <%= is_own_message ? 'message-sent' : 'message-received' %>"
+  data-message-id="<%= message.id %>"
+>
   <% unless is_own_message %>
     <div class="message-avatar">
       <% if message.user.image_url.present? %>
-        <%= image_tag message.user.image_url, class: "avatar-img-sm" %>
+        <%= image_tag message.user.image_url, class: 'avatar-img-sm' %>
       <% else %>
         <div class="avatar-placeholder-sm">
           <%= message.user.username[0].upcase %>
@@ -15,14 +16,14 @@
       <% end %>
     </div>
   <% end %>
-  
+
   <div class="message-bubble">
     <div class="message-content">
       <%= simple_format(message.message) %>
     </div>
     <div class="message-meta">
       <small class="message-time">
-        <%= message.created_at.strftime("%H:%M") %>
+        <%= message.created_at.strftime('%H:%M') %>
       </small>
       <% if is_own_message %>
         <% if message.is_read? %>

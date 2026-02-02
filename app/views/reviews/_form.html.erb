@@ -3,22 +3,32 @@
   <%= f.hidden_field :reviewable_type, value: reviewable.class.name %>
   <%= f.hidden_field :reviewable_id, value: reviewable.id %>
 
-  <div class="comment-input-wrapper rounded-3 border shadow-sm bg-white overflow-hidden">
-    <%= f.text_area :text, 
-        class: 'form-control border-0 shadow-none p-3', 
-        rows: 1,
-        placeholder: 'あなたの感想を共有しましょう...',
-        oninput: 'this.style.height = ""; this.style.height = this.scrollHeight + "px"',
-        style: 'resize: none; background: transparent; width: 100%; min-height: 80px;' %>
-    
-    <div class="d-flex justify-content-between align-items-center p-2 border-top bg-light-subtle">
+  <div
+    class="comment-input-wrapper rounded-3 border shadow-sm bg-white overflow-hidden"
+  >
+    <%=
+      f.text_area :text,
+                  class: 'form-control border-0 shadow-none p-3',
+                  rows: 1,
+                  placeholder: 'あなたの感想を共有しましょう...',
+                  oninput:
+                    'this.style.height = ""; this.style.height = this.scrollHeight + "px"',
+                  style:
+                    'resize: none; background: transparent; width: 100%; min-height: 80px;'
+    %>
+
+    <div
+      class="d-flex justify-content-between align-items-center p-2 border-top bg-light-subtle"
+    >
       <div class="ms-2 text-muted small">
         <i class="fas fa-pen-nib me-1"></i> 丁寧な言葉遣いを心がけましょう
       </div>
-      
-      <%= f.submit 'レビューを書く', 
-          class: 'btn btn-primary rounded-pill px-4 fw-bold shadow-sm',
-          id: 'submit-comment' %>
+
+      <%=
+        f.submit 'レビューを書く',
+                 class: 'btn btn-primary rounded-pill px-4 fw-bold shadow-sm',
+                 id: 'submit-comment'
+      %>
     </div>
   </div>
 <% end %>

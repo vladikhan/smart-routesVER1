@@ -2,17 +2,20 @@
   <div class="error_box" data-turbo-cache="false">
     <div class="error-content">
       <h3 class="error-title">
-        <%= pluralize(resource.errors.count, "ツノエラー") %>が発生しました
+        <%= pluralize(resource.errors.count, 'ツノエラー') %>が発生しました
       </h3>
       <h2>
-      <%= I18n.t("errors.messages.not_saved",
-                 count: resource.errors.count,
-                 resource: resource.class.model_name.human.downcase)
-       %>
-    </h2>
+        <%=
+          I18n.t(
+            'errors.messages.not_saved',
+            count: resource.errors.count,
+            resource: resource.class.model_name.human.downcase,
+          )
+        %>
+      </h2>
       <ul class="error-list">
         <% resource.errors.full_messages.each do |message| %>
-        <li><% message %></li>
+          <li><% message %></li>
         <% end %>
       </ul>
     </div>

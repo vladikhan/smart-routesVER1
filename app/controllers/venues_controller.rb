@@ -1,74 +1,47 @@
 class VenuesController < ApplicationController
-  before_action :set_venue, only: [:show]
-
   def index
-    @venues = Venue.approved
-                   .includes(:district)
-                   .order(popularity_score: :desc)
-                   .page(params[:page])
-                   .per(12)
-
-    @venues = @venues.where(district_id: params[:district_id]) if params[:district_id].present?
-    @venues = @venues.where(venue_type: params[:venue_type]) if params[:venue_type].present?
-    @venues = @venues.where(cuisine_type: params[:cuisine_type]) if params[:cuisine_type].present?
-    @venues = @venues.where('name LIKE ?', "%#{params[:q]}%") if params[:q].present?
+    result = Venue::Operation::Index.call(params: params)
+    @venues = result[:model]
   end
 
   def show
-    @venue.increment_view_count
+    result = Venue::Operation::Show.call(params: params, current_user: current_user)
+    
+    if result.failure?
+      return redirect_to venues_path, alert: "店舗が見つかりませんでした"
+    end
 
-    @venue = Venue.find(params[:id])
-    AiAnalyzeVenueJob.perform_later(@venue.id)
-
-    @route = @venue.routes.joins(:route_items)
-                   .order('route_items.position ASC')
-                   .first
-
-    # Если нет маршрута → пустой массив
-    @route_items = @route ? @route.route_items.includes(:venue, :item) : []
-
-    @reviews = @route ? @route.reviews.includes(:user).order(created_at: :desc).limit(10) : []
-
-    @routes = @venue.routes.where(is_public: true).limit(5)
-    @reviews = @venue.reviews
+    @venue       = result[:model]
+    @routes      = result[:routes]
+    @featured_route = result[:featured_route]
+    @route_items = result[:route_items]
+    # Если отзывов нет в результате операции, берем их из модели
+    @reviews     = result[:reviews] || @venue.reviews.includes(:user).recent
   end
 
   def update
-    @venue = Venue.find(params[:id])
+    # Важно: передаем params.to_unsafe_h только если используем Contract!
+    result = Venue::Operation::Update.call(params: params.to_unsafe_h, id: params[:id])
 
-    if params[:venue][:photos].present?
-      @venue.photos.attach(params[:venue][:photos])
-
-      redirect_to venue_path(@venue), notice: '写真をアップロードしました！'
-    elsif @venue.update(venue_params)
-      redirect_to venue_path(@venue), notice: '更新しました'
+    if result.success?
+      redirect_to venue_path(result[:model]), notice: '情報を更新しました'
     else
-      puts @venue.errors.full_messages
-      render :edit
+      @venue = result[:model]
+      # Вместо ручного вывода ошибок, лучше использовать @form во вьюхе
+      @form = result['contract.default']
+      flash.now[:alert] = "入力内容にエラーがあります"
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def delete_photo
-    @venue = Venue.find(params[:id])
-    photo = @venue.photos.find_by(id: params[:photo_id])
+    result = Venue::Operation::DeletePhoto.call(params: params)
 
-    if photo
-      photo.purge
-      flash[:notice] = '写真を削除しました'
+    if result.success?
+      flash[:notice] = '画像を削除しました'
     else
-      flash[:alert] = '写真が見つかりませんでした'
+      flash[:alert] = '削除に失敗しました'
     end
-
-    redirect_back(fallback_location: venue_path(@venue))
-  end
-
-  private
-
-  def set_venue
-    @venue = Venue.find(params[:id])
-  end
-
-  def venue_params
-    params.require(:venue).permit(:name, :description, :address, :venue_type, :district_id, photos: [])
+    redirect_back(fallback_location: venue_path(params[:id]))
   end
 end

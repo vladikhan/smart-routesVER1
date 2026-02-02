@@ -5,7 +5,13 @@
       <div class="user-details">
         <h5 class="user-name"><%= @other_user.name %></h5>
         <span class="user-status">
-          <%= @other_user.online? ? 'Online' : "was #{time_ago_in_words(@other_user.last_seen_at)} ago" %>
+          <%=
+            if @other_user.online?
+              'Online'
+            else
+              "was #{time_ago_in_words(@other_user.last_seen_at)} ago"
+            end
+          %>
         </span>
       </div>
     </div>

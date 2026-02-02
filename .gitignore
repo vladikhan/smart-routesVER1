@@ -39,3 +39,17 @@ yarn-debug.log*
 # --- TESTS AND REPORTS ---
 /coverage/
 /spec/examples.txt
+
+# --- DOCKER SPECIFIC ---
+# Игнорируем данные базы данных, если они маппятся в корень (иногда полезно)
+/db_data/
+/redis_data/
+
+# --- AWS & DEPLOY ---
+# Если ты создаешь локальные дампы базы перед деплоем
+*.dump
+*.sql
+
+# --- IDE (VS Code / Rubymine) ---
+.vscode/
+.idea/

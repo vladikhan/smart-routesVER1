@@ -1,7 +1,7 @@
 class Venue < ApplicationRecord
   belongs_to :district
   belongs_to :user, optional: true
-  has_many :reviews, as: :reviewable, dependent: :destroy
+  has_many :reviews, as: :reviewable, dependent: :destroy, class_name: '::Review'
   has_many :route_items, dependent: :destroy
   has_many :routes, through: :route_items
   has_many :bookmarks, dependent: :destroy
@@ -12,14 +12,8 @@ class Venue < ApplicationRecord
   has_many :likes, as: :likeable, dependent: :destroy
   has_many :likers, through: :likes, source: :user
 
-  validates :name, presence: true, length: { maximum: 100 }
-  validates :address, presence: true
-  validates :venue_type, presence: true
-  validates :description, length: { maximum: 1000 }
-
   scope :featured, -> { where(is_featured: true).order(featured_order: :asc) }
   scope :approved, -> { where(status: 'approved') }
-  scope :popular, -> { order(popularity_score: :desc) }
   scope :popular, -> { order(likes_count: :desc) }
 
   after_initialize :set_defaults, if: :new_record?

@@ -124,6 +124,9 @@ body {
 	cursor: pointer;
 	transition: background 0.3s;
 	margin-bottom: 20px;
+	text-align: center;
+	height: 50px;
+
 }
 
 .btn-primary:hover {

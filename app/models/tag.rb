@@ -6,10 +6,7 @@ class Tag < ApplicationRecord
 
   validates :parameter, presence: true, uniqueness: true
 
-  # Display name for forms and UI
   def display_name
-    # Convert parameter to readable format
-    # Example: "ramen" -> "ラーメン", "culture" -> "文化"
     case parameter
     when 'ramen' then 'ラーメン'
     when 'culture' then '文化'
@@ -26,7 +23,6 @@ class Tag < ApplicationRecord
     end
   end
 
-  # Alias for compatibility
   def name
     display_name
   end

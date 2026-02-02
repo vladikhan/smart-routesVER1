@@ -73,6 +73,8 @@ group :development, :test do
   gem 'rails-controller-testing'
   gem 'rspec-rails', '~> 6.1.3'
   gem 'rubocop-rails', require: false
+  gem "erb_lint", "~> 0.9.0", require: false
+
 end
 
 group :development do
@@ -100,3 +102,5 @@ end
 # gem 'sass-rails'
 
 gem 'dotenv-rails', '~> 3.1.8'
+
+gem "erb_lint", "~> 0.9.0"

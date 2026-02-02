@@ -1,30 +1,41 @@
-大阪・京都・奈良向け旅行ルート共有プラットフォーム
+ Smart Routes
+Travel route sharing platform for Osaka, Kyoto, and Nara. 大阪・京都・奈良向け旅行ルート共有プラットフォーム
 
-概要
-Smart Routes は、観光地とローカルグルメを組み合わせた旅行ルートを
-作成・共有・検索できるプラットフォームです。
-実際の旅行者によるレビューと評価をもとに、効率的で信頼できる旅の計画を支援します。
+ Overview / 概要
+Smart Routes is a platform to create, share, and search for travel routes that combine sightseeing spots with local gourmet experiences. Smart Routesは、観光地とローカルグルメを組み合わせた旅行ルートを作成・共有・検索できるプラットフォームです。
 
-背景・課題
-	•	コロナ後、日本の観光市場は30%以上成長
-	•	観光＋食事を組み合わせたルート探しが難しい
-	•	情報収集に時間がかかり、個人の好みや予算を反映しづらい
+ Key Features / 主な機能
+AI Route Generation: Create routes based on city, preferences, and budget. (AIによるルート生成：都市・好み・予算を考慮)
 
-解決策
-	•	AIによるルート生成（都市・好み・予算を考慮）
-	•	ユーザー作成＆検証済みルート
-	•	レビュー・評価・写真
-	•	おすすめ表示（人気・トレンド）
-	•	フォロー・保存・メッセージ機能
-	•	地図連動ナビゲーション
+Verified Routes: User-created and community-verified travel plans. (ユーザー作成＆検証済みルート)
 
-対象ユーザー
-	•	訪日外国人観光客（20〜40代）
-	•	旅行・グルメを事前に計画する日本人
-	•	「ルート＋食事」を重視する旅行者
+Interactive Maps: Navigation powered by Google Maps API. (Google Maps API連動ナビゲーション)
 
-技術スタック
-	•	Ruby on Rails / PostgreSQL / Redis
-	•	Docker / AWS（EC2, RDS, S3, Route53）
-	•	Google Maps API / Devise
+Social Features: Follow, save, and messaging functionality. (フォロー・保存・メッセージ機能)
 
+ Tech Stack / 技術スタック
+Backend: Ruby on Rails (Trailblazer), PostgreSQL, Redis
+
+Infrastructure: Docker, AWS (EC2, RDS, S3, Route53)
+
+CI/CD: Docker-based deployment
+
+How to Run with Docker / Dockerでの起動方法
+1. Prerequisites / 前提条件
+Docker & Docker Compose installed.
+
+2. Setup Environment / 環境設定
+Create a .env file in the root directory and add your keys (Refer to .env.example): ルートディレクトリに.envファイルを作成し、キーを追加してください（.env.exampleを参照）:
+
+Bash
+
+GOOGLE_MAPS_API_KEY=your_api_key_here
+DATABASE_URL=postgres://postgres:password@db:5432/smart_routes_dev
+3. Build and Start / ビルドと起動
+Bash
+
+docker-compose up --build
+The app will be available at http://localhost:3000.
+
+Deployment / デプロイ
+The project is deployed using a custom shell script that manages Docker containers on the server. 本プロジェクトは、サーバー上のDockerコンテナを管理するカスタムシェルスクリプトを使用してデプロイされています。

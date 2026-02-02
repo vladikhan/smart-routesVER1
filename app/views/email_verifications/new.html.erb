@@ -1,77 +1,80 @@
-  <div class="verification-container">
-    <div class="verification-header">
-      <div class="verification-icon">📧</div>
-      <h1>メール確認</h1>
-      <p>確認コードを入力してください</p>
-    </div>
-    
-    <div class="verification-body">
-      <% if flash[:notice] %>
-        <div class="success-message">
-          <%= flash[:notice] %>
-        </div>
-      <% end %>
-      
-      <% if flash[:alert] %>
-        <div class="error-message">
-          <%= flash[:alert] %>
-        </div>
-      <% end %>
-      
-      <div class="info-box">
-        <p>
-          <strong><%= current_user&.email || "登録されたメールアドレス" %></strong> 
-        </p>
-      </div>
-      
-      <%= form_with url: email_verification_path, method: :post, local: true do |f| %>
-        <div class="form-group">
-          <%= f.label :verification_code, "確認コード" %>
-          <%= f.text_field :verification_code, 
-                          class: "form-control", 
-                          placeholder: "000000",
-                          maxlength: 6,
-                          pattern: "[0-9]{6}",
-                          required: true,
-                          autofocus: true %>
-        </div>
-        
-        <%= f.submit "確認する", class: "btn-primary" %>
-      <% end %>
-      
-      <div class="divider">
-        <span>または</span>
-      </div>
-      
-      <div class="resend-container">
-        <%= button_to email_verification_resend_path, method: :post, class: "resend-button" do %>
-          確認コードを再送信
-        <% end %>
-</div>
-      
-      <%= link_to "ホームに戻る", root_path, class: "back-link" %>
-    </div>
+<div class="verification-container">
+  <div class="verification-header">
+    <div class="verification-icon">📧</div>
+    <h1>メール確認</h1>
+    <p>確認コードを入力してください</p>
   </div>
-  
-  <script>
-    // Auto-format input (add spaces for readability)
-    const input = document.querySelector('.form-control');
-    if (input) {
-      input.addEventListener('input', function(e) {
-        // Remove non-digits
-        let value = e.target.value.replace(/\D/g, '');
-        // Limit to 6 digits
-        value = value.substring(0, 6);
-        e.target.value = value;
-      });
-      
-      // Auto-submit when 6 digits entered
-      input.addEventListener('keyup', function(e) {
-        if (e.target.value.length === 6) {
-          // Optional: auto-submit
-          // e.target.closest('form').submit();
-        }
-      });
-    }
-  </script>
 
+  <div class="verification-body">
+    <% if flash[:notice] %>
+      <div class="success-message">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="error-message">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <div class="info-box">
+      <p>
+        <strong><%=
+            current_user&.email || '登録されたメールアドレス'
+          %></strong>
+      </p>
+    </div>
+
+    <%= form_with url: email_verification_path, method: :post, local: true do |f| %>
+      <div class="form-group">
+        <%= f.label :verification_code, '確認コード' %>
+        <%=
+          f.text_field :verification_code,
+                       class: 'form-control',
+                       placeholder: '000000',
+                       maxlength: 6,
+                       pattern: '[0-9]{6}',
+                       required: true,
+                       autofocus: true
+        %>
+      </div>
+
+      <%= f.submit '確認する', class: 'btn-primary' %>
+    <% end %>
+
+    <div class="divider">
+      <span>または</span>
+    </div>
+
+    <div class="resend-container">
+      <%= button_to email_verification_resend_path, method: :post, class: "resend-button" do %>
+        確認コードを再送信
+      <% end %>
+    </div>
+
+    <%= link_to 'ホームに戻る', root_path, class: 'back-link' %>
+  </div>
+</div>
+
+<script>
+  // Auto-format input (add spaces for readability)
+  const input = document.querySelector(".form-control");
+  if (input) {
+    input.addEventListener("input", function (e) {
+      // Remove non-digits
+      let value = e.target.value.replace(/\D/g, "");
+      // Limit to 6 digits
+      value = value.substring(0, 6);
+      e.target.value = value;
+    });
+
+    // Auto-submit when 6 digits entered
+    input.addEventListener("keyup", function (e) {
+      if (e.target.value.length === 6) {
+        // Optional: auto-submit
+        // e.target.closest('form').submit();
+      }
+    });
+  }
+</script>

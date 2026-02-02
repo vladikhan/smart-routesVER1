@@ -8,7 +8,7 @@ class Route < ApplicationRecord
   has_many :likes, as: :likeable, dependent: :destroy
   has_many :likers, through: :likes, source: :user
   has_many :comments, as: :commentable, dependent: :destroy
-  has_many :reviews, as: :reviewable, dependent: :destroy
+  has_many :reviews, as: :reviewable, dependent: :destroy, class_name: '::Review'
 
   has_many :bookmarks, as: :item, dependent: :destroy
   has_many :bookmarkers, through: :bookmarks, source: :user
@@ -27,16 +27,16 @@ class Route < ApplicationRecord
   accepts_nested_attributes_for :route_items, allow_destroy: true, reject_if: :all_blank
 
   validates :name, presence: true, length: { maximum: 100 }
-  validates :description, length: { maximum: 5000 }
-  validates :user, presence: true
+  # validates :description, length: { maximum: 5000 }
+  # validates :user, presence: true
   validates :city, presence: true
-  validates :view_count, numericality: { greater_than_or_equal_to: 0 }
-  validate :images_count_within_limit
+  # validates :view_count, numericality: { greater_than_or_equal_to: 0 }
+  # # validate :images_count_within_limit
+  # validate :acceptable_images
 
   # === Колбэки ===
   before_create :initialize_view_count
   # Уведомляем подписчиков после создания маршрута
-  after_create_commit :notify_followers_about_new_route
 
   scope :public_routes, -> { where(is_public: true) }
   scope :recent, -> { order(created_at: :desc) }
@@ -60,15 +60,7 @@ class Route < ApplicationRecord
     bookmarks.exists?(user_id: user.id)
   end
 
-  def average_rating
-    reviews.average(:total_score)
-  end
-
-  def update_average_rating
-    avg = reviews.average(:total_score) || 0
-    update_columns({ average_rating: avg.to_f.round(1),
-                     reviews_count: reviews.count })
-  end
+ 
 
   private
 
@@ -82,18 +74,7 @@ class Route < ApplicationRecord
     NotificationService.notify_new_route_from_following(self) if defined?(NotificationService)
   end
 
-  def acceptable_images
-    return unless images.attached?
-
-    images.each do |image|
-      errors.add(:images, 'は5MB以下である必要があります') unless image.byte_sizw <= 5.megabytes
-    end
-
-    acceptable_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
-    return if acceptable_types.include?(image.content_type)
-
-    errors.add(:images, 'はJPEG, PNG, GIF形式である必要があります')
-  end
+  
 
   def images_count_within_limit
     return unless images.attached? && images.count > 10

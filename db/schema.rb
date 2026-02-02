@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_01_26_061707) do
+ActiveRecord::Schema.define(version: 2026_02_02_002842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,17 @@ ActiveRecord::Schema.define(version: 2026_01_26_061707) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "activities", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "trackable_type", null: false
+    t.bigint "trackable_id", null: false
+    t.string "key"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["trackable_type", "trackable_id"], name: "index_activities_on_trackable"
+    t.index ["user_id"], name: "index_activities_on_user_id"
   end
 
   create_table "bookmarks", force: :cascade do |t|
@@ -237,7 +248,7 @@ ActiveRecord::Schema.define(version: 2026_01_26_061707) do
     t.string "reviewable_type", null: false
     t.integer "reviewable_id", null: false
     t.text "text", null: false
-    t.decimal "total_score", precision: 3, scale: 2, null: false
+    t.decimal "total_score", precision: 3, scale: 2
     t.boolean "is_flagged", default: false
     t.datetime "flagged_at"
     t.integer "flagged_by"
@@ -411,6 +422,7 @@ ActiveRecord::Schema.define(version: 2026_01_26_061707) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "activities", "users"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "comments", "users"
   add_foreign_key "districts", "cities"

@@ -1,16 +1,13 @@
 <div id="follow_section_<%= user.id %>" class="follow-button-wrapper">
   <% if current_user.following?(user) %>
-    <%# Убрали local: true, Rails сам поймет, что это remote запрос %>
     <%= form_with url: unfollow_user_path(user), method: :delete do %>
-      <button type="submit" class="btn btn-outline-secondary btn-sm px-3">
-        フォロー解除
+      <button type="submit" class="btn btn-outline-secondary mb-3 ">
+        フォロー解除123
       </button>
     <% end %>
   <% else %>
     <%= form_with url: follow_user_path(user), method: :post do %>
-      <button type="submit" class="btn btn-primary btn-sm px-4">
-        フォローする
-      </button>
+      <button type="submit" class="btn btn-primary ">フォローする</button>
     <% end %>
   <% end %>
 </div>

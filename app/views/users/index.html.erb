@@ -1,73 +1,76 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>ユーザー一覧 - Smart Routes</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%= stylesheet_link_tag 'users', media: 'all' %>
-  
-</head>
-<body>
-  <%= render 'pages/header' %>
+  <head>
+    <title>ユーザー一覧 - Smart Routes</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'users', media: 'all' %>
+  </head>
+  <body>
+    <%= render 'pages/header' %>
 
-  <!-- Hero Banner -->
-  <section class="hero-banner" style="padding: 60px 20px;">
-    <h1 class="hero-title">ユーザー一覧</h1>
-    <p class="hero-subtitle">Smart Routesのメンバーを探す</p>
-		<div class="search-box-container">
-      <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>
-        <%= f.text_field :q,
-            value: params[:q],
-            placeholder: "ルート名、場所、アクティビティで検索...",
-            class: "search-input" %>
-        <button type="submit" class="search-btn">
-          検索
-        </button>
-      <% end %>
-    </div>
-  </section>
-
-  <!-- Users List -->
-  <main class="users-list">
-    <div style="margin-bottom: 30px;">
-      <h2 style="font-size: 24px; font-weight: 700;">
-        <%= @users.total_count %>人のユーザー
-      </h2>
-    </div>
-
-    <div class="users-grid">
-      <% @users.each do |user| %>
-        <%= link_to user_path(user), class: "user-card" do %>
-          <%= image_tag user.avatar_url, class: "user-avatar", alt: user.username %>
-          
-          <h3 class="user-name">@<%= user.username %></h3>
-          
-          <p class="user-bio">
-            <%= user.bio || "まだ自己紹介がありません" %>
-          </p>
-          
-          <div class="user-stats">
-            <div class="user-stat">
-              <div class="stat-number"><%= user.routes.count %></div>
-              <div class="stat-label">ルート</div>
-            </div>
-            <div class="user-stat">
-              <div class="stat-number"><%= user.reviews.count %></div>
-              <div class="stat-label">レビュー</div>
-            </div>
-          </div>
+    <!-- Hero Banner -->
+    <section class="hero-banner" style="padding: 60px 20px;">
+      <h1 class="hero-title">ユーザー一覧</h1>
+      <p class="hero-subtitle">Smart Routesのメンバーを探す</p>
+      <div class="search-box-container">
+        <%= form_with url: routes_path, method: :get, local: true, class: "search-form" do |f| %>
+          <%=
+            f.text_field :q,
+                         value: params[:q],
+                         placeholder: 'ルート名、場所、アクティビティで検索...',
+                         class: 'search-input'
+          %>
+          <button type="submit" class="search-btn">検索</button>
         <% end %>
-      <% end %>
-    </div>
+      </div>
+    </section>
 
-    <!-- Pagination -->
-    <div class="pagination">
-      <%= paginate @users %>
-    </div>
-  </main>
+    <!-- Users List -->
+    <main class="users-list">
+      <div style="margin-bottom: 30px;">
+        <h2 style="font-size: 24px; font-weight: 700;">
+          <%= @users.total_count %>人のユーザー
+        </h2>
+      </div>
 
-  <%= render 'pages/footer' %>
-</body>
+      <div class="users-grid">
+        <% @users.each do |user| %>
+          <%= link_to user_path(user), class: "user-card" do %>
+            <%=
+              image_tag user.avatar_url,
+                        class: 'user-avatar',
+                        alt: user.username
+            %>
+
+            <h3 class="user-name">@<%= user.username %></h3>
+
+            <p class="user-bio">
+              <%= user.bio || 'まだ自己紹介がありません' %>
+            </p>
+
+            <div class="user-stats">
+              <div class="user-stat">
+                <div class="stat-number"><%= user.routes.count %></div>
+                <div class="stat-label">ルート</div>
+              </div>
+              <div class="user-stat">
+                <div class="stat-number"><%= user.reviews.count %></div>
+                <div class="stat-label">レビュー</div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <%= paginate @users %>
+      </div>
+    </main>
+
+    <%= render 'pages/footer' %>
+  </body>
 </html>

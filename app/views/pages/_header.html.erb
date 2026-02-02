@@ -1,24 +1,22 @@
-  <header class="header">
+<header class="header">
   <div class="container">
     <a href="/" class="logo">SmartRoutes</a>
 
     <ul class="nav-links">
-      <li><%= link_to "ルート一覧", routes_path %></li>
-      <li><%= link_to "場所を探す", venues_path %></li>
-     <li>
-  <%= link_to dm_rooms_path, class: "nav-icon-link" do %>
-    <%= image_tag "message-icon.svg", class: "nav-icon" %>
-  <% end %>
-</li>
-      <li><%= link_to "ユーザー", users_path %></li>
-      <li><%= link_to "通知", notifications_path, title: "通知" %></li>
+      <li><%= link_to 'ルート一覧', routes_path %></li>
+      <li><%= link_to '場所を探す', venues_path %></li>
+      <li>
+        <%= link_to dm_rooms_path, class: "nav-icon-link" do %>
+          <%= image_tag 'message-icon.svg', class: 'nav-icon' %>
+        <% end %>
+      </li>
+      <li><%= link_to 'ユーザー', users_path %></li>
+      <li><%= link_to '通知', notifications_path, title: '通知' %></li>
     </ul>
 
     <div class="auth-links">
       <% if user_signed_in? %>
         <%= render 'pages/notification_bell' %>
-
-        
 
         <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
           <% if current_user.avatar.present? %>
@@ -28,15 +26,13 @@
           <% end %>
         <% end %>
 
-        <%= link_to "ログアウト", logout_confirm_path, class: "login-btn" %>
+        <%= link_to 'ログアウト', logout_confirm_path, class: 'login-btn' %>
       <% else %>
-        <%= link_to "ログイン", new_user_session_path, class: "login-btn" %>
+        <%= link_to 'ログイン', new_user_session_path, class: 'login-btn' %>
       <% end %>
     </div>
   </div>
 </header>
-
-  
 
 <script>
   function getCsrfToken() {
@@ -45,42 +41,45 @@
 
   function toggleNotifications(event) {
     event.stopPropagation();
-    const panel = document.getElementById('notificationsPanel');
-    panel.classList.toggle('show');
+    const panel = document.getElementById("notificationsPanel");
+    panel.classList.toggle("show");
   }
 
   async function markAsReadAndRedirect(notificationId, event) {
     event.preventDefault();
 
     try {
-      const response = await fetch(`/notifications/${notificationId}/mark_as_read`, { 
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': getCsrfToken(),
-          'Accept': 'application/json'
+      const response = await fetch(
+        `/notifications/${notificationId}/mark_as_read`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": getCsrfToken(),
+            Accept: "application/json",
+          },
         }
-      });
+      );
 
       const data = await response.json();
 
       if (data.success) {
         //Update UI
         const item = event.currentTarget;
-        item.classList.remove('unread');
-        const dot = item.querySelector('.unread-dot');
+        item.classList.remove("unread");
+        const dot = item.querySelector(".unread-dot");
         if (dot) dot.remove();
 
         //Update badge
         updateNotificationBadge();
 
         //Redirect after short delay
-        setTimeout(() =>{
-          window.location.href = data.redirect_url
+        setTimeout(() => {
+          window.location.href = data.redirect_url;
         }, 200);
       }
     } catch (error) {
-      console.error('Error', error);
+      console.error("Error", error);
     }
   }
 
@@ -88,48 +87,50 @@
     event.preventDefault();
 
     try {
-      const response = await fetch('/notifications/mark_all_as_read', {
-        method: 'PATCH',
+      const response = await fetch("/notifications/mark_all_as_read", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': getCsrfToken(),
-          'Accept': 'application/json'
-        }
+          "Content-Type": "application/json",
+          "X-CSRF-Token": getCsrfToken(),
+          Accept: "application/json",
+        },
       });
 
       const data = await response.json();
 
       if (data.success) {
         //Update all notification items
-        document.querySelectorAll('.notification-item.unread').forEach(item => {
-          item.classList.remove('remove');
-          const dot = item.querySelector('.unread-dot');
-          if (dot) dot.remove();
-        });
+        document
+          .querySelectorAll(".notification-item.unread")
+          .forEach((item) => {
+            item.classList.remove("remove");
+            const dot = item.querySelector(".unread-dot");
+            if (dot) dot.remove();
+          });
 
-        //Remove badge. 
-        const badge = document.getElementById('notificationBadge');
+        //Remove badge.
+        const badge = document.getElementById("notificationBadge");
         if (badge) badge.remove();
-        
-        //Hide mark all button
-        event.target.style.display = 'none';
 
-        showToast('すべて既読にしました');
+        //Hide mark all button
+        event.target.style.display = "none";
+
+        showToast("すべて既読にしました");
       }
     } catch (error) {
-      console.error('Error:', error);
-      showToast('エラーが発生しました', 'error');
+      console.error("Error:", error);
+      showToast("エラーが発生しました", "error");
     }
   }
 
   async function updateNotificationBadge() {
     try {
-      const response = await fetch('/notifications/unread_count', {
-        headers: {'Accept': 'applications/json' }
+      const response = await fetch("/notifications/unread_count", {
+        headers: { Accept: "applications/json" },
       });
       const data = await response.json();
 
-      const badge = document.getElementById('notificationBadge');
+      const badge = document.getElementById("notificationBadge");
       if (data.count > 0) {
         if (badge) {
           badge.textContent = data.count;
@@ -138,18 +139,18 @@
         if (badge) badge.remove();
       }
     } catch (error) {
-      console.error('Error updating badge:', error);
+      console.error("Error updating badge:", error);
     }
   }
 
-  function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
+  function showToast(message, type = "success") {
+    const toast = document.createElement("div");
     toast.textContent = message;
     toast.style.cssText = `
       position: fixed;
       top: 90px;
       right: 20px;
-      background: ${type === 'success' ? '#4caf50' : '#f44336'};
+      background: ${type === "success" ? "#4caf50" : "#f44336"};
       color: white;
       padding: 14px 24px;
       border-radius: 10px;
@@ -162,23 +163,21 @@
     document.body.appendChild(toast);
 
     setTimeout(() => {
-      toast.style.animation = 'slideOutRight 0.3s ease-out';
+      toast.style.animation = "slideOutRight 0.3s ease-out";
       setTimeout(() => toast.remove(), 300);
     }, 3000);
   }
 
   //Close when clicking outside
-  document.addEventListener('click', (event) => {
-    const dropdown = document.querySelector('.notification-dropdown');
-    const panel = document.getElementById('notificationsPanel');
+  document.addEventListener("click", (event) => {
+    const dropdown = document.querySelector(".notification-dropdown");
+    const panel = document.getElementById("notificationsPanel");
 
     if (dropdown && panel && !dropdown.contains(event.target)) {
-      panel.classList.remove('show');
+      panel.classList.remove("show");
     }
   });
 
   //Poll for new notifications every 30 seconds
   setInterval(updateNotificationBadge, 30000);
 </script>
-
-

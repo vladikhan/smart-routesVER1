@@ -1,47 +1,47 @@
 class FollowsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user
 
   def create
-    @user = User.find(params[:user_id])
-    current_user.follow(@user)
+    result = Follower::Operation::Create.call(
+      params: { 
+        follower_id:  current_user.id, 
+        following_id: params[:user_id] 
+      }
+    )
 
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("follow_section_#{@user.id}",
-                                                  render_to_string(partial: 'users/follow_button',
-                                                                   locals: { user: @user }))
-      end
-      format.html { redirect_back fallback_location: @user }
+    if result.success?
+      @user = result[:model].following # Тот, на кого подписались
+      render_follow_button
+    else
+      redirect_back fallback_location: root_path, alert: 'エラーが発生しました'
     end
   end
 
   def destroy
-    @user = User.find(params[:user_id])
-    current_user.unfollow(@user)
+    result = Follower::Operation::Delete.call(params: params, current_user: current_user)
 
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("follow_section_#{@user.id}",
-                                                  render_to_string(partial: 'users/follow_button',
-                                                                   locals: { user: @user }))
-      end
-      format.html { redirect_back fallback_location: @user }
+    if result.success?
+      # Нам всё еще нужен объект пользователя для рендера кнопки, 
+      # найдем его по ID из параметров
+      @user = User.find(params[:user_id])
+      render_follow_button
+    else
+      redirect_back fallback_location: root_path, alert: 'ユーザーが見つからないか、解除に失敗しました'
     end
   end
 
   private
 
-  def set_user
-    @user = User.find(params[:user_id])
-  rescue ActiveRecord::RecordNotFound
-    render_error
-  end
-
-  def render_error
+  def render_follow_button
     respond_to do |format|
-      format.html { redirect_back fallback_location: root_path, alert: 'エラーが発生しました' }
-      format.json { render json: { success: false, error: 'ユーザーが見つかりません' }, status: :not_found }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "follow_section_#{@user.id}",
+          partial: 'users/follow_button',
+          locals: { user: @user }
+        )
+      end
+      format.html { redirect_back fallback_location: user_path(@user) }
     end
   end
 end

@@ -1,7 +1,9 @@
 class UsersController < ApplicationController
-  # 1. Порядок в фильтрах: сначала проверка входа, потом поиск юзера
+  # 1. Сначала аутентификация, потом всё остальное
   before_action :authenticate_user!, except: %i[index show comments]
-  before_action :set_user, only: %i[show edit update follow unfollow comments]
+  # 2. Поиск юзера нужен только для простых экшенов, где нет Trailblazer операций
+  before_action :set_user, only: %i[comments edit]
+  # 3. Проверка прав (редактировать может только владелец или админ)
   before_action :authorize_user!, only: %i[edit update]
 
   def index
@@ -11,82 +13,73 @@ class UsersController < ApplicationController
   end
 
   def show
-    # Статистика для шапки профиля
-    @followers_count = @user.followers.count
-    @following_count = @user.following.count
+    # Операция Show уже внутри себя делает: set_user, base_routes_scope и prepare_activities
+    result = User::Operation::Show.call(params: params, current_user: current_user)
+    
+    if result.failure?
+      return redirect_to users_path, alert: "ユーザーが見つかりません"
+    end
 
-    # Собираем ленту активностей (вынесено в private)
-    prepare_activities
+    @user = result[:model]
+    @routes = result[:routes]
+    @saved_routes = result[:saved_routes]
+    @activities = result[:activities]
+    
+    # Отзывы подгружаем отдельно с пагинацией
+    @reviews = @user.reviews.includes(:reviewable).recent.page(params[:review_page]).per(10)
+  end
 
-    # Маршруты: используем вспомогательный метод для фильтрации приватных
-    @routes = base_routes_scope.includes(:city, :tags)
-                               .order(created_at: :desc)
-                               .limit(20)
+  def edit
+    # Используем форму (Contract) для редактирования
+    result = User::Operation::Update.call(params: { id: params[:id] }, current_user: current_user)
+    @user = result[:model]
+    @form = result['contract.default']
+  end
 
-    # Сохраненные маршруты
-    @saved_routes = @user.bookmarked_routes.includes(:city, :tags)
-                         .order('bookmarks.created_at DESC')
-                         .limit(20)
+  def update
+    # Передаем params.to_unsafe_h, так как Contract сам отфильтрует нужные поля (username, bio и т.д.)
+    result = User::Operation::Update.call(params: params.to_unsafe_h, current_user: current_user)
 
-    # Отзывы (Reviews)
-    @reviews = @user.reviews.includes(:reviewable)
-                    .recent
-                    .page(params[:review_page])
-                    .per(10)
+    if result.success?
+      redirect_to user_path(result[:model]), notice: "プロフィールを更新しました"
+    else
+      @user = result[:model]
+      @form = result['contract.default']
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def comments
     # Логика для отдельной вкладки комментариев
     @comments = @user.comments
-                     .includes(:user, :commentable)
+                     .includes(:commentable)
                      .order(created_at: :desc)
                      .page(params[:page])
                      .per(20)
-
-    # Чтобы шапка профиля на этой вкладке тоже работала
-    @followers_count = @user.followers.count
-    @following_count = @user.following.count
   end
 
   def my_profile
     redirect_to user_path(current_user)
   end
 
-  def edit
-    # @user уже найден через before_action
-  end
-
-  def update
-    if @user.update(user_params)
-      redirect_to user_path(@user), notice: 'プロフィールを更新しました'
-    else
-      render :edit, status: :unprocessable_entity
-    end
-  end
-
   def follow
-    # Убираем лишний поиск User.find, так как есть before_action
-    return unless current_user.follow(@user)
+    result = User::Operation::Follow.call(params: params, current_user: current_user)
 
-    NotificationService.create_notification(
-      user: @user,
-      actor: current_user,
-      notification_type: 'follow',
-      notifiable: @user
-    )
-
-    respond_to do |format|
-      format.html { redirect_back fallback_location: user_path(@user), notice: 'フォローしました' }
-      format.js   # Откроет follow.js.erb
+    if result.success?
+      redirect_back fallback_location: root_path, notice: "フォローしました"
+    else
+      redirect_back fallback_location: root_path, alert: "エラーが発生しました"
     end
   end
 
   def unfollow
-    return unless current_user.unfollow(@user)
-
-    respond_to do |format|
-      format.html { redirect_back fallback_location: user_path(@user), notice: 'フォローを解除しました' }
-      format.js   # Откроет unfollow.js.erb
+    # Предполагаем, что у тебя есть операция для отписки
+    result = Follower::Operation::Delete.call(params: params, current_user: current_user)
+    
+    if result.success?
+      redirect_back fallback_location: root_path, notice: "フォロー解除済み"
+    else
+      redirect_back fallback_location: root_path, alert: "解除中にエラーが発生しました"
     end
   end
 
@@ -98,45 +91,11 @@ class UsersController < ApplicationController
     redirect_to users_path, alert: 'ユーザーが見つかりませんでした'
   end
 
-  # Логика: обычные люди видят только публичные маршруты, владелец видит всё
-  def base_routes_scope
-    current_user == @user ? @user.routes : @user.routes.where(is_public: true)
-  end
-
-  # Собираем активности в массив и пагинируем его
-  def prepare_activities
-    @activities = []
-
-    # Добавляем маршруты
-    @user.routes.recent.limit(10).each do |r|
-      @activities << { type: 'route', created_at: r.created_at, icon: '🗺️', text: "新しいルート「#{r.name}」を作成しました", obj: r }
-    end
-
-    # Добавляем лайки (проверяем, что объект лайка существует)
-    @user.likes.includes(:likeable).order(created_at: :desc).limit(10).each do |l|
-      next unless l.likeable.respond_to?(:name)
-
-      @activities << { type: 'like', created_at: l.created_at, icon: '❤️', text: "「#{l.likeable.name}」にいいねしました",
-                       obj: l.likeable }
-    end
-
-    # Добавляем отзывы
-    @user.reviews.recent.limit(10).each do |rev|
-      @activities << { type: 'review', created_at: rev.created_at, icon: '📝', text: 'レビューを投稿しました', obj: rev.reviewable }
-    end
-
-    # Сортировка всего микса по дате
-    @activities = @activities.sort_by { |a| a[:created_at] }.reverse
-    @activities = Kaminari.paginate_array(@activities).page(params[:activity_page]).per(10)
-  end
-
   def authorize_user!
-    return if current_user == @user || current_user&.is_admin?
+    user_to_check = @user || User.find_by(id: params[:id])
+    
+    return if current_user == user_to_check || current_user&.admin?
 
-    redirect_to routes_path, alert: 'アクセスが拒否されました'
-  end
-
-  def user_params
-    params.require(:user).permit(:username, :bio, :location, :avatar, :budget_min, :budget_max)
+    redirect_to root_path, alert: 'アクセス権限がありません'
   end
 end

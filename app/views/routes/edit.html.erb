@@ -1,292 +1,345 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>ルート編集 - <%= @route.name %> - Smart Routes</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag 'application', media: 'all' %>
-  <%= stylesheet_link_tag 'routes', media: 'all' %>
-  <%= stylesheet_link_tag 'editRoutes', media: 'all' %>
-  
-	
+  <head>
+    <title>ルート編集 - <%= @route.name %> - Smart Routes</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_link_tag 'routes', media: 'all' %>
+    <%= stylesheet_link_tag 'editRoutes', media: 'all' %>
+  </head>
+  <body>
+    <%= render 'pages/header' %>
 
-</head>
-<body>
-  <%= render 'pages/header' %>
-
-
-  
-
-  <%# Flash Messages with Animation %>
-  <% if notice %>
-  <div class="flash-message flash-notice">
-    <%= notice %>
-  </div> 
-  <% end %>
-
-  <% if alert %>
-  <div class="flash-message flash-alert">
-    <%= alert %>
-  </div>
-  <% end %>
-
-  <div class="edit-container">
-    <div class="edit-header">
-      <h1 class="edit-title">✏️ ルート編集</h1>
-    </div>
-
-  
-    <%= form_with model: @route, local: true do |f| %>
-      <!-- Basic Info -->
-      <div class="form-section">
-        <h2 class="section-title">基本情報</h2>
-        
-        <div class="form-group">
-          <%= f.label :name, "ルート名", class: "form-label" %>
-          <%= f.text_field :name, class: "form-input", required: true %>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :description, "説明", class: "form-label" %>
-          <%= f.text_area :description, class: "form-textarea", rows: 4 %>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <%= f.label :city_id, "都市", class: "form-label" %>
-            <%= f.select :city_id, options_from_collection_for_select(@cities, :id, :name, @route.city_id), {}, class: "form-select" %>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :difficulty_level, "難易度", class: "form-label" %>
-            <%= f.select :difficulty_level, 
-                [['簡単', 'easy'], ['普通', 'medium'], ['難しい', 'hard']], 
-                { selected: @route.difficulty_level },
-                class: "form-select" %>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <%= f.label :estimated_duration, "所要時間（分）", class: "form-label" %>
-            <%= f.number_field :estimated_duration, class: "form-input", min: 0 %>
-          </div>
-
-          <div class="form-group">
-            <%= f.label :estimated_cost, "予算（円）", class: "form-label" %>
-            <%= f.number_field :estimated_cost, class: "form-input", min: 0 %>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <%= f.label :tags, "タグ", class: "form-label" %>
-          <div class="tag-checkboxes-container">
-            <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :display_name do |b| %>
-              <label class="tag-checkbox">
-                <%= b.check_box %>
-                <span><%= b.text %></span>
-              </label>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-checkbox">
-            <%= f.check_box :is_public %>
-            <span>このルートを公開する</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Map and Spots -->
-      <div class="form-section">
-        <h2 class="section-title">📍 訪問場所</h2>
-        
-        <div id="edit-map"></div>
-
-        <div id="spots-list">
-          <% @route.route_items.order(:position).each_with_index do |item, index| %>
-            <div class="spot-item" data-spot-id="<%= index + 1 %>">
-              <div class="spot-number"><%= index + 1 %></div>
-              <button type="button" class="remove-spot" onclick="removeExistingSpot(<%= item.id %>)">×</button>
-              
-              <div class="current-venue-info">
-                <strong><%= item.venue&.name || item.venue_name %></strong><br>
-                <small><%= item.venue&.address || item.venue_address %></small>
-              </div>
-
-              <div class="venue-search-box">
-                <input type="text" 
-                       class="place-autocomplete" 
-                       placeholder="🔍 変更する場合は検索..."
-                       data-spot-index="<%= index %>" />
-              </div>
-
-              <input type="hidden" name="route_items[][venue_name]" value="<%= item.venue_name %>" id="venue-name-<%= index %>">
-              <input type="hidden" name="route_items[][venue_address]" value="<%= item.venue_address %>" id="venue-address-<%= index %>">
-              <input type="hidden" name="route_items[][venue_lat]" value="<%= item.venue&.geo_lat %>" id="venue-lat-<%= index %>">
-              <input type="hidden" name="route_items[][venue_lng]" value="<%= item.venue&.geo_lng %>" id="venue-lng-<%= index %>">
-              <input type="number" name="route_items[][duration_minutes]" value="<%= item.duration_minutes %>" class="spot-duration" placeholder="滞在時間（分）">
-            </div>
-          <% end %>
-        </div>
-
-        <button type="button" class="add-spot-btn" onclick="addNewSpot()">
-          ➕ スポットを追加
-        </button>
-      </div>
-
-      <!-- Actions -->
-      <div class="form-actions">
-        <%= link_to "キャンセル", @route, class: "btn btn-cancel" %>
-        <%= f.submit "変更を保存", class: "btn btn-save" %>
+    <%# Flash Messages with Animation %>
+    <% if notice %>
+      <div class="flash-message flash-notice">
+        <%= notice %>
       </div>
     <% end %>
 
-    <!-- Danger Zone -->
-    <div class="danger-zone">
-      <h3>⚠️ 危険な操作</h3>
-      <p>このルートを削除すると、すべてのデータが完全に削除されます。</p>
-      <%= button_to "このルートを削除", route_path(@route), 
-          method: :delete, 
-          data: { confirm: "本当にこのルートを削除しますか？" },
-          class: "btn-delete" %>
-    </div>
-  </div>
+    <% if alert %>
+      <div class="flash-message flash-alert">
+        <%= alert %>
+      </div>
+    <% end %>
 
+    <div class="edit-container">
+      <div class="edit-header">
+        <h1 class="edit-title">✏️ ルート編集</h1>
+      </div>
 
+      <%= form_with model: @route, local: true do |f| %>
+        <!-- Basic Info -->
+        <div class="form-section">
+          <h2 class="section-title">基本情報</h2>
 
-  <script>
-    const API_KEY = '<%= ENV["GOOGLE_MAPS_API_KEY"] %>';
-    let map;
-    let markers = [];
-    let spotCount = <%= @route.route_items.count %>;
+          <div class="form-group">
+            <%= f.label :name, 'ルート名', class: 'form-label' %>
+            <%= f.text_field :name, class: 'form-input', required: true %>
+          </div>
 
-    // Load existing spots
-    const existingSpots = [
-      <% @route.route_items.order(:position).each do |item| %>
-        <% if item.venue&.geo_lat %>
-          {
-            name: <%= raw (item.venue&.name || item.venue_name).to_json %>,
-            lat: <%= item.venue.geo_lat %>,
-            lng: <%= item.venue.geo_lng %>,
-            address: <%= raw (item.venue&.address || item.venue_address).to_json %>
-          },
-        <% end %>
+          <div class="form-group">
+            <%= f.label :description, '説明', class: 'form-label' %>
+            <%= f.text_area :description, class: 'form-textarea', rows: 4 %>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <%= f.label :city_id, '都市', class: 'form-label' %>
+              <%=
+                f.select :city_id,
+                         options_from_collection_for_select(
+                           @cities,
+                           :id,
+                           :name,
+                           @route.city_id,
+                         ),
+                         {},
+                         class: 'form-select'
+              %>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :difficulty_level, '難易度', class: 'form-label' %>
+              <%=
+                f.select :difficulty_level,
+                         [%w[簡単 easy], %w[普通 medium], %w[難しい hard]],
+                         { selected: @route.difficulty_level },
+                         class: 'form-select'
+              %>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <%=
+                f.label :estimated_duration,
+                        '所要時間（分）',
+                        class: 'form-label'
+              %>
+              <%=
+                f.number_field :estimated_duration, class: 'form-input', min: 0
+              %>
+            </div>
+
+            <div class="form-group">
+              <%= f.label :estimated_cost, '予算（円）', class: 'form-label' %>
+              <%= f.number_field :estimated_cost, class: 'form-input', min: 0 %>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :tags, 'タグ', class: 'form-label' %>
+            <div class="tag-checkboxes-container">
+              <%= f.collection_check_boxes :tag_ids, Tag.all, :id, :display_name do |b| %>
+                <label class="tag-checkbox">
+                  <%= b.check_box %>
+                  <span><%= b.text %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-checkbox">
+              <%= f.check_box :is_public %>
+              <span>このルートを公開する</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Map and Spots -->
+        <div class="form-section">
+          <h2 class="section-title">📍 訪問場所</h2>
+
+          <div id="edit-map"></div>
+
+          <div id="spots-list">
+            <% @route.route_items.order(:position).each_with_index do |item, index| %>
+              <div class="spot-item" data-spot-id="<%= index + 1 %>">
+                <div class="spot-number"><%= index + 1 %></div>
+                <button
+                  type="button"
+                  class="remove-spot"
+                  onclick="removeExistingSpot(<%= item.id %>)"
+                >
+                  ×
+                </button>
+
+                <div class="current-venue-info">
+                  <strong><%= item.venue&.name || item.venue_name %></strong
+                  ><br />
+                  <small><%=
+                      item.venue&.address || item.venue_address
+                    %></small>
+                </div>
+
+                <div class="venue-search-box">
+                  <input
+                    type="text"
+                    class="place-autocomplete"
+                    placeholder="🔍 変更する場合は検索..."
+                    data-spot-index="<%= index %>"
+                  />
+                </div>
+
+                <input
+                  type="hidden"
+                  name="route_items[][venue_name]"
+                  value="<%= item.venue_name %>"
+                  id="venue-name-<%= index %>"
+                />
+                <input
+                  type="hidden"
+                  name="route_items[][venue_address]"
+                  value="<%= item.venue_address %>"
+                  id="venue-address-<%= index %>"
+                />
+                <input
+                  type="hidden"
+                  name="route_items[][venue_lat]"
+                  value="<%= item.venue&.geo_lat %>"
+                  id="venue-lat-<%= index %>"
+                />
+                <input
+                  type="hidden"
+                  name="route_items[][venue_lng]"
+                  value="<%= item.venue&.geo_lng %>"
+                  id="venue-lng-<%= index %>"
+                />
+                <input
+                  type="number"
+                  name="route_items[][duration_minutes]"
+                  value="<%= item.duration_minutes %>"
+                  class="spot-duration"
+                  placeholder="滞在時間（分）"
+                />
+              </div>
+            <% end %>
+          </div>
+
+          <button type="button" class="add-spot-btn" onclick="addNewSpot()">
+            ➕ スポットを追加
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <%= link_to 'キャンセル', @route, class: 'btn btn-cancel' %>
+          <%= f.submit '変更を保存', class: 'btn btn-save' %>
+        </div>
       <% end %>
-    ];
 
-    function initMap() {
-      const center = existingSpots.length > 0 
-        ? { lat: existingSpots[0].lat, lng: existingSpots[0].lng }
-        : { lat: 35.0116, lng: 135.7681 }; // Kyoto
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <h3>⚠️ 危険な操作</h3>
+        <p>このルートを削除すると、すべてのデータが完全に削除されます。</p>
+        <%=
+          button_to 'このルートを削除',
+                    route_path(@route),
+                    method: :delete,
+                    data: {
+                      confirm: '本当にこのルートを削除しますか？',
+                    },
+                    class: 'btn-delete'
+        %>
+      </div>
+    </div>
 
-      map = new google.maps.Map(document.getElementById('edit-map'), {
-        zoom: 13,
-        center: center,
-        mapTypeControl: true
-      });
+    <script>
+      const API_KEY = '<%= ENV['GOOGLE_MAPS_API_KEY'] %>';
+      let map;
+      let markers = [];
+      let spotCount = <%= @route.route_items.count %>;
 
-      updateMapMarkers();
-      initAutocompletes();
-    }
+      // Load existing spots
+      const existingSpots = [
+      <% @route.route_items.order(:position).each do |item| %>
 
-    function updateMapMarkers() {
-      // Clear existing markers
-      markers.forEach(m => m.setMap(null));
-      markers = [];
+      <% if item.venue&.geo_lat %>
 
-      const validSpots = existingSpots.filter(s => s.lat && s.lng);
+            {
+              name: <%= raw (item.venue&.name || item.venue_name).to_json %>,
+              lat: <%= item.venue.geo_lat %>,
+              lng: <%= item.venue.geo_lng %>,
+              address: <%= raw (item.venue&.address || item.venue_address).to_json %>
+            },
+      <% end %>
+      <% end %>
+      ];
 
-      validSpots.forEach((spot, index) => {
-        const marker = new google.maps.Marker({
-          position: { lat: spot.lat, lng: spot.lng },
-          map: map,
-          label: String(index + 1),
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: '#0288d1',
-            fillOpacity: 1,
-            strokeColor: 'white',
-            strokeWeight: 3,
-            scale: 20
-          }
+      function initMap() {
+        const center = existingSpots.length > 0
+          ? { lat: existingSpots[0].lat, lng: existingSpots[0].lng }
+          : { lat: 35.0116, lng: 135.7681 }; // Kyoto
+
+        map = new google.maps.Map(document.getElementById('edit-map'), {
+          zoom: 13,
+          center: center,
+          mapTypeControl: true
         });
 
-        markers.push(marker);
-      });
-
-      // Draw route line
-      if (validSpots.length > 1) {
-        new google.maps.Polyline({
-          path: validSpots,
-          strokeColor: '#0288d1',
-          strokeWeight: 4,
-          map: map
-        });
-      }
-    }
-
-    function initAutocompletes() {
-      document.querySelectorAll('.place-autocomplete').forEach(input => {
-        const autocomplete = new google.maps.places.Autocomplete(input, {
-          componentRestrictions: { country: 'jp' },
-          fields: ['name', 'formatted_address', 'geometry']
-        });
-
-        autocomplete.addListener('place_changed', () => {
-          const place = autocomplete.getPlace();
-          if (!place.geometry) return;
-
-          const index = input.dataset.spotIndex;
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-
-          document.getElementById(`venue-name-${index}`).value = place.name;
-          document.getElementById(`venue-address-${index}`).value = place.formatted_address;
-          document.getElementById(`venue-lat-${index}`).value = lat;
-          document.getElementById(`venue-lng-${index}`).value = lng;
-
-          // Update existingSpots array
-          existingSpots[index] = {
-            name: place.name,
-            lat: lat,
-            lng: lng,
-            address: place.formatted_address
-          };
-
-          updateMapMarkers();
-        });
-      });
-    }
-
-    function addNewSpot() {
-      alert('新しいスポットを追加するには、routes/newページを使用してください');
-    }
-
-    function removeExistingSpot(itemId) {
-      if (confirm('このスポットを削除しますか？')) {
-        // You would need to implement delete endpoint
-        alert('スポット削除機能は開発中です');
-      }
-    }
-
-    // Load Google Maps
-    function loadGoogleMaps() {
-      if (!API_KEY) {
-        console.error('Google Maps API key not set');
-        return;
+        updateMapMarkers();
+        initAutocompletes();
       }
 
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&libraries=places&language=ja`;
-      script.async = true;
-      document.head.appendChild(script);
-    }
+      function updateMapMarkers() {
+        // Clear existing markers
+        markers.forEach(m => m.setMap(null));
+        markers = [];
 
-    window.initMap = initMap;
-    document.addEventListener('DOMContentLoaded', loadGoogleMaps);
-  </script>
-</body>
+        const validSpots = existingSpots.filter(s => s.lat && s.lng);
+
+        validSpots.forEach((spot, index) => {
+          const marker = new google.maps.Marker({
+            position: { lat: spot.lat, lng: spot.lng },
+            map: map,
+            label: String(index + 1),
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              fillColor: '#0288d1',
+              fillOpacity: 1,
+              strokeColor: 'white',
+              strokeWeight: 3,
+              scale: 20
+            }
+          });
+
+          markers.push(marker);
+        });
+
+        // Draw route line
+        if (validSpots.length > 1) {
+          new google.maps.Polyline({
+            path: validSpots,
+            strokeColor: '#0288d1',
+            strokeWeight: 4,
+            map: map
+          });
+        }
+      }
+
+      function initAutocompletes() {
+        document.querySelectorAll('.place-autocomplete').forEach(input => {
+          const autocomplete = new google.maps.places.Autocomplete(input, {
+            componentRestrictions: { country: 'jp' },
+            fields: ['name', 'formatted_address', 'geometry']
+          });
+
+          autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) return;
+
+            const index = input.dataset.spotIndex;
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+
+            document.getElementById(`venue-name-${index}`).value = place.name;
+            document.getElementById(`venue-address-${index}`).value = place.formatted_address;
+            document.getElementById(`venue-lat-${index}`).value = lat;
+            document.getElementById(`venue-lng-${index}`).value = lng;
+
+            // Update existingSpots array
+            existingSpots[index] = {
+              name: place.name,
+              lat: lat,
+              lng: lng,
+              address: place.formatted_address
+            };
+
+            updateMapMarkers();
+          });
+        });
+      }
+
+      function addNewSpot() {
+        alert('新しいスポットを追加するには、routes/newページを使用してください');
+      }
+
+      function removeExistingSpot(itemId) {
+        if (confirm('このスポットを削除しますか？')) {
+          // You would need to implement delete endpoint
+          alert('スポット削除機能は開発中です');
+        }
+      }
+
+      // Load Google Maps
+      function loadGoogleMaps() {
+        if (!API_KEY) {
+          console.error('Google Maps API key not set');
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&libraries=places&language=ja`;
+        script.async = true;
+        document.head.appendChild(script);
+      }
+
+      window.initMap = initMap;
+      document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+    </script>
+  </body>
 </html>

@@ -1,63 +1,52 @@
 class DmMessagesController < ApplicationController
   before_action :authenticate_user!
-  before_action :sent_dm_room
-  before_action :authorize_room_access
 
   def index
-    @dm_messages = DmMessage
-                   .includes(:dm_room, :user)
-                   .where(user_id: current_user.id)
-                   .order(created_at: :desc)
+    result = DmMessage::Operation::Index.call(params: params, current_user: current_user)
+
+    if result.success?
+      @dm_room = result[:dm_room]
+      @dm_message = result[:model]
+    else
+      redirect_to dm_rooms_path, alert: 'アクセス権限がないか、チャットルームが見つかりません'
+    end
   end
 
   def create
-    # 1. Проверка доступа
-    return render json: { error: 'Access denied' }, status: :forbidden unless @dm_room.participant?(current_user)
+    result = DmMessage::Operation::Create.call(params: params, current_user: current_user)
 
-    @dm_message = @dm_room.dm_messages.build(dm_message_params)
-    @dm_message.user = current_user
-
-    if @dm_message.save
-      @dm_room.touch(:updated_at)
-
-      # 3. Увеличиваем счетчик ТОЛЬКО для получателя
-      receiver = @dm_room.other_user(current_user)
-      @dm_room.increment_unread_for(receiver) if receiver
-
-      # 4. Создаем уведомление через наш новый сервис
-      NotificationService.notify_new_message(@dm_message)
-
-      html = render_to_string(partial: 'dm_messages/message', locals: { message: @dm_message })
-
-      ActionCable.server.broadcast("dm_room_#{@dm_room.id}", {
-                                     message: html,
-                                     sender_id: current_user.id
-                                   })
-
+    if result.success?
       respond_to do |format|
-        format.html { redirect_to dm_room_path(@dm_room) }
-        format.json { render json: @dm_message, status: :created }
+        format.html { redirect_to dm_room_path(result[:dm_room]) }
+        format.turbo_stream
+        format.json { render json: result[:model], status: :created }
       end
     else
-      error_msg = @dm_message.errors.full_messages.join(', ')
 
-      respond_to do |format|
-        format.html { redirect_to dm_room_path(@dm_room), alert: "送信エラー: #{error_msg}" }
-        format.js   { render js: "alert('#{error_msg}');" }
-        format.json { render json: { errors: @dm_message.errors.full_messages }, status: :unprocessable_entity }
-      end
+      error_msg = result['contract.default']&.errors&.full_messages&.join(',') || 'エラーが発生しました'
+      redirect_to dm_room_path(params[:dm_room_id]), alert: error_msg
     end
   end
 
   def destroy
-    @dm_message = @dm_room.dm_messages.find(params[:id])
+    result = DmMessage::Operation::Delete.call(params: params, current_user: current_user)
 
-    return if @dm_message.user == current_user
+    if result.success?
+      redirect_back fallback_location: root_path, notice: 'メッセージを削除しました'
+    else
+      redirect_back fallback_location: root_path, alert: '削除権限がないか、失敗しました'
+    end
+  end
 
-    redirect_to dm_room_path(@dm_room), alert: '削除権限がありません'
-
-    @dm_message.destroy
-    redirect_to dm_room_path(@dm_room), notice: 'メッセージを削除しました'
+  def mark_all_as_read
+    @active_room = DmRoom.find(params[:id])
+    
+    if @active_room.participant?(current_user)
+      @active_room.mark_all_as_read_for(current_user)
+      head :ok 
+    else
+      head :forbidden
+    end
   end
 
   private

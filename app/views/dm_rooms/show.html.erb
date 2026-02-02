@@ -1,21 +1,23 @@
 <div class="dm-chat-container">
-	<div class="dm-chat-sidebar">
-		<div class="sidebar-header">
-			<h4>Messages</h4>
-		</div>
+  <div class="dm-chat-sidebar">
+    <div class="sidebar-header">
+      <h4>Messages</h4>
+    </div>
 
-		<div class="chat-search">
-			<input type="text" placeholder='Search...' id="chatSearchInput">
-		</div>
+    <div class="chat-search">
+      <input type="text" placeholder="Search..." id="chatSearchInput" />
+    </div>
 
-		<div class="list-group list-group-flush">
-			<%= render partial: 'dm_rooms/room_item', collection: @dm_rooms, as: :room %>
-		</div>
-	</div>
+    <div class="list-group list-group-flush">
+      <%=
+        render partial: 'dm_rooms/room_item', collection: @dm_rooms, as: :room
+      %>
+    </div>
+  </div>
 
-	<div class="dm-chat-main">
-		<%= render 'dm_rooms/chat_header' %>
-		<%= render 'dm_rooms/messages_area' %>
-		<%= render 'dm_rooms/input_area' %>
-	</div>
+  <div class="dm-chat-main">
+    <%= render 'dm_rooms/chat_header' %>
+    <%= render 'dm_rooms/messages_area' %>
+    <%= render 'dm_rooms/input_area' %>
+  </div>
 </div>

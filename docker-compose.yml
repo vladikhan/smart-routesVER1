@@ -8,7 +8,6 @@ services:
       POSTGRES_DB: smart_routes_dev
     ports:
       - "5432:5432"
-      - "3001:3000"
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -51,6 +50,7 @@ services:
       - db
       - redis
     environment:
+      RAILS_LOG_TO_STDOUT: "true"
       DISABLE_SPRING: 1
       RAILS_ENV: development
       NODE_ENV: development

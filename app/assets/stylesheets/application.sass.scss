@@ -676,7 +676,7 @@ button.dropdown-item {
 
   background: linear-gradient(135deg, #f0f7ff 0%, #e7f3ff 100%);
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
   /* Округлые края (pill-shape) для маленьких кнопок выглядят лучше */
 
   color: #0d6efd;
@@ -780,13 +780,12 @@ button.dropdown-item.text-danger:hover i {
 
 /* Основной стиль кнопки обновления */
 .btn-update-review {
-  background: linear-gradient(135deg,
-      #0d6efd 0%,
-      #0a58ca 100%);
+  background: #2296f3;
   /* Красивый синий градиент */
   border: none;
   color: white;
   font-weight: 600;
+  border-radius: 10px;
   font-size: 13px;
   padding: 8px 24px;
   /* Больше горизонтальных отступов */
@@ -801,7 +800,7 @@ button.dropdown-item.text-danger:hover i {
 
 /* Эффект при наведении */
 .btn-update-review:hover {
-  background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%);
+  background: #4da6ee;
   transform: translateY(-2px);
   /* Кнопка "всплывает" */
   box-shadow: 0 6px 16px rgba(13, 110, 253, 0.35);
@@ -853,7 +852,7 @@ button.dropdown-item.text-danger:hover i {
 
 /* Эффект при клике */
 #review_text:focus {
-  border-color: #0d6efd;
+  border-color: #2296f3;
   box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
   outline: none;
 }
@@ -868,9 +867,10 @@ button.dropdown-item.text-danger:hover i {
   /* Тонкая, почти незаметная граница */
   color: #6c757d;
   /* Спокойный серый цвет текста */
+  border-radius: 10px;
   font-weight: 500;
   font-size: 13px;
-  padding: 6px 20px;
+  padding: 8px 20px;
   /* Больше отступов по бокам для удобства */
   transition: all 0.2s ease-in-out;
   display: inline-flex;

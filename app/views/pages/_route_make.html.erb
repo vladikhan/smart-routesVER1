@@ -1,15 +1,12 @@
 <!-- Hero Banner -->
-  <section class="btn-create">
-      <% if user_signed_in? %>
-        <%= link_to new_route_path, class: "btn-create-route-large" do %>
-        新しいルートを作成
-        <% end %>
-      <% else %>
-        <%= link_to new_user_session_path, class: "btn-create-route-large" do %>
-          ログインしてルートを作成
-        <% end %>
-      <% end %>
-
-
-
-  </section>
+<section class="btn-create">
+  <% if user_signed_in? %>
+    <%= link_to new_route_path, class: "btn-create-route-large" do %>
+      新しいルートを作成
+    <% end %>
+  <% else %>
+    <%= link_to new_user_session_path, class: "btn-create-route-large" do %>
+      ログインしてルートを作成
+    <% end %>
+  <% end %>
+</section>

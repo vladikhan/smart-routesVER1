@@ -1,0 +1,4 @@
+ja:
+  activities:
+    route: "新しいルート「%{name}」を作成しました"
+    like: "「%{name}」にいいねしました"

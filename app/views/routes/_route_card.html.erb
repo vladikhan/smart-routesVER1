@@ -7,7 +7,9 @@
   </div>
   <div class="route-card-content">
     <h3 class="route-card-title"><%= route.name %></h3>
-    <p class="route-card-desc"><%= truncate(route.description, length: 60) %></p>
+    <p class="route-card-desc">
+      <%= truncate(route.description, length: 60) %>
+    </p>
     <div class="route-card-meta">
       <span>💰 ¥<%= number_with_delimiter(route.estimated_cost) %></span>
       <span>⏱️ <%= route.estimated_duration %>分</span>

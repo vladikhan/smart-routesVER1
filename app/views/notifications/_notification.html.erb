@@ -1,21 +1,30 @@
 <%# app/views/notifications/_notification.html.erb %>
-<div class="notification-item p-3 border-bottom <%= 'bg-light' unless notification.read_at? %>" style="transition: 0.3s;">
+<div
+  class="notification-item p-3 border-bottom <%= 'bg-light' unless notification.read_at? %>"
+  style="transition: 0.3s;"
+>
   <div class="d-flex align-items-start gap-3">
     <%# Аватар того, кто совершил действие %>
     <div class="flex-shrink-0">
-      <%= image_tag (notification.actor.avatar_url || "default-avatar.png"), 
-                    class: "rounded-circle", width: 45, height: 45 %>
+      <%=
+        image_tag (notification.actor.avatar_url || 'default-avatar.png'),
+                  class: 'rounded-circle',
+                  width: 45,
+                  height: 45
+      %>
     </div>
 
     <div class="flex-grow-1">
       <div class="notification-text">
-        <strong><%= notification.actor.username %></strong> 
+        <strong><%= notification.actor.username %></strong>
         <span>
           <% case notification.action %>
           <% when 'like' %>
-            님이 회원님의 <%= link_to 'ルート', notification.notifiable %>를 좋아합니다. ❤️
+            님이 회원님의 <%= link_to 'ルート', notification.notifiable %>를
+            좋아합니다. ❤️
           <% when 'comment' %>
-            님이 <%= link_to 'レビュー', notification.notifiable %>를 남겼습니다. 💬
+            님이 <%= link_to 'レビュー', notification.notifiable %>를
+            남겼습니다. 💬
           <% when 'follow' %>
             님이 회원님을 팔로우하기 시작했습니다. 👤
           <% else %>
@@ -27,10 +36,13 @@
         <%= time_ago_in_words(notification.created_at) %> 前
       </small>
     </div>
-    
+
     <%# Маленькая точка для непрочитанных %>
     <% unless notification.read_at? %>
-      <div class="unread-dot bg-primary rounded-circle" style="width: 8px; height: 8px;"></div>
+      <div
+        class="unread-dot bg-primary rounded-circle"
+        style="width: 8px; height: 8px;"
+      ></div>
     <% end %>
   </div>
 </div>

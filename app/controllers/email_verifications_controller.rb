@@ -1,7 +1,6 @@
 class EmailVerificationsController < ApplicationController
   before_action :authenticate_user!
   def new
-    puts "DEBUG: current_user is #{current_user.inspect}"
     @user = current_user
   end
 

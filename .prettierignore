@@ -1,0 +1,10 @@
+# JS / text ERB
+*.js.erb
+*.text.erb
+
+# Mailers (часто ломаются)
+app/views/**/mailer/**
+app/views/layouts/mailer.*
+
+# Legacy / complex views
+app/views/**/_*.erb
