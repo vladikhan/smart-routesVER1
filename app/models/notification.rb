@@ -2,7 +2,6 @@ class Notification < ApplicationRecord
   belongs_to :user
   belongs_to :notifiable, polymorphic: true, optional: true
   belongs_to :actor, class_name: 'User', optional: true
-  belongs_to :notifiable, polymorphic: true
 
   validates :notification_type, :user_id, presence: true
 
@@ -22,13 +21,12 @@ class Notification < ApplicationRecord
   end
 
   def target_url
-  return "#" unless notifiable_id && notifiable_type
+  return "#" if notifiable.blank?
   
   helpers = Rails.application.routes.url_helpers
   
   case notification_type
   when 'new_message'
-    # Используем &. (safe navigation), чтобы не упасть в 500
     msg = DmMessage.find_by(id: notifiable_id)
     msg ? helpers.dm_room_path(msg.dm_room_id) : "#"
   when 'follow'

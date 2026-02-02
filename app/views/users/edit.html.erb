@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>プロフィール編集 - Smart Routes</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= stylesheet_link_tag 'application', media: 'all' %>
-    <%= stylesheet_link_tag 'profile', media: 'all' %>
-    <%= stylesheet_link_tag 'editProfile', media: 'all' %>
-  </head>
+<% content_for :title, "プロフィール編集 - Smart Routes" %>
 
-  <body>
-    <%= render 'pages/header' %>
+<% content_for :extra_styles do %>
+  <%= stylesheet_link_tag 'profile', media: 'all' %>
+<% end %>
+
 
     <!-- =========== PROFILE HEADER =========== -->
     <section class="profile-header">
@@ -196,5 +188,4 @@
         .addEventListener("input", updateCount);
       updateCount();
     </script>
-  </body>
-</html>
+

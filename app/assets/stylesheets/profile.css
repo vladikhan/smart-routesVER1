@@ -553,7 +553,7 @@
 	margin-top: 30px;
 }
 
-.btn-save,
+/* .btn-save,
 .btn-cancel {
 	flex: 1;
 	padding: 14px;
@@ -566,18 +566,18 @@
 	text-align: center;
 	display: block;
 	transition: all 0.3s ease;
-}
+} */
 
-.btn-save {
+/* .btn-save {
 	background: #0288d1;
 	color: white;
-}
+} */
 
-.btn-save:hover {
+/* .btn-save:hover {
 	background: #0277bd;
 	transform: translateY(-1px);
 	box-shadow: 0 4px 12px rgba(2, 136, 209, 0.3);
-}
+} */
 
 .btn-cancel {
 	background: #f5f5f5;

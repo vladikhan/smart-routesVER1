@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>ユーザー一覧 - Smart Routes</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= stylesheet_link_tag 'application', media: 'all' %>
-    <%= stylesheet_link_tag 'users', media: 'all' %>
-  </head>
-  <body>
-    <%= render 'pages/header' %>
+<% content_for :title, "ユーザー一覧 - Smart Routes" %>
+
+<%# 2. Подключаем специфические стили для этой страницы %>
+<% content_for :extra_styles do %>
+  <%= stylesheet_link_tag 'users', media: 'all' %>
+<% end %>
 
     <!-- Hero Banner -->
     <section class="hero-banner" style="padding: 60px 20px;">
@@ -72,5 +66,4 @@
     </main>
 
     <%= render 'pages/footer' %>
-  </body>
-</html>
+

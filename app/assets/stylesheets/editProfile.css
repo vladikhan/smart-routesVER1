@@ -248,17 +248,17 @@ body {
 	border: 1px solid #ddd;
 }
 
-.btn-save {
+/* .btn-save {
 	background: #2296f3;
 	border: 1px solid #ddd;
 	color: white;
-}
+} */
 
-.btn-save:hover {
+/* .btn-save:hover {
 	background: #0277bd;
 	transform: translateY(-1px);
 	box-shadow: 0 4px 12px rgba(0, 126, 223, 0.3);
-}
+} */
 
 .hidden {
 	display: none;

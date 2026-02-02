@@ -132,10 +132,10 @@ body {
 	transition: var(--transition);
 }
 
-.btn-save {
+/* .btn-save {
 	background: var(--primary);
 	color: white;
-}
+} */
 
 .btn-save:hover {
 	background: var(--primary-dark);

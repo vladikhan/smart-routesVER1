@@ -45,15 +45,15 @@
                 <div class="chat-header">
                   <span class="chat-name"><%= other.username %></span>
                   <span class="chat-time">
-                    <% if room.last_message %>
-                      <%= time_ago_in_words(room.last_message.created_at) %>前
+                    <% if room.last_message_at %>
+                      <%= time_ago_in_words(room.last_message_at) %>前
                     <% end %>
                   </span>
                 </div>
                 
                 <div class="chat-preview">
                   <span class="last-message">
-                    <% if room.last_message %>
+                    <% if room.last_message_at %>
                       <%= truncate(room.last_message.message, length: 40) %>
                     <% else %>
                       <span class="text-muted">メッセージがありません</span>

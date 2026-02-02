@@ -21,7 +21,26 @@
                           media: 'all',
                           'data-turbolinks-track': 'reload'
     %>
-    <%= stylesheet_link_tag 'venues', 'data-turbo-track': 'reload' %>
+    <%=
+      stylesheet_link_tag 'users',
+                          media: 'all',
+                          'data-turbolinks-track': 'reload'
+    %>
+
+    <%=
+      stylesheet_link_tag 'profile',
+                          media: 'all',
+                          'data-turbolinks-track': 'reload'
+    %>
+
+    <%= stylesheet_link_tag             'editProfile', media: 'all','data-turbolinks-track': 'reload' %>
+    
+    <%=
+      stylesheet_link_tag 'venues',
+                          media: 'all',
+                          'data-turbolinks-track': 'reload'
+    %>
+
     <%=
       if controller_name == 'notifications'
         stylesheet_link_tag 'notifications', media: 'all'
@@ -43,8 +62,10 @@
   </head>
 
   <body>
-    <%= yield %>
 
+ 
+    <%= yield %>
+  
     <script>
             // 1. Объявляем функцию
             function showToast(message, type = 'success') {

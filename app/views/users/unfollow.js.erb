@@ -1,7 +1,5 @@
-// 1. Обновляем кнопку назад на "Подписаться"
+
 $("#follow_section_<%= @user.id %>").html("<%= j render 'users/follow_button', user: @user %>");
 
 // 2. Уменьшаем счетчик
 $("[data-follow-target='count']").html("<%= @user.followers.count %>");
-
-console.log("Отписка оформлена успешно");

@@ -10,10 +10,12 @@ class NotificationsController < ApplicationController
                      when 'messages'     then @notifications.message_notifications
                      when 'interactions' then @notifications.interaction_notifications
                      when 'follows'      then @notifications.follow_notifications
-                     else @notifications # Важно вернуть исходный список, если фильтр не совпал
+                     else @notifications 
                      end
 
     @notifications = @notifications.page(params[:page]).per(20)
+
+    @unread_count = @notifications.where(is_read: false).count
   end
 
   # Этот метод должен быть один!

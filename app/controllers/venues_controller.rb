@@ -12,7 +12,7 @@ class VenuesController < ApplicationController
     end
 
     @venue       = result[:model]
-    @routes      = result[:routes]
+    @routes      = result[:public_routes]
     @featured_route = result[:featured_route]
     @route_items = result[:route_items]
     # Если отзывов нет в результате операции, берем их из модели

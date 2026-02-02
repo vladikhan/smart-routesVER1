@@ -3,6 +3,8 @@ class DmRoom < ApplicationRecord
   belongs_to :receiver, class_name: 'User', foreign_key: 'receiver_id'
   has_many :dm_messages, dependent: :destroy
 
+  has_one :last_message, -> { order(created_at: :desc) }, class_name: 'DmMessage'
+
   validates :sender_id, :receiver_id, presence: true
   validate :sender_and_receiver_are_different
 
@@ -19,6 +21,10 @@ class DmRoom < ApplicationRecord
 
   def unread_count_for(user)
     (user.id == sender_id ? unread_count_sender || 0 : unread_count_receiver || 0).to_i
+  end
+
+  def any_unread_for?(user)
+    unread_count_for(user) > 0
   end
 
   def mark_all_as_read_for(user)
