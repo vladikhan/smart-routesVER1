@@ -47,8 +47,8 @@ module Route::Operation
       name:    linked_item&.respond_to?(:name) ? linked_item.name : ri.venue_name,
       
       # Координаты берем из новых колонок geo_lat/lng, которые мы только что наполнили
-      lat:     ri.geo_lat.to_f,
-      lng:     ri.geo_lng.to_f,
+      lat:     ri.latitude.to_f,
+      lng:     ri.longitude.to_f,
       
       # Адрес аналогично: из объекта или из колонки
       address: linked_item&.respond_to?(:address) ? linked_item.address : ri.venue_address

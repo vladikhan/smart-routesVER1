@@ -113,11 +113,12 @@ ActiveRecord::Schema.define(version: 2026_02_02_002842) do
   create_table "dm_messages", force: :cascade do |t|
     t.bigint "dm_room_id", null: false
     t.bigint "user_id", null: false
-    t.text "message", null: false
+    t.text "message"
     t.boolean "is_read", default: false
+    t.datetime "read_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.datetime "read_at"
+    t.index ["dm_room_id", "created_at"], name: "index_dm_messages_on_dm_room_id_and_created_at"
     t.index ["dm_room_id"], name: "index_dm_messages_on_dm_room_id"
     t.index ["is_read"], name: "index_dm_messages_on_is_read"
     t.index ["user_id"], name: "index_dm_messages_on_user_id"
@@ -127,10 +128,11 @@ ActiveRecord::Schema.define(version: 2026_02_02_002842) do
     t.bigint "sender_id", null: false
     t.bigint "receiver_id", null: false
     t.datetime "last_message_at"
+    t.integer "unread_count_sender", default: 0
+    t.integer "unread_count_receiver", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "unread_count_sender"
-    t.integer "unread_count_receiver"
+    t.index ["receiver_id", "sender_id"], name: "index_dm_rooms_on_receiver_id_and_sender_id"
     t.index ["receiver_id"], name: "index_dm_rooms_on_receiver_id"
     t.index ["sender_id", "receiver_id"], name: "index_dm_rooms_on_sender_id_and_receiver_id", unique: true
     t.index ["sender_id"], name: "index_dm_rooms_on_sender_id"
@@ -172,17 +174,19 @@ ActiveRecord::Schema.define(version: 2026_02_02_002842) do
   create_table "notifications", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "actor_id", null: false
-    t.string "notification_type", null: false
+    t.string "notification_type", default: "0", null: false
     t.string "notifiable_type"
     t.integer "notifiable_id"
-    t.boolean "is_read", default: false
+    t.boolean "is_read", default: false, null: false
+    t.datetime "read_at"
+    t.json "extra_data"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "message"
-    t.datetime "read_at"
     t.index ["actor_id"], name: "index_notifications_on_actor_id"
-    t.index ["is_read"], name: "index_notifications_on_is_read"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
+    t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
+    t.index ["user_id", "is_read"], name: "index_notifications_on_user_and_read"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 

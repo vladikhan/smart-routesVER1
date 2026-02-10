@@ -11,6 +11,6 @@ class CreateDmMessages < ActiveRecord::Migration[6.1]
     end
 
     add_index :dm_messages, :is_read
-    add_index :dm_messages, %i[dm_room_id create_at]
+    add_index :dm_messages, %i[dm_room_id created_at]
   end
 end

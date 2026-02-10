@@ -103,4 +103,3 @@ end
 
 gem 'dotenv-rails', '~> 3.1.8'
 
-gem "erb_lint", "~> 0.9.0"

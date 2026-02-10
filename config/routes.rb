@@ -48,10 +48,18 @@ Rails.application.routes.draw do
     end
   end
 
+  
   # Email verification
   get 'email_verification', to: 'email_verifications#new'
   post 'email_verification', to: 'email_verifications#verify'
   post 'email_verification/resend', to: 'email_verifications#resend', as: 'email_verification_resend'
+
+  resource :email_verification, only: [:new, :show] do
+    collection do
+      post :verify
+      post :resend
+    end
+  end
 
   # Logout confirmation
   # get 'logout_confirm', to: 'pages#logout_confirm'

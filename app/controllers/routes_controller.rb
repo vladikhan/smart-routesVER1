@@ -29,7 +29,6 @@ class RoutesController < ApplicationController
       }
     end.compact
 
-    # СЕНЬОР-СОВЕТ: Если в логах видишь [0.0, 0.0], значит в БД пусто!
     Rails.logger.debug "MAP DATA DEBUG: #{@map_data.inspect}"
 
     @user_liked = result[:user_liked]
@@ -45,7 +44,8 @@ end
 
   def new
   @route = Route.new
-  3.times { @route.route_items.build } # Создаем 3 пустых поля для точек
+  3.times { @route.route_items.build } 
+  @cities = City.all
 end
 
   def route_params
