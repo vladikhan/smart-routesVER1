@@ -1,13 +1,17 @@
 <div id="follow_section_<%= user.id %>" class="follow-button-wrapper">
-  <% if current_user.following?(user) %>
-    <%= form_with url: unfollow_user_path(user), method: :delete do %>
-      <button type="submit" class="btn btn-outline-secondary mb-3 ">
-        フォロー解除123
-      </button>
+  <% if current_user.present? %>
+    <%# Только залогиненный пользователь может видеть кнопки фолловинга %>
+    <% if current_user.following?(user) %>
+       <%= form_with url: unfollow_user_path(user), method: :delete do %>
+         <button type="submit" class="btn btn-outline-secondary mb-3">フォロー解除</button>
+       <% end %>
+    <% else %>
+       <%= form_with url: follow_user_path(user), method: :post do %>
+         <button type="submit" class="btn btn-primary mb-3">フォローする</button>
+       <% end %>
     <% end %>
   <% else %>
-    <%= form_with url: follow_user_path(user), method: :post do %>
-      <button type="submit" class="btn btn-primary ">フォローする</button>
-    <% end %>
+    <%# Если пользователь гость, можно либо ничего не показывать, либо отправить на логин %>
+    <%= link_to 'ログイン', new_user_session_path, class: "btn btn-primary mb-3" %>
   <% end %>
 </div>

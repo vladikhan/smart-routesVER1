@@ -13,6 +13,17 @@
     <%= render 'pages/header' %>
     <%= render 'pages/hero' %>
 
+    <% if @route.errors.any? %>
+  <div class="alert alert-danger">
+    <p>Маршрут не удалось сохранить. Пожалуйста, исправьте ошибки:</p>
+    <ul>
+      <% @route.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
     <div class="create-container">
       <h1 class="page-title">ルート作成</h1>
 
@@ -123,7 +134,7 @@
         <div class="form-section">
           <h2 class="section-title">マッププレビュー</h2>
           <div id="create-map"></div>
-          <div style="margin-top: 10px; font-size: 13px; color: #666;">
+          <div style="margin-top: 10px; font-size: 13px; color: #64748B;">
             場所を追加すると、マップに自動的に表示されます
           </div>
         </div>
@@ -345,7 +356,7 @@
           });
 
           const infoWindow = new google.maps.InfoWindow({
-            content: `<div style="padding: 10px;"><h4 style="margin: 0 0 5px 0;">${place.name}</h4><p style="margin: 0; color: #666; font-size: 13px;">${place.address}</p></div>`,
+            content: `<div style="padding: 10px;"><h4 style="margin: 0 0 5px 0;">${place.name}</h4><p style="margin: 0; color: #64748B; font-size: 13px;">${place.address}</p></div>`,
           });
 
           marker.addListener("click", () => infoWindow.open(map, marker));

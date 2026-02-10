@@ -7,7 +7,6 @@ class DmMessage::Operation::Create < Trailblazer::Operation
   step Contract::Build(constant: DmMessage::Contract::Create)
   step Contract::Validate(key: :dm_message)
   
-  # 3. Сохранение и побочные эффекты
   step :persist!
   step :update_room_and_counters!
   step :notify!
@@ -36,17 +35,16 @@ class DmMessage::Operation::Create < Trailblazer::Operation
 
   def update_room_and_counters!(ctx, dm_room:, current_user:, **)
     dm_room.touch(:updated_at)
-    # Используем твой метод из модели DmRoom
     receiver = dm_room.other_user(current_user)
+    return true unless receiver
     dm_room.increment_unread_for(receiver) if receiver
-    true
   end
 
   def notify!(ctx, model:, dm_room:, current_user:, **)
     recipient = dm_room.other_user(current_user)
     return true unless recipient
 
-    Notification::Operation::Create.call(params: {
+    res = Notification::Operation::Create.call(params: {
       notification: {
         user_id: recipient.id,
         actor_id: current_user.id,
@@ -54,7 +52,7 @@ class DmMessage::Operation::Create < Trailblazer::Operation
         notifiable: model
       }
     })
-    true
+    res.success?
   end
 
   def broadcast!(ctx, model:, dm_room:, current_user:, **)
@@ -68,6 +66,5 @@ class DmMessage::Operation::Create < Trailblazer::Operation
       message: html,
       sender_id: current_user.id
     })
-    true
   end
 end

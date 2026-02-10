@@ -37,17 +37,24 @@ class UsersController < ApplicationController
   end
 
   def update
-    # Передаем params.to_unsafe_h, так как Contract сам отфильтрует нужные поля (username, bio и т.д.)
-    result = User::Operation::Update.call(params: params.to_unsafe_h, current_user: current_user)
+  # В Trailblazer мы передаем параметры в Операцию. 
+  # Она сама найдет юзера по params[:id] и проверит права через current_user.
+  result = User::Operation::Update.call(params: params.to_unsafe_h, current_user: current_user)
 
-    if result.success?
-      redirect_to user_path(result[:model]), notice: "プロフィールを更新しました"
-    else
-      @user = result[:model]
-      @form = result['contract.default']
-      render :edit, status: :unprocessable_entity
-    end
+  if result.success?
+    # Если операция прошла успешно, редиректим на профиль
+    redirect_to user_path(result[:model]), notice: "プロフィールを更新しました"
+  else
+    # Если валидация внутри Trailblazer Contract провалилась:
+    @user = result[:model]
+    @form = result['contract.default'] # Объект формы с ошибками для вьюхи
+    
+    # Выведем ошибки в консоль, чтобы мы видели, почему Trailblazer сделал Rollback
+    puts "TRAILBLAZER ERRORS: #{@form.errors.full_messages}"
+    
+    render :edit, status: :unprocessable_entity
   end
+end
 
   def comments
     # Логика для отдельной вкладки комментариев
@@ -63,25 +70,26 @@ class UsersController < ApplicationController
   end
 
   def follow
-    result = User::Operation::Follow.call(params: params, current_user: current_user)
+  result = User::Operation::Follow.call(params: params, current_user: current_user)
 
-    if result.success?
-      redirect_back fallback_location: root_path, notice: "フォローしました"
-    else
-      redirect_back fallback_location: root_path, alert: "エラーが発生しました"
-    end
+  if result.success?
+    # Добавляем status: :see_other
+    redirect_back fallback_location: root_path, notice: "フォローしました", status: :see_other
+  else
+    redirect_back fallback_location: root_path, alert: "エラーが発生しました", status: :see_other
   end
+end
 
-  def unfollow
-    # Предполагаем, что у тебя есть операция для отписки
-    result = Follower::Operation::Delete.call(params: params, current_user: current_user)
-    
-    if result.success?
-      redirect_back fallback_location: root_path, notice: "フォロー解除済み"
-    else
-      redirect_back fallback_location: root_path, alert: "解除中にエラーが発生しました"
-    end
+def unfollow
+  result = Follower::Operation::Delete.call(params: params, current_user: current_user)
+  
+  if result.success?
+    redirect_back fallback_location: root_path, notice: "フォロー解除済み", status: :see_other
+  else
+    redirect_back fallback_location: root_path, alert: "解除中にエラーが発生しました", status: :see_other
   end
+end
+
 
   private
 
@@ -90,6 +98,10 @@ class UsersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     redirect_to users_path, alert: 'ユーザーが見つかりませんでした'
   end
+
+  def user_params
+  params.require(:user).permit(:username, :birthday, :location, :gender, :bio, :avatar, :remove_avatar)
+end
 
   def authorize_user!
     user_to_check = @user || User.find_by(id: params[:id])

@@ -38,16 +38,22 @@ module Route::Operation
     end
 
     def map_items!(ctx, model:, **)
-      ctx[:map_items] = model.route_items.includes(:item).ordered.map do |ri|
-        venue = ri.item
-        {
-          name:    venue.name,
-          # Называем ключи так, как их хочет Google Maps в твоем JS
-          lat:     (venue.respond_to?(:geo_lat) ? venue.geo_lat : venue.latitude).to_f,
-          lng:     (venue.respond_to?(:geo_lng) ? venue.geo_lng : venue.longitude).to_f,
-          address: venue.try(:address) || ""
-        }
-      end
-    end
+  ctx[:map_items] = model.route_items.ordered.map do |ri|
+    # Пытаемся взять привязанный объект (например, Venue), если он есть
+    linked_item = ri.item 
+
+    {
+      # Если есть linked_item, берем имя у него. Если нет — берем venue_name из route_item
+      name:    linked_item&.respond_to?(:name) ? linked_item.name : ri.venue_name,
+      
+      # Координаты берем из новых колонок geo_lat/lng, которые мы только что наполнили
+      lat:     ri.geo_lat.to_f,
+      lng:     ri.geo_lng.to_f,
+      
+      # Адрес аналогично: из объекта или из колонки
+      address: linked_item&.respond_to?(:address) ? linked_item.address : ri.venue_address
+    }
+  end
+end
     end
 end

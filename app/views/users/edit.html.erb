@@ -1,8 +1,22 @@
 <% content_for :title, "プロフィール編集 - Smart Routes" %>
+<%= render 'pages/header' %>
 
 <% content_for :extra_styles do %>
   <%= stylesheet_link_tag 'profile', media: 'all' %>
 <% end %>
+
+<% if @user.errors.any? %>
+  <div class="error-messages" style="color: red; margin-bottom: 20px;">
+    <h2>入力内容 на проверку:</h2>
+    <ul>
+      <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+
 
 
     <!-- =========== PROFILE HEADER =========== -->
@@ -44,7 +58,7 @@
     <div class="edit-container">
       <!-- Flash Notification -->
       <div id="upload-notification" class="notification hidden">
-        <span class="notification-icon"></span>
+        
         <span id="notification-message"></span>
       </div>
 

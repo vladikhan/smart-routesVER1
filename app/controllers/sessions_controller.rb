@@ -2,16 +2,19 @@ class SessionsController < Devise::SessionsController
   skip_before_action :check_email_verification, only: %i[create new]
 
   def create
-    self.resource = warden.authenticate!(auth_options)
-    set_flash_message!(:notice, :signed_in)
-    sign_in(resource_name, resource)
-    yield resource if block_given?
-    respond_with resource, location: after_sign_in_path_for(resource)
-  rescue StandardError
+  # 1. Сначала проверяем, существует ли пользователь вообще
+  user = User.find_by(email: params[:user][:email])
+  
+  if user.nil?
     flash.now[:alert] = '入力されたメールアドレスはアカウントにリンクされていません。'
     self.resource = resource_class.new(sign_in_params)
-    render :new
+    return render :new # Выходим раньше, чтобы не мучить Warden
   end
+
+  # 2. Если юзер есть, отдаем всё на откуп Devise
+  # Он сам проверит пароль, подтверждение email и т.д.
+  super
+end
 
   def logout_confirm
   end

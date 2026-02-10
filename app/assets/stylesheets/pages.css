@@ -339,7 +339,7 @@
 .btn-create-route-large:hover {
 	background: #09c2d7;
 	transform: translateY(-3px);
-	box-shadow: #0cbdd1;
+	box-shadow: #06b6d4;
 }
 
 .btn-create-route-large::before {

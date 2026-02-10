@@ -117,7 +117,7 @@
   left: 0;
   width: 80px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   border-radius: 2px;
 }
 
@@ -151,7 +151,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s ease;
@@ -169,7 +169,7 @@
 .venue-card-header {
   width: 100%;
   height: 200px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -220,7 +220,7 @@
 
 .venue-card-description {
   font-size: 14px;
-  color: #666;
+  color: #64748B;
   line-height: 1.7;
   margin-bottom: 16px;
   display: -webkit-box;
@@ -253,7 +253,7 @@
 }
 
 .tag-cuisine:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   color: white;
   border-color: transparent;
   transform: translateY(-2px) scale(1.05);
@@ -316,7 +316,7 @@
 .empty-state-icon {
   font-size: 80px;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -325,7 +325,7 @@
 .empty-state h3 {
   font-size: 24px;
   font-weight: 700;
-  color: #666;
+  color: #64748B;
   margin-bottom: 12px;
 }
 
@@ -349,7 +349,7 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #01dbff 0%, #918dac 100%);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s ease;
@@ -385,13 +385,13 @@
   left: 0;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   border-radius: 2px;
 }
 
 .venue-info-card h2 i,
 .venue-info-card h3 i {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -422,7 +422,7 @@
 
 .info-label {
   font-weight: 700;
-  color: #666;
+  color: #64748B;
   width: 160px;
   display: flex;
   align-items: center;
@@ -534,7 +534,7 @@
 }
 
 .venue-action-btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
   color: white;
 }
 
@@ -647,7 +647,7 @@
 }
 
 .route-mini-card-meta {
-	color: #666;
+	color: #64748B;
 	font-size: 13px;
 }
 
@@ -666,7 +666,7 @@
 }
 
 .review-text {
-	color: #666;
+	color: #64748B;
 	line-height: 1.6;
 	margin: 8px 0;
 }

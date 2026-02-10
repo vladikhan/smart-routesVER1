@@ -6,4 +6,3 @@ module Review::Contract
     validates :text, presence: true, length: { maximum: 1000 }
   end
 end
-

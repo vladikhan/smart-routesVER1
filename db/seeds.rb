@@ -763,8 +763,8 @@ users.first(15).each do |u|
       user: u,
       actor: users.sample,
       notification_type: %w[follow like comment review].sample,
-      entity_type: notifiable.class.name,
-      entity_id: notifiable.id,
+      notifiable_type: notifiable.class.name,
+      notifiable_id: notifiable.id,
       is_read: [true, false].sample
     )
   end

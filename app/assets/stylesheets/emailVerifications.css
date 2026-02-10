@@ -30,7 +30,7 @@ body {
 }
 
 .verification-header {
-	background: linear-gradient(135deg, #0cbdd1 0%, #2296f3 100%);
+	background: linear-gradient(135deg, #06b6d4 0%, #2296f3 100%);
 	padding: 40px 30px;
 	text-align: center;
 	color: white;
@@ -70,7 +70,7 @@ body {
 
 .info-box {
 	background: #f8f9fa;
-	border-left: 4px solid #667eea;
+	border-left: 4px solid #07c8f9;
 	padding: 15px 20px;
 	border-radius: 8px;
 	margin-bottom: 30px;
@@ -189,7 +189,7 @@ body {
 	display: block;
 	text-align: center;
 	margin-top: 20px;
-	color: #666;
+	color: #64748B;
 	text-decoration: none;
 	font-size: 14px;
 }

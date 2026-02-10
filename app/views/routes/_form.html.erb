@@ -96,6 +96,44 @@
     %>
   </div>
 
+  
+  <hr class="my-4" />
+<h3 class="fw-bold mb-3">Пункты маршрута</h3>
+
+<div id="route-items-fields">
+  <%= f.fields_for :route_items do |item_f| %>
+    <div class="card mb-3 shadow-sm border-primary">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <%= item_f.label :venue_name, 'Название заведения', class: 'form-label' %>
+            <%= item_f.text_field :venue_name, class: 'form-control', placeholder: 'Например: Starbucks' %>
+          </div>
+
+          <div class="col-md-6">
+            <%= item_f.label :venue_address, 'Адрес', class: 'form-label' %>
+            <%= item_f.text_field :venue_address, class: 'form-control' %>
+          </div>
+
+          <%# Пока сделаем их текстовыми полями, чтобы ты мог вручную вписать координаты для теста %>
+          <div class="col-md-3">
+            <%= item_f.label :geo_lat, 'Широта (Lat)', class: 'form-label' %>
+            <%= item_f.text_field :geo_lat, class: 'form-control', placeholder: '35.0116' %>
+          </div>
+
+          <div class="col-md-3">
+            <%= item_f.label :geo_lng, 'Долгота (Lng)', class: 'form-label' %>
+            <%= item_f.text_field :geo_lng, class: 'form-control', placeholder: '135.7681' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
+
+
   <div class="d-flex gap-2 pb-5">
     <%=
       f.submit(

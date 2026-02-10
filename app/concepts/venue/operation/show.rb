@@ -10,7 +10,7 @@ class Venue::Operation::Show < Trailblazer::Operation
 
   def increment_stats!(ctx, model:, **)
     # Используем update_all, чтобы инкрементировать счетчик в базе данных напрямую
-    # Это быстрее и не вызывает колбэки/валидации всей модели
+    
     Venue.where(id: model.id).update_all("view_count = COALESCE(view_count, 0) + 1")
     true
   end

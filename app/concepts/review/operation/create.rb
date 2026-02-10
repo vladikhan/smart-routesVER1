@@ -32,7 +32,7 @@ class Review::Operation::Create < Trailblazer::Operation
   end
 
   def notify!(options, model:, **)
-    # Проверка: если сервис существует, вызываем его
+  
     NotificationService.notify_review_added(model) if defined?(NotificationService)
     true
   end

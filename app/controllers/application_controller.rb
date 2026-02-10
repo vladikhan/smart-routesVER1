@@ -13,14 +13,15 @@ class ApplicationController < ActionController::Base
   end
 
   def check_email_verification
-    return unless user_signed_in?
-    # Не редиректим, если запрос JSON или JS (например, unread_count)
-    return if request.format.json? || request.format.js?
+  return unless user_signed_in?
+  return if request.format.json? || request.format.js?
+  
+  # Добавим проверку devise_controller?, это покроет все страницы Devise (пароли, логины)
+  return if devise_controller? || controller_name == 'email_verifications'
 
-    if !current_user.email_verified? &&
-       !%w[email_verifications confirmations sessions].include?(controller_name)
-      redirect_to email_verification_path, alert: 'メールアドレスの確認が必要です。'
-    end
+  if !current_user.email_verified?
+    redirect_to email_verification_path, alert: 'メールアドレスの確認が必要です。'
+  end
   end
 
   def set_notifications

@@ -53,9 +53,9 @@ class User < ApplicationRecord
     Time.current <= verification_code_sent_at + VERIFICATION_CODE_EXPIRY && verification_code == code
   end
 
-  def send_confirmation_instructions
-    generate_verification_code
-    UserMailer.verification_code_email(self).deliver_now
+  def send_verification_code
+  generate_verification_code
+  UserMailer.verification_code_email(self).deliver_now
   end
 
   # === Messages and Notifications ===

@@ -16,12 +16,13 @@
     <% if @notifications.where(is_read: false).any? %>
       <%# Исправлено: вызываем JS функцию напрямую через onclick %>
       <button
-        type="button"
-        class="mark-all-read"
-        onclick="markAllNotificationsAsRead()"
-      >
-        すべて既読にする
-      </button>
+  type="button"
+  class="mark-all-read"
+  data-url="<%= mark_all_as_read_notifications_path %>"
+  onclick="console.log('Клик сработал!'); alert('URL: ' + this.dataset.url); markAllNotificationsAsRead(this.dataset.url)"
+>
+  すべて既読にする
+</button>
     <% end %>
   </div>
 
@@ -155,47 +156,20 @@
   /**
    * Отметить ВСЕ уведомления как прочитанные
    */
-  async function markAllNotificationsAsRead() {
-    if (!confirm("すべての通知を既読にしますか？")) return;
+  window.markAllNotificationsAsRead = async function (url) { 
+  if (!url) return; // Предохранитель
+  if (!confirm("すべての通知を既読にしますか？")) return;
 
-    try {
-      const response = await fetch("eexs31eexs", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')
-            .content,
-          Accept: "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Обновляем все карточки на странице
-        document
-          .querySelectorAll(".notification-card.unread")
-          .forEach((card) => {
-            card.classList.remove("unread");
-            card.classList.add("read");
-            const dot = card.querySelector(".notification-unread-dot");
-            if (dot) dot.remove();
-          });
-
-        // Прячем кнопку "Прочитать все"
-        const markAllBtn = document.querySelector(".mark-all-read");
-        if (markAllBtn) markAllBtn.remove();
-
-        // Вызываем глобальный тост (из application.html.erb)
-        if (typeof showToast === "function") {
-          showToast("すべて既読にしました", "success");
-        }
-      }
-    } catch (error) {
-      console.error("Error marking all as read:", error);
-      if (typeof showToast === "function") {
-        showToast("エラーが発生しました", "error");
-      }
-    }
-  }
+  try {
+    const response = await fetch(url, { // Используем полученный url
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "Accept": "application/json",
+      },
+    });
+    // ... остальной твой код с data.success
+  } catch (e) { console.error(e) }
+}
 </script>

@@ -114,232 +114,198 @@
         <div class="form-section">
           <h2 class="section-title">📍 訪問場所</h2>
 
-          <div id="edit-map"></div>
+          <div id="edit-map" style="height: 400px; margin-bottom: 20px;"></div>
 
-          <div id="spots-list">
+          <div id="route-items-container">
             <% @route.route_items.order(:position).each_with_index do |item, index| %>
-              <div class="spot-item" data-spot-id="<%= index + 1 %>">
+              <div class="route-item-row spot-item" data-index="<%= index %>">
                 <div class="spot-number"><%= index + 1 %></div>
-                <button
-                  type="button"
-                  class="remove-spot"
-                  onclick="removeExistingSpot(<%= item.id %>)"
-                >
-                  ×
-                </button>
+                
+                <input type="text" 
+                       class="place-autocomplete form-control" 
+                       value="<%= item.venue_name %>" 
+                       placeholder="場所を検索...">
 
-                <div class="current-venue-info">
-                  <strong><%= item.venue&.name || item.venue_name %></strong
-                  ><br />
-                  <small><%=
-                      item.venue&.address || item.venue_address
-                    %></small>
-                </div>
+                <%# Скрытые поля для передачи данных в контроллер %>
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][id]" value="<%= item.id %>">
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_name]" class="input-name" value="<%= item.venue_name %>">
+                <%# ВАЖНО: используем geo_lat/lng из базы %>
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_lat]" class="input-lat" value="<%= item.geo_lat %>">
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_lng]" class="input-lng" value="<%= item.geo_lng %>">
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_address]" class="input-address" value="<%= item.venue_address %>">
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][position]" value="<%= index %>">
 
-                <div class="venue-search-box">
-                  <input
-                    type="text"
-                    class="place-autocomplete"
-                    placeholder="🔍 変更する場合は検索..."
-                    data-spot-index="<%= index %>"
-                  />
-                </div>
-
-                <input
-                  type="hidden"
-                  name="route_items[][venue_name]"
-                  value="<%= item.venue_name %>"
-                  id="venue-name-<%= index %>"
-                />
-                <input
-                  type="hidden"
-                  name="route_items[][venue_address]"
-                  value="<%= item.venue_address %>"
-                  id="venue-address-<%= index %>"
-                />
-                <input
-                  type="hidden"
-                  name="route_items[][venue_lat]"
-                  value="<%= item.venue&.geo_lat %>"
-                  id="venue-lat-<%= index %>"
-                />
-                <input
-                  type="hidden"
-                  name="route_items[][venue_lng]"
-                  value="<%= item.venue&.geo_lng %>"
-                  id="venue-lng-<%= index %>"
-                />
-                <input
-                  type="number"
-                  name="route_items[][duration_minutes]"
-                  value="<%= item.duration_minutes %>"
-                  class="spot-duration"
-                  placeholder="滞在時間（分）"
-                />
+                <button type="button" class="remove-item remove-spot">×</button>
               </div>
             <% end %>
           </div>
 
-          <button type="button" class="add-spot-btn" onclick="addNewSpot()">
-            ➕ スポットを追加
-          </button>
+          <div class="text-center mt-3">
+            <button type="button" id="add-item-btn" class="btn btn-outline-primary">
+              + スポットを追加
+            </button>
+          </div>
         </div>
 
-        <!-- Actions -->
-        <div class="form-actions">
+        <template id="route-item-template">
+          <div class="route-item-row spot-item">
+            <div class="spot-number">__POSITION__</div>
+            <input type="text" class="place-autocomplete form-control" placeholder="場所を検索...">
+            <input type="hidden" name="route[route_items_attributes][__INDEX__][venue_name]" class="input-name">
+            <input type="hidden" name="route[route_items_attributes][__INDEX__][venue_lat]" class="input-lat">
+            <input type="hidden" name="route[route_items_attributes][__INDEX__][venue_lng]" class="input-lng">
+            <input type="hidden" name="route[route_items_attributes][__INDEX__][venue_address]" class="input-address">
+            <input type="hidden" name="route[route_items_attributes][__INDEX__][position]" value="__INDEX__">
+            <button type="button" class="remove-item remove-spot">×</button>
+          </div>
+        </template>
+
+        <div class="form-actions" style="margin-top: 30px;">
           <%= link_to 'キャンセル', @route, class: 'btn btn-cancel' %>
           <%= f.submit '変更を保存', class: 'btn btn-save' %>
         </div>
-      <% end %>
+      <% end %> <%# Конец формы %>
 
-      <!-- Danger Zone -->
       <div class="danger-zone">
         <h3>⚠️ 危険な操作</h3>
         <p>このルートを削除すると、すべてのデータが完全に削除されます。</p>
-        <%=
-          button_to 'このルートを削除',
-                    route_path(@route),
-                    method: :delete,
-                    data: {
-                      confirm: '本当にこのルートを削除しますか？',
-                    },
-                    class: 'btn-delete'
-        %>
+        <%= button_to 'Удалить', route_path(@route), 
+              method: :delete, 
+              form: { data: { turbo_confirm: 'Вы уверены?' } },
+              class: 'btn btn-danger' %>
       </div>
     </div>
 
     <script>
-      const API_KEY = '<%= ENV['GOOGLE_MAPS_API_KEY'] %>';
-      let map;
-      let markers = [];
-      let spotCount = <%= @route.route_items.count %>;
+(function() {
+  const API_KEY = '<%= ENV['GOOGLE_MAPS_API_KEY'] %>';
+  let map, markers = [], polyline;
 
-      // Load existing spots
-      const existingSpots = [
-      <% @route.route_items.order(:position).each do |item| %>
+  // Инициализация карты
+  window.initMap = function() {
+    const mapElement = document.getElementById('edit-map');
+    if (!mapElement) return;
 
-      <% if item.venue&.geo_lat %>
+    map = new google.maps.Map(mapElement, {
+      zoom: 14,
+      center: { lat: 35.0116, lng: 135.7681 }, // Киото по умолчанию
+      mapTypeControl: false
+    });
 
-            {
-              name: <%= raw (item.venue&.name || item.venue_name).to_json %>,
-              lat: <%= item.venue.geo_lat %>,
-              lng: <%= item.venue.geo_lng %>,
-              address: <%= raw (item.venue&.address || item.venue_address).to_json %>
-            },
-      <% end %>
-      <% end %>
-      ];
+    refreshMap(); // Рисуем точки, которые уже есть в базе
+    initAutocompletes(); // Подключаем поиск к полям
+  };
 
-      function initMap() {
-        const center = existingSpots.length > 0
-          ? { lat: existingSpots[0].lat, lng: existingSpots[0].lng }
-          : { lat: 35.0116, lng: 135.7681 }; // Kyoto
+  function refreshMap() {
+    if (!map) return;
+    markers.forEach(m => m.setMap(null));
+    markers = [];
+    if (polyline) polyline.setMap(null);
 
-        map = new google.maps.Map(document.getElementById('edit-map'), {
-          zoom: 13,
-          center: center,
-          mapTypeControl: true
+    const path = [];
+    const bounds = new google.maps.LatLngBounds();
+
+    // Ищем все строки маршрута
+    document.querySelectorAll('.route-item-row').forEach((row, index) => {
+      const lat = parseFloat(row.querySelector('.input-lat')?.value);
+      const lng = parseFloat(row.querySelector('.input-lng')?.value);
+
+      if (!isNaN(lat) && !isNaN(lng) && lat !== 0) {
+        const pos = { lat, lng };
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: map,
+          label: (index + 1).toString()
         });
+        markers.push(marker);
+        path.push(pos);
+        bounds.extend(pos);
+      }
+    });
 
-        updateMapMarkers();
+    if (path.length > 1) {
+      polyline = new google.maps.Polyline({
+        path: path,
+        strokeColor: '#0288d1',
+        strokeWeight: 4,
+        map: map
+      });
+    }
+    if (path.length > 0) map.fitBounds(bounds);
+  }
+
+  function initAutocompletes() {
+    document.querySelectorAll('.place-autocomplete').forEach(input => {
+      if (input.dataset.bound) return;
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        componentRestrictions: { country: 'jp' },
+        fields: ['name', 'formatted_address', 'geometry']
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+
+        const row = input.closest('.route-item-row');
+        row.querySelector('.input-name').value = place.name;
+        row.querySelector('.input-address').value = place.formatted_address;
+        row.querySelector('.input-lat').value = place.geometry.location.lat();
+        row.querySelector('.input-lng').value = place.geometry.location.lng();
+        
+        // Обновляем текст в UI
+        const display = row.querySelector('.display-name');
+        if (display) display.innerText = place.name;
+
+        refreshMap();
+      });
+      input.dataset.bound = "true";
+    });
+  }
+
+  function setupEventListeners() {
+    const container = document.getElementById('route-items-container');
+    const addBtn = document.getElementById('add-item-btn');
+    const template = document.getElementById('route-item-template');
+
+    if (addBtn && container && template) {
+      // Чтобы не вешать событие несколько раз при переходах Turbolinks
+      addBtn.onclick = (e) => {
+        e.preventDefault();
+        const newIndex = container.querySelectorAll('.route-item-row').length;
+        let html = template.innerHTML
+          .replace(/__INDEX__/g, newIndex)
+          .replace(/__POSITION__/g, newIndex + 1);
+        
+        container.insertAdjacentHTML('beforeend', html);
         initAutocompletes();
-      }
+      };
 
-      function updateMapMarkers() {
-        // Clear existing markers
-        markers.forEach(m => m.setMap(null));
-        markers = [];
-
-        const validSpots = existingSpots.filter(s => s.lat && s.lng);
-
-        validSpots.forEach((spot, index) => {
-          const marker = new google.maps.Marker({
-            position: { lat: spot.lat, lng: spot.lng },
-            map: map,
-            label: String(index + 1),
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              fillColor: '#0288d1',
-              fillOpacity: 1,
-              strokeColor: 'white',
-              strokeWeight: 3,
-              scale: 20
-            }
-          });
-
-          markers.push(marker);
-        });
-
-        // Draw route line
-        if (validSpots.length > 1) {
-          new google.maps.Polyline({
-            path: validSpots,
-            strokeColor: '#0288d1',
-            strokeWeight: 4,
-            map: map
-          });
+      container.onclick = (e) => {
+        if (e.target.classList.contains('remove-item')) {
+          e.target.closest('.route-item-row').remove();
+          refreshMap();
         }
-      }
+      };
+    }
 
-      function initAutocompletes() {
-        document.querySelectorAll('.place-autocomplete').forEach(input => {
-          const autocomplete = new google.maps.places.Autocomplete(input, {
-            componentRestrictions: { country: 'jp' },
-            fields: ['name', 'formatted_address', 'geometry']
-          });
+    // Загрузка самого API Google
+    if (typeof google === 'undefined') {
+      const script = document.createElement('script');
+      // Добавляем loading=async как просит Google
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&libraries=places&language=ja&loading=async`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    } else {
+      initMap();
+    }
+  }
 
-          autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) return;
-
-            const index = input.dataset.spotIndex;
-            const lat = place.geometry.location.lat();
-            const lng = place.geometry.location.lng();
-
-            document.getElementById(`venue-name-${index}`).value = place.name;
-            document.getElementById(`venue-address-${index}`).value = place.formatted_address;
-            document.getElementById(`venue-lat-${index}`).value = lat;
-            document.getElementById(`venue-lng-${index}`).value = lng;
-
-            // Update existingSpots array
-            existingSpots[index] = {
-              name: place.name,
-              lat: lat,
-              lng: lng,
-              address: place.formatted_address
-            };
-
-            updateMapMarkers();
-          });
-        });
-      }
-
-      function addNewSpot() {
-        alert('新しいスポットを追加するには、routes/newページを使用してください');
-      }
-
-      function removeExistingSpot(itemId) {
-        if (confirm('このスポットを削除しますか？')) {
-          // You would need to implement delete endpoint
-          alert('スポット削除機能は開発中です');
-        }
-      }
-
-      // Load Google Maps
-      function loadGoogleMaps() {
-        if (!API_KEY) {
-          console.error('Google Maps API key not set');
-          return;
-        }
-
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&libraries=places&language=ja`;
-        script.async = true;
-        document.head.appendChild(script);
-      }
-
-      window.initMap = initMap;
-      document.addEventListener('DOMContentLoaded', loadGoogleMaps);
-    </script>
+  // Поддержка всех вариантов загрузки Rails
+  document.addEventListener('DOMContentLoaded', setupEventListeners);
+  document.addEventListener('turbolinks:load', setupEventListeners);
+  document.addEventListener('turbo:load', setupEventListeners);
+})();
+</script>
   </body>
 </html>

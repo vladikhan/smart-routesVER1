@@ -41,7 +41,12 @@ class NotificationsController < ApplicationController
   end
 
   def mark_all_as_read
-    Notification.mark_all_as_read_for(current_user)
-    redirect_back(fallback_location: notifications_path, notice: 'すべて既読にしました')
+  # Твоя логика пометки прочитанными
+  Notification.mark_all_as_read_for(current_user)
+
+  respond_to do |format|
+    format.html { redirect_back(fallback_location: notifications_path) }
+    format.json { render json: { success: true } } 
   end
+end
 end

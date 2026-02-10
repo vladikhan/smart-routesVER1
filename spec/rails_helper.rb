@@ -1,127 +1,85 @@
-require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
-
 require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
+
+require 'spec_helper'
 require 'rspec/rails'
+require 'shoulda/matchers'
 
-# Load support files
+# 1. Настройка DatabaseCleaner (особенно важно для Docker/CI)
+DatabaseCleaner.allow_remote_database_url = true
+
+# 2. Подключение support-файлов
 Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
-require 'factory_bot_rails'
-require 'faker'
-require 'database_cleaner/active_record'
-require 'simplecov'
 
-SimpleCov.start 'rails' do
-  add_filter '/spec/'
-  add_filter '/config/'
-  add_filter '/vendor/'
-end
-
+# 3. Проверка миграций
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
-  abort e.to_s.strip
+  puts e.to_s.strip
+  exit 1
 end
 
-DatabaseCleaner.allow_remote_database_url = true
+# 4. Гарантированная загрузка фабрик (защита от дублирования)
+if FactoryBot.factories.count == 0
+  FactoryBot.find_definitions
+end
 
 RSpec.configure do |config|
-  config.before(:suite) do
-    Warden.test_mode!
-  end
-
-  config.after(:each) do
-    Warden.test_reset!
-  end
-
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
-
-  config.use_transactional_fixtures = false
+  
+  # Используем transactional fixtures, но DatabaseCleaner дает более тонкий контроль
+  config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
 
-  #Factory Bot
+  # --- Helpers ---
   config.include FactoryBot::Syntax::Methods
+  config.include ActiveSupport::Testing::TimeHelpers
 
-  #Database Cleaner
+
+  
+  # Devise Helpers (для контроллеров и системных тестов)
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Devise::Test::IntegrationHelpers, type: :request
+  
+  # ActionCable Helpers
+  config.include ActionCable::TestHelper, type: :channel
+
+  # --- DatabaseCleaner Strategy ---
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
 
   config.before(:each) do
     DatabaseCleaner.strategy = :transaction
+
   end
 
-  config.before(:each, js: true) do
+  # Для тестов через браузер (JS: true) или feature-тестов нужна транзакция truncation
+  config.before(:each, type: :feature) do
     DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
   end
 
-  config.before(:all) do
-    # Укажите любой тестовый хост и порт.
-    # В реальных условиях можно использовать 'example.com' или 'localhost:3000'.
-    Rails.application.routes.default_url_options[:host] = 'localhost:3000'
+  # --- Localization ---
+  config.before(:each) do
+    Time.zone = 'Tokyo'
+    Faker::Config.locale = 'ja'
   end
-
-  #Devise helpers
-  config.include Devise::Test::ControllerHelpers, type: :controller
-  config.include Devise::Test::IntegrationHelpers, type: :request
 end
 
+# 5. Настройка Shoulda Matchers
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
     with.library :rails
   end
-end
-require 'support/devise'
-
-RSpec.configure do |config|
-  config.before(:suite) do
-    Warden.test_mode!
-  end
-
-  config.after(:each) do
-    Warden.test_reset!
-  end
-
-
-  config.use_transactional_fixtures = true
-
-  
-
-  config.before(:suite) do
-
-    DatabaseCleaner.clean_with(:truncation)
-
-  end
-
-  config.before(:each) do
-
-    DatabaseCleaner.strategy = :transaction
-
-  end
-
-  config.before(:each, js: true) do
-
-    DatabaseCleaner.strategy = :truncation
-
-  end
-
-  config.before(:each) do
-
-    DatabaseCleaner.start
-
-  end
-
-  config.after(:each) do
-
-    DatabaseCleaner.clean
-
-  end
-
 end

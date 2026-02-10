@@ -13,7 +13,6 @@ module Comment::Operation
         trackable: model,
         key: 'comment.create'
       )
-      true
     rescue  => e 
       Rails.logger.error "アクティビティログの失敗: #{e.message}"
       true

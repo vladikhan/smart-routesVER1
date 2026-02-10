@@ -16,12 +16,12 @@ module Notification::Operation
 
     def setup_params!(ctx, params:, **)
       p = params[:notification]
-      # Используем .new, но данные берем из params динамически
+     
       ctx[:model] = Notification.new(
         user_id:           p[:user_id],
         actor_id:          p[:actor_id],
         notification_type: p[:action] || p[:notification_type],
-        notifiable:        p[:notifiable], # Rails сам поймет type и id
+        notifiable:        p[:notifiable], 
         is_read:           false
       )
     end

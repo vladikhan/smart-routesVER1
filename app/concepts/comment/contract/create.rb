@@ -3,7 +3,7 @@ require "reform/form/dry"
 
 module Comment::Contract
   class Create < Reform::Form
-    include Dry # Используем современный dry-validation
+    include Dry 
     
     property :text
     property :commentable_id

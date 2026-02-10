@@ -231,44 +231,33 @@ const notificationChannel = consumer.subscriptions.create(
 )
 
 // Global function to mark all as read
-window.markAllNotificationsAsRead = async function () {
-	try {
-		const response = await fetch('/notifications/mark_all_as_read', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')
-					.content,
-				Accept: 'application/json',
-			},
-		})
+window.markAllNotificationsAsRead = async function (url) {
+  if (!url) return;
+  
+  // Оставляем только одно подтверждение
+  if (!confirm("すべての通知を既読にしますか？")) return;
 
-		const data = await response.json()
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        "Accept": "application/json",
+      },
+    });
 
-		if (data.success) {
-			// Remove all unread styling
-			document.querySelectorAll('.notification-item.unread').forEach(item => {
-				item.classList.remove('unread')
-				item.classList.add('read')
-				const indicator = item.querySelector('.unread-indicator')
-				if (indicator) indicator.remove()
-			})
-
-			// Update badge
-			notificationChannel.updateBadge(0)
-
-			// Show success message
-			showSuccessToast('すべて既読にしました')
-
-			// Hide "mark all" button
-			const markAllBtn = document.querySelector('.mark-all-read')
-			if (markAllBtn) markAllBtn.style.display = 'none'
-		}
-	} catch (error) {
-		console.error('Error:', error)
-		showErrorToast('エラーが発生しました')
-	}
-}
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        // Если всё ок — просто перезагружаем, чтобы Rails перерисовал уведомления
+        window.location.reload();
+      }
+    }
+  } catch (error) {
+    console.error("Ошибка при пометке прочитанными:", error);
+  }
+};
 
 function showSuccessToast(message) {
 	const toast = document.createElement('div')

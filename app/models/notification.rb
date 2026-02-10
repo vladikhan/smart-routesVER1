@@ -41,6 +41,10 @@ class Notification < ApplicationRecord
     "#"
   end
 
+  def self.mark_all_as_read_for(user)
+  user.notifications.where(is_read: false).update_all(is_read: true, read_at: Time.current)
+end
+
   def icon
     case notification_type
     when 'like' then '❤️'

@@ -7,10 +7,11 @@ import './notifications'
 import './notifications_poll'
 require('@rails/activestorage').start()
 require('@rails/ujs').start()
-require('turbolinks').start()
 
 const application = Application.start()
 application.debug = false
 window.Stimulus = application
 
 export { application }
+
+

@@ -212,7 +212,7 @@ body {
 	right: 14px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #666;
+	color: #64748B;
 	font-size: 18px;
 }
 
@@ -347,7 +347,7 @@ body {
 
 .preview-duration {
 	font-size: 13px;
-	color: #666;
+	color: #64748B;
 }
 
 /* Delete in preview */
@@ -404,7 +404,7 @@ body {
 
 .btn-cancel {
 	background: white;
-	color: #666;
+	color: #64748B;
 	border: 1px solid #ddd;
 }
 

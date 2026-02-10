@@ -24,11 +24,10 @@ module PlaceOwner::Operation
     end
 
     def notify_user!(ctx, model:, **)
-      # Здесь можно вызвать операцию уведомления
       Notification::Operation::Create.call(params: {
         notification: {
           user_id: model.user_id,
-          action: 'mention', # Или создай новый тип 'claim_approved'
+          action: 'mention',
           notifiable: model.venue,
           message: "店舗「#{model.venue.name}」のオーナー確認が完了しました！"
         }

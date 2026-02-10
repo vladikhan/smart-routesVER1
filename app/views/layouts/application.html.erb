@@ -47,22 +47,54 @@
       end
     %>
 
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%# Swiper %>
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
     />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <%# Emoji %>
+
+      <script src="https://cdn.jsdelivr.net/npm/picmo@latest/dist/umd/index.js"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/@picmo/renderer-fontawesome@latest/dist/umd/index.js"></script>
+    
+
     <%= yield :extra_css %>
+
+    <style>
+  /* Уменьшаем шрифты категорий и отступы */
+  .picker {
+    --emojis-per-row: 6;
+    --emoji-size: 1.5rem;
+    font-size: 0.8rem; /* Уменьшаем общий текст интерфейса */
+  }
+
+  /* Если хочешь убрать лишние детали (например, превью внизу) */
+  .picmo__preview {
+    display: none !important;
+  }
+  
+  /* Делаем само окно более легким */
+  .picmo__picker {
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border: 1px solid #444;
+  }
+</style>
   </head>
 
-  <body>
-
+  
  
     <%= yield %>
   
@@ -174,6 +206,54 @@
           }
         })
       }
-    </script>
+
+      function initEmojiPicker() {
+    // Теперь мы ищем кнопку по классу .emoji-btn, как в твоем коде
+    const btn = document.querySelector('.emoji-btn');
+    const textarea = document.querySelector('#message-content-input');
+
+    console.log("Поиск элементов:");
+    console.log("- Кнопка найдена:", !!btn);
+    console.log("- Поле найдено:", !!textarea);
+
+    if (!btn || !textarea) return;
+
+    // Инициализация библиотеки Joe Attardi
+    try {
+      const picker = new EmojiButton({
+        position: 'top-end', // Чтобы окно всплывало над кнопкой
+        theme: 'dark',
+        autoHide: false,
+        zIndex: 10000
+      });
+
+      picker.on('emoji', selection => {
+        // Вставляем эмодзи (selection.emoji — это сам символ)
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        textarea.setRangeText(selection.emoji, start, end, 'end');
+        textarea.focus();
+        
+        // Генерируем событие ввода, чтобы если есть авто-высота, она сработала
+        textarea.dispatchEvent(new Event('input'));
+      });
+
+      btn.onclick = (e) => {
+        e.preventDefault();
+        console.log("Открываю пикер...");
+        picker.togglePicker(btn);
+      };
+
+      console.log("Emoji Picker успешно подключен!");
+    } catch (e) {
+      console.error("Ошибка при создании пикера:", e);
+    }
+  }
+
+  // Слушаем события Rails
+  document.addEventListener("DOMContentLoaded", initEmojiPicker);
+  document.addEventListener("turbo:load", initEmojiPicker);
+  document.addEventListener("turbolinks:load", initEmojiPicker);
+  </script>
   </body>
 </html>

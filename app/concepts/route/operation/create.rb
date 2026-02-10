@@ -2,9 +2,9 @@ class Route::Operation::Create < Trailblazer::Operation
   step Model(::Route, :new)
   step :initialize_view_count!
   step :assign_current_user!
-  step :process_google_items
   step Contract::Build(constant: Route::Contract::Create)
   step Contract::Validate(key: :route)
+  step :process_google_items
   step :process_tags!
   step Contract::Persist()
   step :notify_followers!
@@ -21,28 +21,30 @@ class Route::Operation::Create < Trailblazer::Operation
     NotificationService.notify_new_route_from_following(model)
   end
 
-  def process_google_items!(options, params:, model:, **)
-    true unless params[:route][:google_maps_items].present?
+def process_google_items(options, params:, model:, **)
+  items = params[:route_items]
+  return true if items.blank?
 
-    items = JSON.parse(params[:route][:google_maps_items])
-    items.each_with_index do |item, index|
-      model.route_items.build(
-        name: item['name'],
-        latitude: item['latitude'],
-        longitude: item['longitude'],
-        order_index: index,
-        description: item['address']
-      )
-    end
-    begin
-      true
-    rescue StandardError
-      true
-    end
-  end
+  items.each_with_index do |item, index|
+    # Пропускаем, если название места пустое
+    next if item['venue_name'].blank?
 
-  def process_tags!(options, params:, model:, **)
-    model.tag_list = params[:route][:tag_list].split(',').map(&:strip) if params[:route][:tag_list].present?
-    true
+    model.route_items.build(
+      venue_name:       item['venue_name'],
+      venue_address:    item['venue_address'],
+      duration_minutes: item['duration_minutes'],
+      order_index:      index,
+      position:         index + 1,
+      item_type:        "venue"
+    )
   end
+  true
+end
+
+def process_tags!(options, params:, model:, **)
+  if params[:route] && params[:route][:tag_ids].present?
+    model.tag_ids = params[:route][:tag_ids].reject(&:blank?)
+  end
+  true
+end
 end

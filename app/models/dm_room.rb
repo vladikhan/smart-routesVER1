@@ -3,6 +3,8 @@ class DmRoom < ApplicationRecord
   belongs_to :receiver, class_name: 'User', foreign_key: 'receiver_id'
   has_many :dm_messages, dependent: :destroy
 
+  has_many :dm_room_members, dependent: :destroy
+
   has_one :last_message, -> { order(created_at: :desc) }, class_name: 'DmMessage'
 
   validates :sender_id, :receiver_id, presence: true
@@ -15,8 +17,26 @@ class DmRoom < ApplicationRecord
     order(Arel.sql('COALESCE(last_message_at, updated_at) DESC'))
   }
 
-  def other_user(current_user)
-    current_user.id == sender_id ? receiver : sender
+  def self.find_or_create_between(user_a_id, user_b_id)
+  room = where(sender_id: user_a_id, receiver_id: user_b_id)
+         .or(where(sender_id: user_b_id, receiver_id: user_a_id))
+         .first
+
+  # Используем create! чтобы увидеть ошибку, если валидация не прошла
+  room ||= create!(sender_id: user_a_id, receiver_id: user_b_id)
+  
+  room
+end
+
+  def other_user(user_to_compare)
+    user_to_compare.id == sender_id ? receiver : sender
+  end
+
+  def increment_unread_for(user)
+    return unless user
+    column = (user.id == sender.id) ? :unread_count_sender : :unread_count_receiver
+
+    self.increment!(column)
   end
 
   def unread_count_for(user)
@@ -48,6 +68,11 @@ class DmRoom < ApplicationRecord
 
   def self.for_user_with_preloads(user)
     for_user(user).includes(:sender, :receiver).recent
+  end
+
+  def participant?(user)
+    return false if user.nil?
+    sender.id == user.id ||receiver_id == user.id
   end
 
   private

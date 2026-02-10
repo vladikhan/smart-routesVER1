@@ -174,8 +174,8 @@ body {
 .resend-button {
   border: none;
   border-radius: 10px;
-  color: #666;
-  background-color: #0cbdd1;
+  color: #64748B;
+  background-color: #6366f1;
   padding: 16px;
   cursor: pointer;
   transition: all 0.3s;
@@ -296,6 +296,7 @@ body {
 .notifications-list {
   max-height: 500px;
   overflow-y: auto;
+  display: grid;
 }
 
 .notification-item {
@@ -513,7 +514,7 @@ body {
 }
 
 .delete-photo-overlay:hover {
-  background: #c43838;
+  background: #f43f5e;
   color: white;
   transform: scale(1.1);
 }
@@ -693,7 +694,7 @@ button.dropdown-item {
 
 /* Эффект при наведении на кнопку "Редактировать" */
 button.dropdown-item:hover {
-  background: #0cbdd1;
+  background: #6366f1;
   color: white;
   /* Текст становится синим */
   transform: translateX(4px);
@@ -993,7 +994,7 @@ button.dropdown-item.text-danger:hover i {
 }
 
 .stat-label {
-  color: #666;
+  color: #64748B;
   font-size: 16px;
 }
 
@@ -1045,7 +1046,7 @@ button.dropdown-item.text-danger:hover i {
 }
 
 .card-description {
-  color: #666;
+  color: #64748B;
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 15px;
@@ -1069,7 +1070,7 @@ button.dropdown-item.text-danger:hover i {
 }
 
 .duration {
-  color: #666;
+  color: #64748B;
   font-size: 14px;
 }
 
@@ -1223,7 +1224,7 @@ button.dropdown-item.text-danger:hover i {
 }
 
 .feature p {
-  color: #666;
+  color: #64748B;
   line-height: 1.6;
 }
 

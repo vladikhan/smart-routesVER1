@@ -2,143 +2,152 @@
 <%= render 'pages/header'%>
 
 <div class="dm-chat-container">
-  <!-- Left Sidebar: Room List -->
   <div class="dm-chat-sidebar" id="chatSidebar">
-    <!-- Sidebar Header -->
     <div class="sidebar-header">
-      <h4>メッセージ</h4>
-      <%= link_to sent_dm_rooms_path, class: "btn btn-sm btn-outline-light" do %>
-        <i class="fas fa-paper-plane"></i> 送信済み
-      <% end %>
-    </div>
-    
-    <!-- Chat Search -->
-    <div class="chat-search">
-      <input type="text" placeholder="チャットを検索..." id="chatSearchInput" class="search-input">
-    </div>
-    
-    <!-- Rooms List -->
-    <div class="list-group list-group-flush">
-      <% if @dm_rooms.any? %>
-        <% @dm_rooms.each do |room| %>
-          <% other = room.other_user(current_user) %>
-          <%= link_to dm_room_path(room), 
-              class: "list-group-item chat-list-item #{room == @active_room ? 'active' : ''}", 
-              data: { room_id: room.id } do %>
-            
-            <div class="chat-content">
-              <div class="chat-avatar-wrapper">
-                <% if other.image_url.present? %>
-                  <%= image_tag other.image_url, class: "chat-avatar", alt: other.username %>
-                <% else %>
-                  <div class="chat-avatar" style="background: linear-gradient(135deg, #5ab2f7, #12cff3 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
-                    <%= other.username[0].upcase %>
-                  </div>
-                <% end %>
-                
-                <% if other.respond_to?(:online?) && other.online? %>
-                  <span class="online-indicator"></span>
-                <% end %>
-              </div>
-              
-              <div class="chat-info">
-                <div class="chat-header">
-                  <span class="chat-name"><%= other.username %></span>
-                  <span class="chat-time">
-                    <% if room.last_message_at %>
-                      <%= time_ago_in_words(room.last_message_at) %>前
-                    <% end %>
-                  </span>
-                </div>
-                
-                <div class="chat-preview">
-                  <span class="last-message">
-                    <% if room.last_message_at %>
-                      <%= truncate(room.last_message.message, length: 40) %>
-                    <% else %>
-                      <span class="text-muted">メッセージがありません</span>
-                    <% end %>
-                  </span>
-                  
-                  <% if room.any_unread_for?(current_user) %>
-                    <span class="unread-badge"><%= room.unread_count_for(current_user) %></span>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        <% end %>
-      <% else %>
-        <div class="empty-state">
-          <div class="empty-icon"><i class="fas fa-comments"></i></div>
-          <h3>メッセージがありません</h3>
-          <p>新しい会話を始めましょう！</p>
-        </div>
-      <% end %>
-    </div>
-  </div>
-  <!-- Right Panel: Chat Messages -->
-  <div class="dm-chat-main">
-    <% if @active_room %>
-      <% other = @active_room.other_user(current_user) %>
+      <div class="header-title">
+        <i class="fas fa-comments"></i>
+        <h4>メッセージ</h4>
+      </div>
       
-      <!-- Chat Header -->
-      <div class="dm-chat-header">
-        <div class="header-content">
-          <div class="user-info">
-            <div class="chat-avatar-wrapper">
-              <% if other.image_url.present? %>
-                <%= image_tag other.image_url, class: "user-avatar", alt: other.username %>
-              <% else %>
-                <div class="user-avatar" style="background: linear-gradient(135deg, #5ab2f7, #12cff3 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
-                  <%= other.username[0].upcase %>
-                </div>
-              <% end %>
-            </div>
-            
-            <div class="user-details">
-              <h5 class="user-name"><%= other.username %></h5>
-              <span class="user-status">
-                <% if other.respond_to?(:online?) && other.online? %>
-                  オンライン
-                <% else %>
-                  オフライン
+    </div>
+
+    <div class="chat-search">
+      <div class="search-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" placeholder="ユーザーやメッセージを検索..." id="chatSearchInput" class="search-input">
+        <button class="clear-search" id="clearSearch" style="display: none;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-filter-tabs">
+      <button class="filter-tab active" data-filter="all">
+        <i class="fas fa-inbox"></i> すべて
+      </button>
+      <button class="filter-tab" data-filter="unread">
+        <i class="fas fa-circle"></i> 未読
+      </button>
+    </div>
+
+    <div class="rooms-list-container">
+  <% if @dm_rooms.any? %>
+    <% @dm_rooms.each do |room| %>
+      <% other = room.other_user(current_user) %>
+      <% is_unread = room.any_unread_for?(current_user) %>
+      
+      <div class="chat-list-item-wrapper <%= room == @active_room ? 'active' : '' %> <%= is_unread ? 'unread' : '' %>" 
+           data-room-id="<%= room.id %>" 
+           data-filter="<%= is_unread ? 'unread' : 'all' %>">
+        
+        <%= link_to user_path(other), class: "chat-avatar-link" do %>
+  <div class="chat-avatar-wrapper">
+    <% if other.avatar.present? %>
+      <%# Для CarrierWave обязательно добавляем .url %>
+      <%= image_tag other.avatar.url, class: "chat-avatar", alt: other.username %>
+    <% elsif other.image_url.present? %>
+      <%# Это твои ссылки из консоли или плейсхолдеры %>
+      <%= image_tag other.image_url, class: "chat-avatar", alt: other.username %>
+    <% else %>
+      <%# Заглушка с первой буквой %>
+      <div class="chat-avatar chat-avatar-placeholder">
+        <%= other.username[0].upcase if other.username.present? %>
+      </div>
+    <% end %>
+
+    <% if other.respond_to?(:online?) && other.online? %>
+      <span class="online-indicator"></span>
+    <% end %>
+  </div>
+<% end %>
+
+        <%= link_to dm_room_path(room), class: "chat-info-clickable-area" do %>
+          <div class="chat-info">
+            <div class="chat-header">
+              <span class="chat-name"><%= other.username %></span>
+              <span class="chat-time">
+                <% if room.last_message %>
+                  <%= time_ago_in_words(room.last_message.created_at) %>前
                 <% end %>
               </span>
             </div>
+            <div class="chat-preview">
+              <span class="last-message">
+                <% if room.last_message %>
+                  <% if room.last_message.user == current_user %>
+                    <i class="fas fa-check-double <%= room.last_message.is_read? ? 'read' : '' %>"></i>
+                  <% end %>
+                  <%= truncate(room.last_message.message, length: 45) %>
+                <% else %>
+                  <span class="text-muted">メッセージなし</span>
+                <% end %>
+              </span>
+              <% if is_unread %>
+                <span class="unread-badge"><%= room.unread_count_for(current_user) %></span>
+              <% end %>
+            </div>
           </div>
-          
-          <div class="header-actions">
-            <%= link_to user_path(other), class: "btn-icon", title: "プロフィールを見る" do %>
-              <i class="fas fa-user"></i>
-            <% end %>
-            <button class="btn-icon" title="その他">
-              <i class="fas fa-ellipsis-v"></i>
-            </button>
-          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="empty-state-sidebar"><h3>メッセージなし</h3></div>
+  <% end %>
+</div>
+  </div>
+  
+
+  <div class="dm-chat-main">
+    <% if @active_room %>
+      <% other = @active_room.other_user(current_user) %>
+      <div class="dm-chat-header">
+        <div class="header-user-info">
+<%# !!!!!!!!!!! %>
+          <%= link_to user_path(other), class: "chat-avatar-link" do %>
+  <div class="chat-avatar-wrapper">
+    <% if other.avatar.present? %>
+      <%# Для CarrierWave обязательно добавляем .url %>
+      <%= image_tag other.avatar.url, class: "chat-avatar", alt: other.username %>
+    <% elsif other.image_url.present? %>
+      <%# Это твои ссылки из консоли или плейсхолдеры %>
+      <%= image_tag other.image_url, class: "chat-avatar", alt: other.username %>
+    <% else %>
+      <%# Заглушка с первой буквой %>
+      <div class="chat-avatar chat-avatar-placeholder">
+        <%= other.username[0].upcase if other.username.present? %>
+      </div>
+    <% end %>
+
+    <% if other.respond_to?(:online?) && other.online? %>
+      <span class="online-indicator"></span>
+    <% end %>
+  </div>
+<% end %>
+<%# !!!!!!!! %>
+
+          <h5 class="user-name"><%= other.username %></h5>
         </div>
       </div>
 
-      <!-- Messages Container -->
       <div class="dm-messages-area" id="messages-area">
         <div id="messages-container">
           <% if @messages.any? %>
             <% group_messages_by_date(@messages).each do |date, messages| %>
-              <div class="date-divider">
-                <span><%= format_message_date(date) %></span>
-              </div>
-              
+              <div class="date-divider"><span><%= format_message_date(date) %></span></div>
               <% messages.each do |message| %>
-                <%= render partial: 'dm_messages/message', 
-                          locals: { message: message, current_user: current_user } %>
+                <div class="message-wrapper <%= message.user == current_user ? 'message-sent' : 'message-received' %>">
+                  <div class="message-bubble">
+                    <div class="message-text">
+                      
+                      <%= simple_format(message.message) %>
+                    </div>
+                    <div class="message-meta">
+                      <span class="message-time"><%= message.created_at.strftime('%H:%M') %></span>
+                    </div>
+                  </div>
+                </div>
               <% end %>
             <% end %>
-          <% else %>
-            <div class="empty-state">
-              <div class="empty-icon"><i class="fas fa-comment-dots"></i></div>
-              <h3>会話を始めましょう！</h3>
-              <p>最初のメッセージを送信してください</p>
-            </div>
           <% end %>
         </div>
       </div>
@@ -159,9 +168,9 @@
                       class: "message-form" do |f| %>
           
           <div class="input-wrapper">
-            <button type="button" class="attachment-btn" title="ファイルを添付">
+            <%# <button type="button" class="attachment-btn" title="ファイルを添付">
               <i class="fas fa-paperclip"></i>
-            </button>
+            </button> %>
             
             <div class="input-container">
   <%= f.text_area :text, 
@@ -172,7 +181,7 @@
                  autocomplete: "off",
                  maxlength: 5000 %>
   
-  <button type="button" class="emoji-btn" title="絵文字">😊</button>
+  <button type="button" data-emoji-target="btn" class="emoji-btn">😊</button>
 </div>
 
 <%# Заменяем f.submit на f.button, чтобы вставить иконку внутрь %>
@@ -191,7 +200,6 @@
     <% end %>
   </div>
 </div>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -274,4 +282,82 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Emoji
+
+function initEmojiPicker() {
+    const btn = document.querySelector('.emoji-btn');
+    const textarea = document.querySelector('#message-content-input');
+
+    if (!btn || !textarea) return;
+
+    // Проверяем, не инициализирован ли уже пикер, чтобы не дублировать
+    if (btn.dataset.initialized) return;
+
+    // Создаем контейнер для пикера (он будет всплывающим)
+    const pickerContainer = document.createElement('div');
+    pickerContainer.style.position = 'absolute';
+    pickerContainer.style.zIndex = '10000';
+    pickerContainer.style.display = 'none';
+    document.body.appendChild(pickerContainer);
+
+    // Инициализация Picmo (библиотека будет доступна как picmo)
+    const picker = picmo.createPicker({
+  rootElement: pickerContainer,
+  theme: 'dark',
+  emojiSize: '1.2rem', // Еще меньше
+  perLine: 7,          // 7 штук в ряд сделают окно компактным
+  showPreview: false,  // Отключаем нижнюю панель просмотра (экономим место)
+  height: '350px'
+});
+
+    // Когда выбрали эмодзи
+    picker.addEventListener('emoji:select', event => {
+      const emoji = event.emoji;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.setRangeText(emoji, start, end, 'end');
+      textarea.focus();
+      pickerContainer.style.display = 'none'; // Скрываем после выбора
+    });
+
+    // Логика кнопки
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const rect = btn.getBoundingClientRect();
+      const pickerWidth = 250; // Твоя ширина
+      const pickerHeight = 280; //Твоя высота
+      
+      // 1. Позиция по вертикали (TOP)
+      // Берем верхнюю точку кнопки (rect.top) + текущий скролл страницы
+      // И вычитаем высоту пикера и небольшой зазор (8px)
+      const topPosition = window.scrollY + rect.top - pickerHeight - 8;
+      
+      // 2. Позиция по горизонтали (LEFT)
+      let leftPosition = window.scrollX + rect.left;
+      
+      // Проверка правого края (чтобы не улетало за экран)
+      if (rect.left + pickerWidth > window.innerWidth) {
+        leftPosition = window.scrollX + rect.right - pickerWidth;
+      }
+      
+      // Применяем стили
+      pickerContainer.style.top = `${topPosition}px`;
+      pickerContainer.style.left = `${leftPosition}px`;
+      
+      // Переключаем видимость
+      pickerContainer.style.display = pickerContainer.style.display === 'none' ? 'block' : 'none';
+    };
+    
+
+    btn.dataset.initialized = "true";
+    console.log("Picmo Emoji Picker готов!");
+  }
+
+  document.addEventListener("turbo:load", initEmojiPicker);
+  document.addEventListener("DOMContentLoaded", initEmojiPicker);
+
 </script>
+

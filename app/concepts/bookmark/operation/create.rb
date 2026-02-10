@@ -18,7 +18,6 @@ module Bookmark::Operation
     end
 
     def notify!(ctx, model:, **)
-      # Находим автора контента (маршрута или места)
       content_owner_id = model.item&.user_id 
       return true unless content_owner_id && content_owner_id != model.user_id
 

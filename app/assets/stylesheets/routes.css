@@ -502,13 +502,13 @@
 		left: 0;
 		width: 60px;
 		height: 3px;
-		background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
 		border-radius: 2px;
 	}
 
 	i {
 		font-size: 26px;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
@@ -522,7 +522,7 @@
 	padding: 28px;
 	border-radius: 16px;
 	margin-bottom: 20px;
-	border-left: 5px solid #667eea;
+	border-left: 5px solid #07c8f9;
 	color: inherit;
 	text-decoration: none;
 	background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -550,7 +550,7 @@
 		transform: translateX(12px);
 		background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
 		box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
-		border-left-color: #764ba2;
+		border-left-color: #0d41e1;
 
 		&::before {
 			width: 100%;
@@ -561,12 +561,12 @@
 			box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 		}
 	}
-}
+};
 
 .venue-number {
 	width: 56px;
 	height: 56px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	color: white;
 	border-radius: 50%;
 	display: flex;
@@ -596,7 +596,7 @@
 
 	p {
 		font-size: 14px;
-		color: #666;
+		color: #64748B;
 		margin-bottom: 14px;
 		line-height: 1.7;
 	}
@@ -625,7 +625,7 @@
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
 	&:hover {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 		color: white;
 		border-color: transparent;
 		transform: translateY(-2px) scale(1.05);
@@ -753,7 +753,7 @@
 
 .map-loading i {
 	font-size: 64px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -763,7 +763,7 @@
 .map-loading span {
 	font-size: 16px;
 	font-weight: 600;
-	color: #666;
+	color: #64748B;
 }
 
 /* === Premium Sidebar === */
@@ -793,7 +793,7 @@
 	left: 0;
 	right: 0;
 	height: 80px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%);
 	border-radius: 20px 20px 0 0;
 	z-index: 0;
 }
@@ -802,7 +802,7 @@
 	width: 100px;
 	height: 100px;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -842,7 +842,7 @@
 
 .author-username {
 	font-size: 14px;
-	color: #666;
+	color: #64748B;
 	font-weight: 600;
 	margin-bottom: 16px;
 }
@@ -864,23 +864,22 @@
 .author-stat-value {
 	font-size: 24px;
 	font-weight: 900;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
 	background-clip: text;
 	display: block;
 }
 
 .author-stat-label {
 	font-size: 12px;
-	color: #666;
+	color: #64748B;
 	font-weight: 600;
 }
 
 .follow-btn {
 	width: 100%;
 	padding: 16px;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	color: white;
 	border: none;
 	border-radius: 30px;
@@ -930,8 +929,9 @@
 
 .follow-btn.following {
 	background: rgba(102, 126, 234, 0.1);
-	color: #667eea;
-	border: 2px solid #667eea;
+	color: #2296f3;
+	border: 2px solid #2296f3;
+;
 }
 
 .follow-btn.following:hover {
@@ -971,7 +971,7 @@
 }
 
 .write-review-btn:hover {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	color: white;
 	border-color: transparent;
 	transform: translateY(-3px);
@@ -1085,7 +1085,7 @@
 	padding: 20px;
 	background: #f8f9fa;
 	border-radius: 12px;
-	border-left: 4px solid #667eea;
+	border-left: 4px solid #07c8f9;
 	transition: all 0.3s ease;
 }
 
@@ -1095,7 +1095,7 @@
 .review-card:hover .review-content {
 	background: white;
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-	border-left-color: #764ba2;
+	border-left-color: #0d41e1;
 }
 
 .review-footer {
@@ -1142,7 +1142,7 @@
 }
 
 .review-action-btn:hover {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	color: white;
 	transform: translateY(-2px);
 	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
@@ -1208,9 +1208,10 @@
 	bottom: -2px;
 	left: 0;
 	height: 2px;
-	background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
 	transition: all 0.3s ease;
 }
+
 
 .tab-buttons {
 	display: flex;
@@ -1254,12 +1255,12 @@
 	left: 0;
 	right: 0;
 	height: 3px;
-	background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
 	border-radius: 3px 3px 0 0;
 }
 
 .tab-badge {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #5ab2f7 0%, #12cff3 100%)
 	color: white;
 	padding: 2px 10px;
 	border-radius: 12px;

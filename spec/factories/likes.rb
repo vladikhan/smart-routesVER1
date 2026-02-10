@@ -1,7 +1,15 @@
 FactoryBot.define do
   factory :like do
-    user { nil }
-    likeable_type { "MyString" }
-    likeable_id { 1 }
+    association :user
+
+    association :likeable, factory: :route
+
+    trait :for_venue do
+      association :likeable, factory: :venue
+    end
+
+    trait :for_review do
+      association :likeable, factory: :review
+    end
   end
 end

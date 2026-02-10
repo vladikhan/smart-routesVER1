@@ -85,7 +85,7 @@
 		border-color: #e2e8f0;
 
 		&::before {
-			background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
 		}
 	}
 
@@ -98,7 +98,7 @@
 		border-color: rgba(102, 126, 234, 0.2);
 
 		&::before {
-			background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
 		}
 	}
 }
@@ -108,7 +108,7 @@
 	width: 56px;
 	height: 56px;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: #87D3F8;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -121,6 +121,8 @@
 .notification-body {
 	flex: 1;
 	min-width: 0;
+	margin-top: 20px;
+
 }
 
 .notification-message {
@@ -134,6 +136,35 @@
 .notification-time {
 	font-size: 0.875rem;
 	color: #718096;
+}
+
+/* Контейнер для аватарки */
+.notification-actor-avatar {
+  width: 48px;           /* Фиксированный размер */
+  height: 48px;
+  flex-shrink: 0;        /* Чтобы аватарка не сжималась, если текста много */
+  margin-right: 12px;
+  border-radius: 50%;    /* Делаем круглой */
+  overflow: hidden;      /* Скрываем всё, что больше 48px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+}
+
+/* Сама картинка внутри класса .avatar-small */
+.avatar-small {
+  width: 100%;           /* Занимает всю ширину контейнера (48px) */
+  height: 100%;          /* Занимает всю высоту контейнера (48px) */
+  object-fit: cover;     /* ГЛАВНОЕ: фото масштабируется и обрезается по центру, не искажаясь */
+  display: block;
+}
+
+/* Стили для заглушки (если нет фото) */
+.avatar-placeholder-small {
+  font-weight: bold;
+  color: #64748B;
+  font-size: 18px;
 }
 
 /* === EMPTY STATE === */
@@ -186,7 +217,7 @@
 		}
 
 		&.active .page-link {
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
 			color: white;
 			border-color: transparent;
 		}
