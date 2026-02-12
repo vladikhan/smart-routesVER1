@@ -8,8 +8,10 @@ class Share < ApplicationRecord
   private
 
   def create_notification
-    Notification.create(
+    Notification.create!(
       user: route.user,
+      actor: user,
+      notification_type: 'new_post',
       notifiable: self,
       is_read: false
     )

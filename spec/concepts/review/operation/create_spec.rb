@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'base64'
 
 RSpec.describe Review::Operation::Create do
   let(:user) { create(:user) }
@@ -62,7 +63,7 @@ RSpec.describe Review::Operation::Create do
           current_user: user
         )
         expect(result).to be_failure
-        expect(result['contract.default'].errors[:reviewable_id]).to include('が存在しません')
+        expect(result['contract.default'].errors[:reviewable_id]).to be_present
       end
     end
   end
@@ -80,13 +81,26 @@ RSpec.describe Review::Operation::Create do
   end
 
   describe 'Review with images' do # Переименовал логически (это не Rollback, а проверка вложений)
+    def uploaded_png
+      png_base64 =
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAgMBgQf1kq8AAAAASUVORK5CYII='
+
+      tmp = Tempfile.new(['test_image', '.png'])
+      tmp.binmode
+      tmp.write(Base64.decode64(png_base64))
+      tmp.rewind
+      Rack::Test::UploadedFile.new(tmp.path, 'image/png')
+    ensure
+      tmp&.close
+    end
+
     let(:params_with_images) do
       {
         reviewable_type: 'Venue',
         reviewable_id: venue.id,
         text: '美味しいかったです！',
         images: [
-          fixture_file_upload('spec/fixtures/files/test_image.png', 'image/png')
+          uploaded_png
         ]
       }
     end

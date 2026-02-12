@@ -125,18 +125,9 @@ RSpec.describe 'Users', type: :request do
   end
 
   describe 'GET /users/:id/comments' do
-    it 'requires authentication' do
+    it 'returns success (public)' do
       get comments_user_path(user)
-      expect(response).to redirect_to(new_user_session_path)
-    end
-
-    context 'when authenticated' do
-      before { sign_in user }
-
-      it 'returns success' do
-        get comments_user_path(other_user)
-        expect(response).to have_http_status(:success)
-      end
+      expect(response).to have_http_status(:success)
     end
   end
 

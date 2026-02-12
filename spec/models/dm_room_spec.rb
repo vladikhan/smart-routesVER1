@@ -12,18 +12,18 @@ RSpec.describe DmRoom, type: :model do
     let(:user1) { create(:user) }
     let(:user2) { create(:user) }
 
-    it 'prevents duplicate rooms between same users' do
-      create(:dm_room, sender: user1, receiver: user2)
-      duplicate_room = build(:dm_room, sender: user1, receiver: user2)
-      
-      expect(duplicate_room).not_to be_valid
+    it 'does not create duplicate rooms between same users (find_or_create_between)' do
+      expect {
+        DmRoom.find_or_create_between(user1.id, user2.id)
+        DmRoom.find_or_create_between(user1.id, user2.id)
+      }.to change(DmRoom, :count).by(1)
     end
 
     it 'prevents self-messaging' do
       room = build(:dm_room, sender: user1, receiver: user1)
       
       expect(room).not_to be_valid
-      expect(room.errors[:receiver]).to include('自分自身とチャットはできません')
+      expect(room.errors[:base]).to include('You cannot chat with yourself')
     end
   end
 
@@ -91,7 +91,7 @@ RSpec.describe DmRoom, type: :model do
     end
   end
 
-  describe '#mark_all_as_read_for!' do
+  describe '#mark_all_as_read_for' do
     let(:room) { create(:dm_room) }
     let(:user) { room.receiver }
     
@@ -101,20 +101,20 @@ RSpec.describe DmRoom, type: :model do
     end
 
     it 'marks all messages as read' do
-      room.mark_all_as_read_for!(user)
+      room.mark_all_as_read_for(user)
       
       expect(room.dm_messages.where(is_read: false).count).to eq(0)
     end
 
     it 'resets unread counter' do
-      room.mark_all_as_read_for!(user)
+      room.mark_all_as_read_for(user)
       
       expect(room.reload.unread_count_receiver).to eq(0)
     end
 
     it 'sets read_at timestamp' do
       freeze_time do
-        room.mark_all_as_read_for!(user)
+        room.mark_all_as_read_for(user)
         
         room.dm_messages.each do |msg|
           expect(msg.read_at).to eq(Time.current)

@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :popularity_metric do
-    entity_type { "MyString" }
-    entity_id { 1 }
+    association :entity, factory: :route
     view_count { 1 }
     like_count { 1 }
     save_count { 1 }

@@ -10,6 +10,7 @@ FactoryBot.define do
     is_admin { false }
     is_banned { false }
     email_verified { true }
+    confirmed_at { Time.current }
     is_online { false }
     langauge { "ja" }
     timezone { "Asia/Tokyo" }

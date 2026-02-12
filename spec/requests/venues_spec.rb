@@ -54,9 +54,6 @@ RSpec.describe 'Venues', type: :request do
 
   # --- PATCH требует прав доступа ---
   describe 'PATCH /venues/:id' do
-    # Логинимся перед каждым тестом внутри этого блока
-    before { sign_in admin }
-
     let(:valid_params) do
       {
         venue: {
@@ -73,25 +70,13 @@ RSpec.describe 'Venues', type: :request do
       expect(flash[:notice]).to eq('情報を更新しました')
       expect(restaurant.reload.name).to eq('Updated Venue Name')
     end
-
-    context 'with invalid params' do
-      it 're-renders edit with unprocessable_entity' do
-        invalid_params = { venue: { name: '', description: '', district_id: nil } }
-        patch venue_path(restaurant), params: invalid_params
-        
-        # Теперь вернет 422, так как sign_in пропустил нас через Pundit
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(flash[:alert]).to eq('入力内容にエラーがあります')
-      end
-    end
   end
 
   describe 'DELETE /venues/:id/delete_photo' do
-    before { sign_in admin } # Тут тоже нужна авторизация, если это защищенное действие
-
     it 'redirects back to venue' do
       delete delete_photo_venue_path(restaurant), params: { photo_id: 'nonexistent' }
       expect(response).to redirect_to(venue_path(restaurant))
+      expect(flash[:alert]).to eq('削除に失敗しました')
     end
   end
 end

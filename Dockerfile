@@ -15,7 +15,9 @@ WORKDIR /app
 
 # Устанавливаем гемы отдельно для кеширования слоев Docker
 COPY Gemfile Gemfile.lock ./
-RUN bundle config set --local without 'development test' && \
+# This image is used for development/test via docker-compose (volume-mounted app).
+# Install development + test gems so `bundle exec rspec` works in-container.
+RUN bundle config set --local without 'production' && \
     bundle install
 
 # Копируем остальной код

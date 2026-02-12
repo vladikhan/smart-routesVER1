@@ -19,7 +19,7 @@ FactoryBot.define do
     #Counters
     is_public { true }
     is_deleted { false }
-    id_featured { false }
+    is_featured { false }
     view_count { 0 }
     likes_count { 0 }
     bookmarks_count { 0 }

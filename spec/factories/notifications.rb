@@ -3,9 +3,14 @@ FactoryBot.define do
     association :user
     association :actor, factory: :user
 
-    notification_type { 'follow_request' }
+    notification_type { 'follow' }
     is_read { false }
     message { nil }
+
+    trait :unread do
+      is_read { false }
+      read_at { nil }
+    end
 
     trait :read do 
       is_read { true }
@@ -14,14 +19,14 @@ FactoryBot.define do
 
     trait :new_message do
       notification_type { 'new_message' }
-      association :notifiable, factory: dm_message
-      message { '#{actor.username}さんから新しいメッセージが届きました'}
+      association :notifiable, factory: :dm_message
+      message { "#{actor.username}さんから新しいメッセージが届きました" }
     end
 
     trait :route_liked do
       notification_type { 'route_liked' }
       association :notifiable, factory: :route
-      message { '#{actor.username}さんがあなたのルートにいいねしました' }
+      message { "#{actor.username}さんがあなたのルートにいいねしました" }
     end
   end
 end

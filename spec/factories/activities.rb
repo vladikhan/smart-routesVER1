@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :activity do
-    user { nil }
-    trackable { nil }
-    key { "MyString" }
+    association :user
+    association :trackable, factory: :route
+    key { "review.create" }
   end
 end

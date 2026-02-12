@@ -1,20 +1,20 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>確認メールを再送信 - Smart Routes</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-    <%= stylesheet_link_tag 'login', 'data-turbo-track': 'reload' %>
-  </head>
-  <body>
     <header class="header">
       <div class="container">
         <a href="/" class="logo">SmartRoutes</a>
 
         <ul class="nav-links">
-          <li><%= link_to 'ルート一覧', routes_path %></li>
-          <li><%= link_to '場所を探す', venues_path %></li>
+          <li>
+        <%= link_to routes_path, class: "nav-icon-link vertical-layout" do %>
+          <%= image_tag 'route-icon.svg', class: 'nav-icon' %>
+          <span class="nav-text">ルート一覧</span>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to venues_path, class: "nav-icon-link vertical-layout" do %>
+        <%= image_tag 'venue-icon.svg', class: 'nav-icon' %>
+        <span class="nav-text">場所を探す</span>
+        <% end %>
+      </li>
         </ul>
 
         <div class="auth-links">
@@ -78,5 +78,3 @@
         </div>
       </div>
     </div>
-  </body>
-</html>

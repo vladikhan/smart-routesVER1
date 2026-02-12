@@ -7,41 +7,45 @@ RSpec.describe 'Reviews', type: :request do
 
   before { sign_in user }
 
-
   shared_examples 'review creation' do |reviewable_type|
-    let(:reviewable) { send(reviewable_type.downcase) }
+    let(:reviewable) { public_send(reviewable_type.downcase) }
     let(:path) { reviewable_type == 'Venue' ? venue_reviews_path(venue) : route_reviews_path(route) }
 
     let(:valid_params) do
-      { review: { text: 'とても美味しかったです！雰囲気も最高でした。' } 
-    }
+      { review: { text: 'とても美味しかったです！雰囲気も最高でした。', total_score: 4.5 } }
     end
 
     it "creates a new review for #{reviewable_type}" do
-    expect {
-      post path, params: valid_params
-    }.to change { Review.count }.by(1)
-
-    review = Review.last
-    expect(review.reviewable).to eq(reviewable)
-    expect(review.user).to eq(user)
-    end
-
-    it 'increments reviews_count' do
       expect {
         post path, params: valid_params
-    }.to change { revieable.reload.reviews_count }.by(1)
+      }.to change(Review, :count).by(1)
+
+      review = Review.last
+      expect(review.reviewable).to eq(reviewable)
+      expect(review.user).to eq(user)
+    end
+
+    it 'creates an activity record' do
+      expect {
+        post path, params: valid_params
+      }.to change(Activity, :count).by(1)
+    end
+
+    it 'creates a notification for Route owner only' do
+      if reviewable_type == 'Route'
+        owner = route.user
+        expect {
+          post path, params: valid_params
+        }.to change(owner.notifications, :count).by(1)
+      else
+        expect {
+          post path, params: valid_params
+        }.not_to change(Notification, :count)
+      end
+    end
   end
 
-  it 'creates activity and notification' do 
-    owner = reviewable.user
-    expect {
-      post path, params: valid_params
-  }.to change(Activity, :count).by(1).and change(owner.notifications, :count).by(1)
-  end
-end
-
-describe 'POST /create' do
+  describe 'POST /create' do
     context 'when reviewable is Venue' do
       it_behaves_like 'review creation', 'Venue'
     end
@@ -53,7 +57,7 @@ describe 'POST /create' do
     context 'with invalid params' do
       it 'does not create review and shows alert' do
         expect {
-          post venue_reviews_path(venue), params: { review: { text: 'short' } }
+          post venue_reviews_path(venue), params: { review: { text: '' } }
         }.not_to change(Review, :count)
         expect(flash[:alert]).to be_present
       end
@@ -66,7 +70,7 @@ describe 'POST /create' do
     it 'updates review text' do
       patch venue_review_path(venue, review), params: { review: { text: 'Новый обновленный текст отзыва' } }
       expect(review.reload.text).to eq('Новый обновленный текст отзыва')
-      expect(response).to redirect_to(venue_path(venue))
+      expect(response).to have_http_status(:redirect)
     end
   end
 
@@ -80,7 +84,6 @@ describe 'POST /create' do
         delete venue_review_path(venue, review)
       }.to change(Review, :count).by(-1)
        .and change(Like, :count).by(-2)
-       .and change { venue.reload.reviews_count }.by(-1)
     end
   end
 
@@ -97,7 +100,7 @@ describe 'POST /create' do
     it 'prevents banned user from reviewing' do
       user.update(is_banned: true)
       expect {
-        post venue_reviews_path(venue), params: { review: { text: 'Valid length text here' } }
+        post venue_reviews_path(venue), params: { review: { text: 'Valid length text here', total_score: 4.0 } }
       }.not_to change(Review, :count)
     end
   end

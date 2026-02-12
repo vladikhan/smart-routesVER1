@@ -2,6 +2,7 @@ class BookmarksController < ApplicationController
   before_action :authenticate_user!
 
   def create
+    
     result = Bookmark::Operation::Create.call(params: params, current_user: current_user)
 
     if result.success?

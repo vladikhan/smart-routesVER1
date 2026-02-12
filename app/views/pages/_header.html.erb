@@ -3,15 +3,39 @@
     <a href="/" class="logo">SmartRoutes</a>
 
     <ul class="nav-links">
-      <li><%= link_to 'ルート一覧', routes_path %></li>
-      <li><%= link_to '場所を探す', venues_path %></li>
       <li>
-        <%= link_to dm_rooms_path, class: "nav-icon-link" do %>
-          <%= image_tag 'message-icon.svg', class: 'nav-icon' %>
+        <%= link_to routes_path, class: "nav-icon-link vertical-layout" do %>
+          <%= image_tag 'route-icon.svg', class: 'nav-icon' %>
+          <span class="nav-text">ルート一覧</span>
         <% end %>
       </li>
-      <li><%= link_to 'ユーザー', users_path %></li>
-      <li><%= link_to '通知', notifications_path, title: '通知' %></li>
+      <li>
+        <%= link_to venues_path, class: "nav-icon-link vertical-layout" do %>
+        <%= image_tag 'venue-icon.svg', class: 'nav-icon' %>
+        <span class="nav-text">場所を探す</span>
+        <% end %>
+      </li>
+
+      <li>
+        <%= link_to dm_rooms_path, class: "nav-icon-link vertical-layout" do %>
+          <%= image_tag 'message-icon.svg', class: 'nav-icon' %>
+        <span class="nav-text">メッセージ</span>
+        <% end %>
+      </li>
+
+      <li>
+        <%= link_to  users_path, class: "nav-icon-link vertical-layout" do %>
+          <%= image_tag 'user-icon.svg', class: 'nav-icon' %>
+          <span class="nav-text">ユーザー</span>
+        <% end %>
+        </li>
+
+      <li>
+        <%= link_to notifications_path, class: "nav-icon-link vertical-layout" do %>
+          <%= image_tag 'notification-icon.svg', class: 'nav-icon' %>
+          <span class="nav-text">通知</span>
+        <% end %>
+      </li>
     </ul>
 
     <div class="auth-links">

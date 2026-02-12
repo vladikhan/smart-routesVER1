@@ -95,7 +95,7 @@ RSpec.describe DmRoomChannel, type: :channel do
     
     before do
       subscribe(room_id: room.id)
-      room.update(unread_count_receiver: 3)
+      room.update(unread_count_sender: 3)
     end
 
     it 'marks messages as read' do
@@ -107,7 +107,7 @@ RSpec.describe DmRoomChannel, type: :channel do
     it 'resets unread counter' do
       perform :mark_as_read
       
-      expect(room.reload.unread_count_receiver).to eq(0)
+      expect(room.reload.unread_count_sender).to eq(0)
     end
 
     it 'broadcasts read status to sender' do

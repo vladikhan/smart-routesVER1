@@ -10,6 +10,8 @@ class Bookmark < ApplicationRecord
     message: 'すでに保存済みです'
   }
   validates :collection_name, length: { maximum: 100 }, allow_blank: true
+  validates :item_type, inclusion: { in: ['Route', 'Venue'], message: '不正なタイプ' }
+  validates :item_id, presence: true
   
 
   scope :venues, -> { where(item_type: 'Venue') }

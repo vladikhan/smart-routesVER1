@@ -1,5 +1,7 @@
 module AuthenticationHelper
-  def sign_in(user)
+  # NOTE: don't override Devise's `sign_in` integration helper.
+  # Use this helper only when you explicitly want to sign in via HTTP POST.
+  def sign_in_via_post(user)
     post user_session_path, params: {
       user: {
         email: user.email,

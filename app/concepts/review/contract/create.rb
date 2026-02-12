@@ -11,7 +11,6 @@ module Review::Contract
     property :reviewable_id
     property :reviewable_type
 
-    validates :total_score, presence: true
     validates :user_id, presence: true
     validates :reviewable_id, presence: true
     validates :reviewable_type, presence: true

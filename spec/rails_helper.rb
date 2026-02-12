@@ -1,4 +1,12 @@
 ENV['RAILS_ENV'] ||= 'test'
+
+# In docker-compose, `DATABASE_URL` is set for development (smart_routes_dev).
+# Rails prefers `DATABASE_URL` over `config/database.yml`, even in test mode.
+# Force a dedicated test database URL so RSpec doesn't purge the dev DB.
+if ENV['RAILS_ENV'] == 'test'
+  ENV['DATABASE_URL'] = ENV.fetch('TEST_DATABASE_URL', 'postgres://postgres:password@db:5432/smartroutes_test')
+end
+
 require_relative '../config/environment'
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 

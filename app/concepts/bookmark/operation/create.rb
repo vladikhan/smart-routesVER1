@@ -6,11 +6,22 @@ module Bookmark::Operation
     step :notify!
 
     def setup_params!(ctx, params:, current_user:, **)
+      bookmark_params = params[:bookmark] || params
+
       ctx[:model].user = current_user
-      ctx[:model].item_id = params[:item_id]
-      ctx[:model].item_type = params[:item_type]
-      ctx[:item] = ctx[:model].item
-      true
+      ctx[:model].item_id = bookmark_params[:item_id]
+
+      allowed_types = ['Route', 'Venue']
+      input_type =bookmark_params[:item_type]
+
+      if allowed_types.include?(input_type)
+        ctx[:model].item_type = input_type
+        ctx[:item] = ctx[:model].item
+        true
+      else
+        ctx[:model].item_type = nil
+        false
+      end
     end
 
     def persist!(ctx, model:, **)

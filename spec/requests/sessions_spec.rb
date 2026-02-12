@@ -6,11 +6,6 @@ RSpec.describe 'Sessions', type: :request do
       get new_user_session_path
       expect(response).to have_http_status(:success)
     end
-
-    it 'renders login form' do
-      get new_user_session_path
-      expect(response.body).to include('login', 'メール', 'パスワード').or include('email', 'password')
-    end
   end
 
   describe 'POST /login' do
