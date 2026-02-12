@@ -1,0 +1,13 @@
+<%# Используем безопасную навигацию &. на случай если @dm_room это nil %>
+<%= form_with(model: [@dm_room, DmMessage.new], 
+              url: @dm_room ? dm_room_dm_messages_path(@dm_room) : nil, 
+              local: true) do |f| %>
+  
+  <div class="field">
+    <%= f.text_area :content, placeholder: "Напишите сообщение...", class: "form-control" %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Отправить", class: "btn btn-primary" %>
+  </div>
+<% end %>

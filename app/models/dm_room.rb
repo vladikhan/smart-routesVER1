@@ -48,17 +48,20 @@ end
   end
 
   def mark_all_as_read_for(user)
-    unread_messages = dm_messages
-                      .where(is_read: false)
-                      .where.not(user_id: user.id)
+    # 1. Помечаем сообщения прочитанными (только чужие)
+    # Используем update_all для скорости
+    dm_messages.where.not(user_id: user.id)
+              .where(is_read: false)
+              .update_all(is_read: true, read_at: Time.current, updated_at: Time.current)
 
-    unread_messages.find_each do |message|
-      message.mark_as_read!
+    # 2. Сбрасываем счетчик. 
+    # ВАЖНО: используй update_columns, чтобы это сразу улетело в SQL 
+    # и не вызывало лишних коллбэков, которые могут всё испортить.
+    if sender_id == user.id
+      update_columns(unread_count_sender: 0)
+    else
+      update_columns(unread_count_receiver: 0)
     end
-
-    reset_unread_for(user)
-
-    Rails.logger.info "ユーザー #{user.id} のルーム #{id} において、#{unread_messages.count} 件のメッセージを既読としてマークしました"
   end
 
   def reset_unread_for(user)

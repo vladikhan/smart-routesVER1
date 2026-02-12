@@ -103,7 +103,7 @@ Rails.application.routes.draw do
     member do
       post :mark_all_as_read
     end
-    resources :dm_messages, only: %i[create destroy]
+    resources :dm_messages, only: %i[index create destroy]
   end
 
   # Notification routes

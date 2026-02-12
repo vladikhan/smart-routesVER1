@@ -1,17 +1,18 @@
 <div class="dm-chat-header">
   <div class="header-content">
     <div class="user-info">
-      <%= image_tag @other_user.avatar_url, class: 'user-avatar' %>
+      <%= image_tag @other_user.avatar_url || 'default-avatar.png', class: 'user-avatar' %>
+      
       <div class="user-details">
-        <h5 class="user-name"><%= @other_user.name %></h5>
+        <h5 class="user-name"><%= @other_user.username %></h5>
         <span class="user-status">
-          <%=
-            if @other_user.online?
-              'Online'
-            else
-              "was #{time_ago_in_words(@other_user.last_seen_at)} ago"
-            end
-          %>
+          <% if @other_user.online? %>
+            <span class="status-online">Online</span>
+          <% elsif @other_user.last_seen_at.present? %>
+            was <%= time_ago_in_words(@other_user.last_seen_at) %> ago
+          <% else %>
+            Offline
+          <% end %>
         </span>
       </div>
     </div>

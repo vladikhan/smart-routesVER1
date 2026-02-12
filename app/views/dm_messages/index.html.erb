@@ -3,7 +3,7 @@
 <% @messages.each do |message| %>
   <div style="margin-bottom: 10px;">
     <strong>Room:</strong> <%= message.dm_room_id %><br />
-    <strong>Message:</strong> <%= message.content %><br />
+    <strong>Message:</strong> <%= message.message %><br />
     <small><%= message.created_at %></small>
   </div>
 <% end %>

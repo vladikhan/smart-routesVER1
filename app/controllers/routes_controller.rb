@@ -101,7 +101,6 @@ end
       @cities = City.order(:name)
       @venues = Venue.order(:name) if defined?(Venue)
       flash.now[:alert] = result['contract.default']&.errors&.full_messages&.join(', ') || '更新に失敗しました'
-      puts "!!! VALIDATION ERRORS: #{result['contract.default'].errors.messages}"
       render :edit, status: :unprocessable_entity
     end
   end

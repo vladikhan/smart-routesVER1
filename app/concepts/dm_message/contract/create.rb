@@ -1,4 +1,4 @@
 class DmMessage::Contract::Create < Reform::Form
       property :message
-      validates :message, presence: true, length: { maximum: 1000 }
+      validates :message, presence: true, length: { maximum: 5000 }
 end

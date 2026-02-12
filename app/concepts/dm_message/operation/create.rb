@@ -18,6 +18,7 @@ class DmMessage::Operation::Create < Trailblazer::Operation
      true
    end
 
+
    def find_room!(ctx, params:, **)
      ctx[:dm_room] = DmRoom.find_by(id: params[:dm_room_id])
    end
@@ -27,17 +28,25 @@ class DmMessage::Operation::Create < Trailblazer::Operation
      dm_room.participant?(current_user) 
    end
 
+  # @param current_user [Object] the current_user to be associated with the model
   def persist!(ctx, model:, dm_room:, current_user:, **)
-    model.dm_room_id = dm_room.id
-    model.user = current_user
-    ctx['contract.default'].save 
+    ctx['contract.default'].save do |hash|
+      model.dm_room_id = dm_room.id
+      model.user = current_user
+      model.message = hash[:message]
+      model.save
+    end
   end
 
+
   def update_room_and_counters!(ctx, dm_room:, current_user:, **)
-    dm_room.touch(:updated_at)
+    # dm_room.touch(:updated_at)
+    dm_room.update(last_message_at: Time.current)
+
     receiver = dm_room.other_user(current_user)
     return true unless receiver
     dm_room.increment_unread_for(receiver) if receiver
+    true
   end
 
   def notify!(ctx, model:, dm_room:, current_user:, **)
@@ -56,15 +65,16 @@ class DmMessage::Operation::Create < Trailblazer::Operation
   end
 
   def broadcast!(ctx, model:, dm_room:, current_user:, **)
-    
-    html = ApplicationController.render(
-      partial: 'dm_messages/message',
-      locals: { message: model, current_user: current_user }
-    )
-
     ActionCable.server.broadcast("dm_room_#{dm_room.id}", {
-      message: html,
-      sender_id: current_user.id
+      message: {
+        content: model.message, # Тест ищет content
+        sender_id: current_user.id,
+        user_name: current_user.username
+      },
+      action: 'create'
     })
+    true
   end
+
+  
 end

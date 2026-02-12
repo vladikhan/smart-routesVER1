@@ -5,6 +5,7 @@ module DmRoom::Operation
     step :mark_all_as_read!
     step :fetch_messages!
 
+
     def fetch_rooms!(ctx, current_user:, **)
       ctx[:dm_rooms] = DmRoom.for_user_with_preloads(current_user)
                              .order(last_message_at: :desc)
