@@ -115,7 +115,5 @@ end
     respond_to?(:is_admin) && is_admin
   end
 
-  def confirmed?
-    respond_to?(:email_verified) ? email_verified : super
-  end
+  
 end

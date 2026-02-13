@@ -5,14 +5,15 @@ RSpec.describe 'DmRooms', type: :request do
   let(:other_user) { create(:user) }
   let(:third_user) { create(:user) }
   
-  before { sign_in user }
   
   describe 'GET /dm_rooms' do
     let!(:room_as_sender) { create(:dm_room, sender: user, receiver: other_user) }
     let!(:room_as_receiver) { create(:dm_room, sender: third_user, receiver: user) }
-    let!(:other_user) { create(:dm_room) }
+
+    let!(:other_room) { create(:dm_room, sender: other_user, receiver: third_user) }
 
     context 'when logged in' do
+      before { sign_in user }
       it 'returns success' do
         get dm_rooms_path
 
@@ -36,7 +37,6 @@ RSpec.describe 'DmRooms', type: :request do
 
     context 'authorization checks' do
       context 'when not logged in' do
-        before { sign_in user }
 
         it 'redirects to login' do
           get dm_rooms_path
@@ -47,8 +47,9 @@ RSpec.describe 'DmRooms', type: :request do
 
       context 'when email not verified' do
         before do 
-          user.update(email_verified: false)
-          allow_any_instance_of(ApplicationController).to receive(:check_email_verification).and_call_original
+          user.update!(email_verified: false, confirmed_at: Time.current)
+          sign_in user
+
         end
 
         it 'redirects to email verification' do
@@ -63,38 +64,39 @@ RSpec.describe 'DmRooms', type: :request do
 
   describe 'GET /dm_rooms/:id' do
     let!(:room) { create(:dm_room, sender: user, receiver: other_user) }
-    let!(:messages) { create_list(:dm_messages, 5, dm_room: room, user: other_user) }
+    let!(:messages) { create_list(:dm_message, 5, dm_room: room, user: other_user) }
 
     context 'when user is room participant' do
+      before { sign_in user }
       it 'returns success' do
-        it 'returns success' do
           get dm_room_path(room)
 
           expect(response).to have_http_status(:success)
+
         end
-
-        it 'assigns active_room' do
-          get dm_room_path(room)
-          expect(assigns(:active_room)).to eq(room)
-        end
-      end
-    end
-
-    context 'authorization: when is not room participant' do
-      let(:stranger) { create(:user) }
-
-      before { sign_in stranger }
-
-      it 'does not show messages' do
+      it 'assigns active_room' do
         get dm_room_path(room)
-
-        expect(assigns(:messages)).to eq([])
+        expect(assigns(:active_room)).to eq(room)
       end
     end
+
+    context 'when is not room participant' do
+  before { sign_in third_user }
+
+  it 'redirects to dm_rooms_path and shows alert' do
+    get dm_room_path(room)
+    
+    # Проверяем факт редиректа, а не содержимое переменных
+    expect(response).to redirect_to(dm_rooms_path)
+    expect(flash[:alert]).to eq('このチャットルームにはアクセスできません。')
+    
+    # Если хочешь убедиться, что сообщения не загрузились:
+    expect(assigns(:messages)).to be_nil
+  end
+end
 
     context 'authorization checks' do
       context 'when not logged in' do
-        before { sign_out user }
 
         it 'redirectss to login' do
           get dm_room_path(room)
@@ -111,6 +113,7 @@ RSpec.describe 'DmRooms', type: :request do
     end
 
     context 'when room does not exist yet' do
+      before { sign_in user }
       it 'create a new dm_room' do
         expect {
           post dm_rooms_path, params: valid_params
@@ -118,15 +121,22 @@ RSpec.describe 'DmRooms', type: :request do
       end
 
       it 'creates room with correct sender and receiver' do
-        post dm_rooms_path, params: valid_params
+        sign_in user
+
+        post dm_rooms_path, params: { receiver_id: other_user.id }
 
         room = DmRoom.last
+
+        if room.nil?
+          puts "FAILED TO CREATE ROOM!"
+        end
+
         expect(room.sender_id).to eq(user.id)
         expect(room.receiver_id).to eq(other_user.id)
       end
 
       it 'redirects to the new room' do
-        post dm_rooms_path, params: valid_params
+        post dm_rooms_path, params: { receiver_id: other_user.id }
 
         room = DmRoom.last
         expect(response).to redirect_to(dm_room_path(room))
@@ -135,15 +145,17 @@ RSpec.describe 'DmRooms', type: :request do
 
     context 'when room already exist' do
       let!(:existing_room) { create(:dm_room, sender: user, receiver: other_user) }
+        before { sign_in user }
+
 
       it 'does not duplicate room' do
         expect{
-          post dm_room_path, params: valid_params
+          post dm_rooms_path, params: valid_params
       }.not_to change(DmRoom, :count)
       end
       
       it 'redirects to existing room' do
-        post dm_room_path, params: valid_params
+        post dm_rooms_path, params: valid_params
 
         expect(response).to redirect_to(dm_room_path(existing_room))
       end
@@ -163,8 +175,7 @@ RSpec.describe 'DmRooms', type: :request do
 
     context 'authorization checks' do
       context 'when not logged in' do
-        before { sign_in user }
-
+        before { sign_out user }
         it 'redirects to login' do 
           post dm_rooms_path, params: valid_params
 

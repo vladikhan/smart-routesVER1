@@ -16,16 +16,18 @@ class EmailVerificationsController < ApplicationController
     @user = User.find_by(confirmation_token: params[:confirmation_token])
     code = params[:verification_code].to_s.strip
 
-    if @user && @user.verification_code.to_s == code
+    if @user && @user.verification_code.present? && @user.verification_code.to_s == code
+
       @user.update(email_verified: true, verification_code: nil)
       @user.confirm if !@user.confirmed?
+
       sign_in(@user)
 
       redirect_to root_path, notice: 'メールアドレスが確認されました'
     else
 
-      puts "DEBUG: User code in DB: #{@user&.verification_code.inspect}"
-    puts "DEBUG: Input code: #{input_code.inspect}"
+      puts "DEBUG: User found: #{@user.present?}"
+    puts "DEBUG: Code in DB: #{@user&.verification_code.inspect}, Input: #{code.inspect}"
     
       @user ||= User.new
       flash.now[:alert] = '確認コードが正しくありません'

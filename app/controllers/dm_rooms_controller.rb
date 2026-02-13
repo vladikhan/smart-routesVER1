@@ -6,9 +6,22 @@ class DmRoomsController < ApplicationController
   end
 
   def show
-    run_index
-    render :index
+  @room = DmRoom.find(params[:id])
+
+  unless @room.sender_id == current_user.id || @room.receiver_id == current_user.id
+    redirect_to dm_rooms_path, alert: 'このチャットルームにはアクセスできません。'
+    return 
   end
+
+  @other_user = (@room.sender == current_user) ? @room.receiver : @room.sender
+  @messages = @room.dm_messages.includes(:user).order(created_at: :asc)
+  
+  run_index 
+
+  @room.dm_messages.where.not(user_id: current_user.id).update_all(is_read: true)
+
+  render :index
+end
 
 
   def create
@@ -16,12 +29,11 @@ class DmRoomsController < ApplicationController
     if @room.persisted? # или if @room.save
       redirect_to dm_room_path(@room)
     else
-      redirect_to root_path # Вот здесь тебя и редиректит!
+      redirect_to root_path 
     end
   end
 
   def mark_all_as_read
-    # 1. Ищем комнату. В этом методе ID обычно передается как params[:id]
     @dm_room = DmRoom.find_by(id: params[:id])
 
     # 2. Если комната не найдена — выходим
@@ -54,7 +66,6 @@ class DmRoomsController < ApplicationController
     @active_room = result[:active_room]
     @messages    = result[:messages] || [] 
   end
-
 end
 
 
