@@ -13,6 +13,8 @@ class EmailVerificationsController < ApplicationController
   end
 
   def verify
+    
+
     @user = User.find_by(confirmation_token: params[:confirmation_token])
     code = params[:verification_code].to_s.strip
 
@@ -26,11 +28,9 @@ class EmailVerificationsController < ApplicationController
       redirect_to root_path, notice: 'メールアドレスが確認されました'
     else
 
-      puts "DEBUG: User found: #{@user.present?}"
-    puts "DEBUG: Code in DB: #{@user&.verification_code.inspect}, Input: #{code.inspect}"
     
       @user ||= User.new
-      flash.now[:alert] = '確認コードが正しくありません'
+      flash.now[:alert] = '認証コードを入力してください。'
       render :new, status: :unprocessable_entity
     end
   end
@@ -38,21 +38,31 @@ class EmailVerificationsController < ApplicationController
   def resend
 
     @user = User.find_by(confirmation_token: params[:confirmation_token])
+    
+    if @user.nil?
+      return redirect_to new_user_session_path, alert: 'セッションが切れました。再度ログインしてください'
+    end
 
     if @user
-      code = SecureRandom.random_number(1_000_000).to_s.rjust(6, '0')
+      code = SecureRandom.random_number(1_000_000_00).to_s.rjust(8, '0')
 
       @user.update(
         verification_code: code,
         verification_code_sent_at: Time.current
       )
   
-      UserMailer.verification_code_email(@user).deliver_now
-  
-      redirect_to email_verification_path(confirmation_token: @user.confirmation_token), notice: '確認コードを再送信しました'
-    else
+      begin
+        UserMailer.verification_code_email(@user).deliver_now
+        # Обязательно return!
+        redirect_to email_verification_path(confirmation_token: @user.confirmation_token), notice: '確認コードを再送信しました'
+        return 
+      rescue Net::SMTPFatalError
+        redirect_to email_verification_path(confirmation_token: @user.confirmation_token), alert: 'メールの送信に失敗しました'
+        return
+      end
 
-      redirect_to new_user_session_path, alert: 'セッションが切れました。再度ログインしてください'  
+    else
+      redirect_to new_user_session_path, alert: 'セッションが切れました。再度ログインしてください'
     end
   end
 end
