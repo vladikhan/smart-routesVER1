@@ -113,7 +113,7 @@ Rails.application.routes.draw do
       patch :mark_all_as_read
     end
     member do
-      get :mark_as_read
+      patch :mark_as_read
     end
   end
 end

@@ -6,15 +6,21 @@ FactoryBot.define do
     notification_type { 'follow' }
     is_read { false }
     message { nil }
+    notifiable { association(:follower) }
+
+    trait :follow_request do
+      notifiable { association(:follower) }
+      notification_type { 'follow'}
+    end
+
+    
 
     trait :unread do
       is_read { false }
-      read_at { nil }
     end
 
     trait :read do 
       is_read { true }
-      read_at { Time.current }
     end
 
     trait :new_message do

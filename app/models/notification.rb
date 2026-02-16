@@ -15,6 +15,9 @@ class Notification < ApplicationRecord
   scope :unread, -> { where(is_read: false) }
   scope :recent, -> { order(created_at: :desc) }
   scope :for_user, ->(user) { where(user_id: user.id) }
+  scope :message_notifications, -> { where(notification_type: 'new_message') }
+  scope :interaction_notifications, -> { where(notification_type: ['like', 'comment', 'route_liked', 'route_commented']) }
+  scope :follow_notifications, -> { where(notification_type: 'follow') }
 
   def mark_as_read!
     update!(is_read: true, read_at: Time.current)
