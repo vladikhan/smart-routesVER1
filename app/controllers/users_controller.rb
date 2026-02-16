@@ -70,23 +70,59 @@ end
   end
 
   def follow
-  result = User::Operation::Follow.call(params: params, current_user: current_user)
 
-  if result.success?
-    # Добавляем status: :see_other
-    redirect_back fallback_location: root_path, notice: "フォローしました", status: :see_other
-  else
-    redirect_back fallback_location: root_path, alert: "エラーが発生しました", status: :see_other
+    @user = User.find_by(id: params[:id])
+
+    return head :not_found unless @user
+
+    result = User::Operation::Follow.call(params: params, current_user: current_user)
+
+    respond_to do |format|
+      if result.success?
+        format.html { redirect_back fallback_location: root_path, status: :see_other }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace(
+            "follow_section_#{@user.id}",
+            partial: "users/follow_button",
+            locals: { user: @user }
+          )
+        }
+     
+      # redirect_back fallback_location: root_path, notice: "フォローしました", status: :see_other
+    else
+      format.html { redirect_back fallback_location: root_path, alert: "エラーが発生しました", status: :see_other }
+      format.turbo_stream { head :unprocessable_entity }
+      # redirect_back fallback_location: root_path, alert: "エラーが発生しました", status: :see_other
+    end
   end
 end
 
 def unfollow
+  # 1. Находим пользователя в самом начале
+  @user = User.find(params[:user_id] || params[:id])
+
+  puts "Current User: #{current_user&.id}"
+
+  # 2. Выполняем операцию (один раз!)
   result = Follower::Operation::Delete.call(params: params, current_user: current_user)
-  
-  if result.success?
-    redirect_back fallback_location: root_path, notice: "フォロー解除済み", status: :see_other
-  else
-    redirect_back fallback_location: root_path, alert: "解除中にエラーが発生しました", status: :see_other
+
+  puts "Operation Result: #{result.success?}"
+
+  # 3. Отвечаем в зависимости от формата запроса
+  respond_to do |format|
+    if result.success?
+      format.html { redirect_back fallback_location: root_path, notice: "フォロー解除済み", status: :see_other }
+      format.turbo_stream {
+        render turbo_stream: turbo_stream.replace(
+          "follow_section_#{@user.id}",
+          partial: "users/follow_button", # Проверь: "users" или "user"? Обычно "users"
+          locals: { user: @user }
+        )
+      }
+    else
+      format.html { redirect_back fallback_location: root_path, alert: "ユーザーが見つからないか、解除に失敗しました", status: :see_other }
+      format.turbo_stream { head :unprocessable_entity }
+    end
   end
 end
 

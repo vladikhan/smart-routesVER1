@@ -30,13 +30,12 @@ class User < ApplicationRecord
   has_many :dm_messages, dependent: :destroy
 
   # === Ассоциации: Follow System ===
-  # Те, на кого я подписан
   has_many :following_relationships, class_name: 'Follower', foreign_key: 'follower_id', dependent: :destroy
-  has_many :following, through: :following_relationships, source: :following_user
+  has_many :following, through: :following_relationships, source: :following
 
   # Мои подписчики
   has_many :follower_relationships, class_name: 'Follower', foreign_key: 'following_id', dependent: :destroy
-  has_many :followers, through: :follower_relationships, source: :follower_user
+  has_many :followers, through: :follower_relationships, source: :follower
 
   # === Verification Logic ===
   VERIFICATION_CODE_LENGTH = 6
