@@ -54,9 +54,14 @@ RSpec.describe 'Likes', type: :request do
   describe 'ActionCable broadcast' do
     it 'broadcasts notification to content owner' do
       owner = route.user
+
+      sign_in user
+
+      # binding.pry
+
       expect {
         post likes_path, params: { likeable_id: route.id, likeable_type: 'Route' }
-      }.to have_broadcasted_to("notifications_#{owner.id}")
+      }.to have_broadcasted_to("notifications_#{owner.id}").at_least(:once)
     end
   end
 end

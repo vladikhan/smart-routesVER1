@@ -3,6 +3,7 @@ module Notification::Operation
     step :should_notify?
     step :setup_params!
     step :persist!
+    step :broadcast!
 
     def should_notify?(ctx, params:, **)
       p = params[:notification]
@@ -34,7 +35,7 @@ module Notification::Operation
       presenter = NotificationPresenter.new(model)
       
       ActionCable.server.broadcast(
-        "notification_#{model.user_id}",
+        "notifications_#{model.user_id}",
         {
           unread_count: model.user.notifications.unread.count,
           notification: {

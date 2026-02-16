@@ -7,7 +7,7 @@ class NotificationPresenter
   end
 
   def icon
-    case notification_type
+    case @n.notification_type
     when 'like', 'route_liked' then '❤️'
     when 'comment', 'route_commented' then '💬'
     when 'follow' then '👤'
@@ -21,10 +21,10 @@ class NotificationPresenter
   end
 
   def message
-    actor_name = actor&.username || '誰か'
+    actor_name = @n.actor&.username || '誰か'
     target_name = get_target_name
 
-    case notification_type
+    case @n.notification_type
     when 'new_message'
       "#{actor_name}さんからメッセージが届きました"
 
@@ -75,7 +75,7 @@ class NotificationPresenter
   end
 
   def target_url
-    return Rails.application.routes.url_helpers.root_path if notifiable.nil?
+    return Rails.application.routes.url_helpers.root_path if @n.notifiable.nil?
 
     helpers = Rails.application.routes.url_helpers
 
