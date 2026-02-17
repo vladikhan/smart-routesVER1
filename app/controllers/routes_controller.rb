@@ -94,8 +94,11 @@ end
       id: params[:id]
     )
 
+
     if result.success?
       redirect_to route_path(result[:model]), notice: 'ルートを更新しました'
+    elsif result['result.policy.default']&.failure?
+      redirect_to routes_path, alert: '他の人のルートは編集できません'
     else
       @route = result[:model]
       @cities = City.order(:name)
@@ -106,15 +109,17 @@ end
   end
 
   def destroy
-  @route = Route.find_by(id: params[:id])
-  
-  if @route && (@route.user_id == current_user.id || current_user.is_admin?)
-    @route.update(is_deleted: true)
-    # Добавляем status: :see_other — это критично для Rails 7 + Turbo
-    redirect_to routes_path, notice: 'ルートを削除しました', status: :see_other
+  @route = Route::Operation::Delete.call(params: params, current_user: current_user)
+
+  if @route.success?
+    flash[:notice] = 'ルートを削除しました'
+    redirect_to routes_path, status: :see_other #see_other = 303 Error
   else
-    redirect_to routes_path, alert: 'アクセス権限がないか、ルートが見つかりません', status: :see_other
+    flash[:alert] = 'このルートを削除する権限がありません'
+    redirect_to route_path(@route[:model]), status: :forbidden
   end
+  
+  
 end
 
   def route_params

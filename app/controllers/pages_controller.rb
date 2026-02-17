@@ -1,4 +1,5 @@
 class PagesController < ApplicationController
+  before_action :authenticate_user!, only: [:logout_confirm]
   def home
     result = Page::Operation::Home.call
     
@@ -11,5 +12,9 @@ class PagesController < ApplicationController
 
   def logout_confirm
     # Просто рендерит вьюху
+  end
+
+  def index
+    @recent_routes = Route.visible.recent.limit(10)
   end
 end

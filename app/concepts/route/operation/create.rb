@@ -19,10 +19,14 @@ class Route::Operation::Create < Trailblazer::Operation
   
   def notify_followers!(ctx, model:, **)
     NotificationService.notify_new_route_from_following(model)
+    true
+  rescue => e
+    Rails.logger.error("Notificaiton failed: #{e.message}")
+    true
   end
 
 def process_google_items(options, params:, model:, **)
-  items = params[:route_items]
+  items = params[:route_items] || (params[:route] && params[:route][:route_items_attributes]) || (params[:route] && params[:route][:route_items])
   return true if items.blank?
 
   items.each_with_index do |item, index|
@@ -35,7 +39,7 @@ def process_google_items(options, params:, model:, **)
       duration_minutes: item['duration_minutes'],
       order_index:      index,
       position:         index + 1,
-      item_type:        "venue"
+      item_type:        "Venue"
     )
   end
   true

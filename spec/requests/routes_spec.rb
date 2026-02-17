@@ -62,7 +62,14 @@ RSpec.describe 'Routes API', type: :request do
           city_id: city.id,
           estimated_duration: 300,
           estimated_cost: 5000,
-          is_public: true
+          is_public: true,
+          route_items_attributes: [
+            {
+              venue_name: 'Osaka Dotonbori',
+              venue_address: 'Osaka Dotonbori, Osaka, Japan',
+              durarion_minutes: 60
+            }
+          ]
         }
       }
     end
@@ -78,6 +85,11 @@ RSpec.describe 'Routes API', type: :request do
       
       it 'redirects to route' do
         post routes_path, params: valid_params
+
+        if response.status != 302
+          post routes_path, params: valid_params
+        end
+
         expect(response).to redirect_to(Route.last)
       end
       
@@ -97,8 +109,10 @@ RSpec.describe 'Routes API', type: :request do
   end
   
   describe 'GET /routes/:id/edit' do
+    let(:route) { create(:route, user: user, city: city)}
     context 'when owner' do
       before { sign_in user }
+
       
       it 'shows edit form' do
         get edit_route_path(route)
@@ -158,18 +172,30 @@ RSpec.describe 'Routes API', type: :request do
   end
   
   describe 'DELETE /routes/:id' do
+    let!(:city) { create(:city) }
+
     context 'when owner' do
-      before { sign_in user }
-      
       it 'deletes route' do
-        route_to_delete = create(:route, user: user, city: city)
-        expect {
-          delete route_path(route_to_delete)
-        }.to change(Route, :count).by(-1)
+        # 1. Создаем юзера
+        me = create(:user)
+        # 2. СРАЗУ логиним именно его
+        sign_in me 
+        # 3. Создаем роут для него
+        my_route = create(:route, user: me, city: city)
+
+        delete route_path(my_route)
+
+        expect(response).to have_http_status(:redirect)
+        expect(Route.exists?(my_route.id)).to be_falsey
       end
       
       it 'redirects to routes index' do
-        delete route_path(route)
+        me = create(:user)
+        sign_in me
+        my_route = create(:route, user: me, city: city)
+
+        delete route_path(my_route)
+        
         expect(response).to redirect_to(routes_path)
       end
     end

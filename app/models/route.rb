@@ -43,6 +43,9 @@ class Route < ApplicationRecord
   scope :trending, -> { order(view_count: :desc) }
   scope :by_city, ->(city_id) { where(city_id: city_id) }
   scope :popular, -> { order(likes_count: :desc) }
+  scope :visible, -> { where(is_public: true, is_deleted: false) }
+  scope :recent, -> { order(created_at: :desc) }
+  scope :featured, -> { where(is_featured: true) }
 
   def increment_view_count!
     increment!(:view_count)

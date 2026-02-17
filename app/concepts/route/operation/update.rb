@@ -1,29 +1,32 @@
 module Route::Operation
   class Update < Trailblazer::Operation
-    # Операция Present нужна для инициализации формы в контроллере (action :edit)
     class Present < Trailblazer::Operation
-      step :model!
-      step :check_ownership!
-      step Contract::Build(constant: Route::Contract::Update)
+      step :model!, id: :present_model
+      step :check_ownership!, id: :present_check_ownership
+      step Contract::Build(constant: Route::Contract::Update), id: :present_build_contract
 
       def model!(ctx, params:, **)
         ctx[:model] = ::Route.find_by(id: params[:id])
       end
 
       def check_ownership!(ctx, current_user:, model:, **)
-        return true if model&.user_id == current_user.id || current_user&.is_admin?
+        if model&.user_id == current_user.id || current_user&.is_admin?
+        true
+      else
         ctx[:error] = 'アクセス権限がありません'
+        ctx['result.policy.default'] = Trailblazer::Operation::Result.new(false,{})
         false
       end
     end
+  end
 
     # --- Основные шаги PATCH/PUT запроса ---
-    step :model!
-    step :check_ownership!
-    step Contract::Build(constant: Route::Contract::Update)
+    step :model!, id: :update_model
+    step :check_ownership!, id: :update_check_ownership
+    step Contract::Build(constant: Route::Contract::Update), id: 'update_contract_build'
     step Contract::Validate(key: :route)
     step :process_route_items!
-    step :persist_images! # Добавил из твоего старого кода, чтобы картинки не терялись
+    step :persist_images! 
     step Contract::Persist()
     step :update_tags!
     step :log_activity!
@@ -41,6 +44,7 @@ module Route::Operation
       return true if model.user_id == current_user.id || current_user&.is_admin?
       
       ctx[:error] = 'アクセス権限がありません'
+      ctx['result.policy.default'] = Trailblazer::Operation::Result.new(false, {})
       false
     end
 
@@ -54,24 +58,24 @@ def process_route_items!(ctx, params:, model:, **)
   model.route_items.destroy_all
 
   items_array.each_with_index do |item_params, index|
-    next if item_params["venue_name"].blank?
+      next if item_params["venue_name"].blank?
 
-    # Создаем через create!, чтобы если упадет - мы увидели ошибку в логах сразу
-    model.route_items.create!(
-      venue_name:    item_params["venue_name"],
-      venue_address: item_params["venue_address"],
-      geo_lat:       item_params["venue_lat"].to_f,
-      geo_lng:       item_params["venue_lng"].to_f,
-      position:      index
-    )
+      # Создаем через create!, чтобы если упадет - мы увидели ошибку в логах сразу
+      model.route_items.create!(
+        venue_name:    item_params["venue_name"],
+        venue_address: item_params["venue_address"],
+        geo_lat:       item_params["venue_lat"].to_f,
+        geo_lng:       item_params["venue_lng"].to_f,
+        position:      index
+      )
+    end
+    true
+  rescue => e
+    # Если что-то упадет, мы увидим это в консоли сервера!
+    Rails.logger.error "!!! ERROR SAVING ITEMS: #{e.message}"
+    ctx[:error] = e.message
+    false 
   end
-  true
-rescue => e
-  # Если что-то упадет, мы увидим это в консоли сервера!
-  Rails.logger.error "!!! ERROR SAVING ITEMS: #{e.message}"
-  ctx[:error] = e.message
-  false 
-end
 
     def persist_images!(ctx, model:, params:, **)
       # Сохраняем логику загрузки картинок из твоего старого кода
@@ -100,7 +104,7 @@ end
       true
     rescue => e
       Rails.logger.error("[Route::Update] Activity log failed: #{e.message}")
-      true # Лог не должен «валить» всю операцию
+      true 
     end
   end
 end

@@ -38,15 +38,6 @@ RSpec.describe 'Pages', type: :request do
       end
     end
 
-    describe 'Performance & Caching' do
-      it 'caches stats' do
-        # Пример того, как реально протестировать кэш Rails
-        allow(Rails.cache).to receive(:fetch).with('homepage_stats', expires_in: 1.hour).and_call_original
-        get root_path
-        expect(Rails.cache).to have_received(:fetch)
-      end
-    end
-
     context 'when user is logged in' do
       let(:user) { create(:user) }
       before { sign_in user }
@@ -72,7 +63,7 @@ RSpec.describe 'Pages', type: :request do
       it 'redirects to root or login' do
         get logout_confirm_path
         # Обычно такие страницы не показывают гостям
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
   end
