@@ -4,7 +4,7 @@
 <div class="container mt-4" style="max-width: 900px;">
   <div class="card mb-4 shadow-sm border-0">
     <div class="card-body text-center pt-5">
-      <% if @user.avatar.attached? %>
+      <% if @user.avatar.present? %>
         <%=
           image_tag @user.avatar,
                     class: 'rounded-circle mb-3 shadow-sm',

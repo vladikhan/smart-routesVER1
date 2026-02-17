@@ -79,7 +79,7 @@ end
 
     respond_to do |format|
       if result.success?
-        format.html { redirect_back fallback_location: root_path, status: :see_other }
+        format.html { redirect_back fallback_location: root_path, notice: "フォローしました", status: :see_other }
         format.turbo_stream {
           render turbo_stream: turbo_stream.replace(
             "follow_section_#{@user.id}",
@@ -88,7 +88,6 @@ end
           )
         }
      
-      # redirect_back fallback_location: root_path, notice: "フォローしました", status: :see_other
     else
       format.html { redirect_back fallback_location: root_path, alert: "エラーが発生しました", status: :see_other }
       format.turbo_stream { head :unprocessable_entity }
@@ -101,12 +100,10 @@ def unfollow
   # 1. Находим пользователя в самом начале
   @user = User.find(params[:user_id] || params[:id])
 
-  puts "Current User: #{current_user&.id}"
 
   # 2. Выполняем операцию (один раз!)
   result = Follower::Operation::Delete.call(params: params, current_user: current_user)
 
-  puts "Operation Result: #{result.success?}"
 
   # 3. Отвечаем в зависимости от формата запроса
   respond_to do |format|

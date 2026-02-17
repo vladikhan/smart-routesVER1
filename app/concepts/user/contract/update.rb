@@ -3,6 +3,7 @@ module User::Contract
     property :username
     property :bio
     property :avatar
+    property :location
 
     validates :username, presence: true
     validates :bio, length: { maximum: 500 }

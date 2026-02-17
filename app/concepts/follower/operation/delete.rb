@@ -6,10 +6,7 @@ module Follower::Operation
 
     
     def find_model!(ctx, params:, current_user:, **)
-      puts "--- DEBUG DELETE OPERATION ---"
-      puts "Params ID: #{params[:id].inspect}"
-      puts "Params User ID: #{params[:user_id].inspect}"
-      puts "Current User ID: #{current_user&.id}"
+      
       target_id = (params[:user_id] || params[:id]).to_i 
       
       ctx[:model] = Follower.find_by(
@@ -36,15 +33,13 @@ module Follower::Operation
         if model.destroy
           User.decrement_counter(:following_count, model.follower_id)
           User.decrement_counter(:followers_count, model.following_id)
-          puts "DEBUG: Counters decremented successfully"
+          
           true
         else
-          puts "DEBUG: Destroy FAILED! Errors: #{model.errors.full_messages}"
           false
         end
       end
     rescue => e
-      puts "DEBUG: Exception in delete step: #{e.message}"
       false
     end
 

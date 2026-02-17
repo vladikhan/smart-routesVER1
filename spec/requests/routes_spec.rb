@@ -176,11 +176,8 @@ RSpec.describe 'Routes API', type: :request do
 
     context 'when owner' do
       it 'deletes route' do
-        # 1. Создаем юзера
         me = create(:user)
-        # 2. СРАЗУ логиним именно его
         sign_in me 
-        # 3. Создаем роут для него
         my_route = create(:route, user: me, city: city)
 
         delete route_path(my_route)

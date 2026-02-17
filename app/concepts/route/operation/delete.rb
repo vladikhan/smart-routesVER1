@@ -10,7 +10,6 @@ module Route::Operation
 
     def check_ownership!(ctx, current_user:, model:, **)
       # binding.pry
-      puts "DEBUG: User ID: #{current_user&.id}, Route Owner ID: #{model&.user_id}"
       return false unless model && current_user
       model.user_id == current_user.id || current_user.is_admin?
     end
