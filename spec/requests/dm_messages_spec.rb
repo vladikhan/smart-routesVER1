@@ -166,7 +166,7 @@ RSpec.describe "DmMessages", type: :request do
         post dm_room_dm_messages_path(room), params: invalid_params
         
         expect(response).to redirect_to(dm_room_path(room))
-        expect(flash[:alert]).to match(/エラーが発生しました/)
+        expect(flash[:alert]).to match("Messageを入力してください")
       end
     end
 

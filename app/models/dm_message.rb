@@ -2,6 +2,8 @@ class DmMessage < ApplicationRecord
   belongs_to :dm_room, touch: true
   belongs_to :user
 
+  after_create :update_room_stats
+
   has_one_attached :image
 
   validates :message, presence: true, length: { maximum: 5000 }, unless: -> { image.attached? }
@@ -31,5 +33,12 @@ class DmMessage < ApplicationRecord
       notification_type: 'new_message'
     )
     notification&.update(is_read: true, read_at: Time.current) if notification && !notification.is_read?
+  end
+
+  def update_room_stats
+    dm_room.update_columns(last_message_at: Time.current)
+
+    receiver = (user_id == dm_room.sender_id) ? :unread_count_receiver : :unread_count_sender
+    dm_room.increment!(receiver)
   end
 end

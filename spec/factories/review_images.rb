@@ -1,7 +1,13 @@
 FactoryBot.define do
   factory :review_image do
-    review { nil }
-    image_url { "MyString" }
+    association :review
     position { 1 }
+
+    image do
+      Rack::Test::UploadedFile.new(
+        Rails.root.join('spec/fixtures/files/test_image.jpg'), 
+        'image/jpeg'
+      )
+    end
   end
 end

@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :review_response do
-    review { nil }
-    user { nil }
-    text { "MyText" }
+    association :review
+    association :user
+
+    text { "貴重なご意見ありがとうございます。対応いたします。" }
   end
 end

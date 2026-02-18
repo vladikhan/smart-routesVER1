@@ -1,4 +1,3 @@
-# spec/models/dm_message_spec.rb
 require 'rails_helper'
 
 RSpec.describe DmMessage, type: :model do

@@ -43,10 +43,11 @@ class RoutesController < ApplicationController
 end
 
   def new
-  @route = Route.new
-  3.times { @route.route_items.build } 
-  @cities = City.all
-end
+    @route = Route.new
+    3.times { @route.route_items.build } 
+    @cities = City.all
+    @venues = Venue.all
+  end
 
   def route_params
   params.require(:route).permit(

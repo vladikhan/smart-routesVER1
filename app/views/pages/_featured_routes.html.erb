@@ -34,3 +34,33 @@
   </div>
   </div>
 </section>
+
+
+<section class="features" style="background-color: #f9f9f9; padding-top: 0;">
+  <div class="container">
+    <h2 class="section-title">新着ルート</h2> <% if @recent_routes.any? %>
+      <div class="cards-grid">
+        <% @recent_routes.each do |route| %>
+          <div class="card">
+            <div class="card-image">🆕</div>
+            <div class="card-body">
+              <h3 class="card-title"><%= route.name %></h3>
+              <p class="card-description"><%= truncate(route.description, length: 80) %></p>
+              
+              <div class="card-meta">
+                <span class="badge"><%= route.difficulty_level || "easy" %></span>
+                <span class="duration">⏱️ <%= route.estimated_duration %>分</span>
+              </div>
+              
+              <div class="card-footer">
+                <a href="/routes/<%= route.id %>" class="view-btn">詳細を見る</a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-center">新着ルートはまだありません。</p>
+    <% end %>
+  </div>
+</section>

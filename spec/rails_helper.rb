@@ -50,7 +50,8 @@ RSpec.configure do |config|
   # Devise Helpers (для контроллеров и системных тестов)
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :request
-  
+  config.include Devise::Test::IntegrationHelpers, type: :system
+
   # ActionCable Helpers
   config.include ActionCable::TestHelper, type: :channel
 

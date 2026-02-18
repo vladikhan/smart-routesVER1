@@ -32,11 +32,16 @@ module Notification::Operation
     end
 
     def broadcast!(ctx, model:, **)
+      
       presenter = NotificationPresenter.new(model)
       
+
+      cable_type = model.notification_type == "follow" ? "follow_request" : model.notification_type
+
       ActionCable.server.broadcast(
         "notifications_#{model.user_id}",
         {
+          type: cable_type,
           unread_count: model.user.notifications.unread.count,
           notification: {
             id: model.id,

@@ -9,7 +9,7 @@ gem 'jbuilder', '~> 2.7'
 gem 'pg'
 gem 'puma', '~> 5.0'
 gem 'rails', '~> 6.1.7', '>= 6.1.7.6'
-gem 'turbolinks', '~> 5'
+# gem 'turbolinks', '~> 5'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # gem 'webpacker', '~> 5.0'
 
@@ -91,7 +91,7 @@ group :test do
   gem 'selenium-webdriver', '~> 4.10'
   gem 'shoulda-matchers', '~> 5.3'
   gem 'simplecov', require: false
-  gem 'webdrivers', '~> 5.2'
+  # gem 'webdrivers', '~> 5.2'
 end
 
 # Используем Dart Sass вместо sassc

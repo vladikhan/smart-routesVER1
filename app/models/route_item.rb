@@ -6,7 +6,12 @@ class RouteItem < ApplicationRecord
 
   validates :route, presence: true
   validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  
+  validates :geo_lat, numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
+  validates :geo_lng, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }, allow_nil: true
 
+
+  attr_accessor :geo_lat, :geo_lng
 
   scope :ordered, -> { order(:position) }
 

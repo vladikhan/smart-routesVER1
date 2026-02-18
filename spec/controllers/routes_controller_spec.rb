@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'rails_helper'
 
 RSpec.describe RoutesController, type: :controller do

@@ -18,7 +18,7 @@ module Page::Operation
                                    .limit(6)
       ctx[:popular_venues]  = Venue.order(average_rating: :desc)
                                    .limit(6)
-      ctx[:recent_routes]   = Route.where(is_public: true, is_deleted: false)
+      ctx[:recent_routes]   = Route.where(is_public: true,                               is_deleted: false)
                                    .order(created_at: :desc).limit(6)
     end
   end

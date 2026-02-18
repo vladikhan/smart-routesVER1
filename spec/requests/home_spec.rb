@@ -35,6 +35,8 @@ RSpec.describe 'Home', type: :request do
     end
     
     it 'displays recent routes' do
+      recent_route = create(:route, name: "ルート 133", is_public: true, is_deleted: false)
+      
       get root_path
       expect(response.body).to include(recent_route.name)
     end

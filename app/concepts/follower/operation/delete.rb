@@ -13,15 +13,7 @@ module Follower::Operation
         follower_id: current_user.id,
         following_id: target_id
       )
-      
-      puts "Found Model: #{ctx[:model].inspect}"
-      puts "------------------------"
-      
-      # Если не нашли, давай посмотрим, что вообще есть в таблице
-      if ctx[:model].nil?
-        puts "All Followers in DB: #{Follower.all.map { |f| "[from: #{f.follower_id} to: #{f.following_id}]" }.join(', ')}"
-      end
-      
+     
       true # Шаг всегда возвращает true, чтобы мы могли увидеть ошибку на следующем шаге
     end
 

@@ -6,10 +6,18 @@ class Notification < ApplicationRecord
   validates :notification_type, :user_id, presence: true
 
   enum notification_type: {
-    follow: 'follow', like: 'like', comment: 'comment', review: 'review',
-    new_message: 'new_message', new_post: 'new_post', bookmark: 'bookmark',
-    route_liked: 'route_liked', route_commented: 'route_commented',
-    route_reviewed: 'route_reviewed', mention: 'mention'
+    follow: 'follow', 
+    follow_request: 'follow_request',
+    like: 'like', 
+    comment: 'comment', 
+    review: 'review',
+    new_message: 'new_message', 
+    new_post: 'new_post', 
+    bookmark: 'bookmark',
+    route_liked: 'route_liked', 
+    route_commented: 'route_commented',
+    route_reviewed: 'route_reviewed', 
+    mention: 'mention'
   }, _prefix: :type
 
   scope :unread, -> { where(is_read: false) }
