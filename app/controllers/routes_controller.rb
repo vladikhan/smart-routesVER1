@@ -1,6 +1,5 @@
 class RoutesController < ApplicationController
   before_action :authenticate_user!, except: [:index, :show]
-  
 
   def index
     result = Route::Operation::Index.call(params: params)
@@ -16,23 +15,10 @@ class RoutesController < ApplicationController
   
   if result.success?
     @route = result[:model]
-    @route_items = @route.route_items.includes(:item).map do |route_item|
-      target = route_item.item 
-      next if target.nil?
-
-      {
-        lat: target.geo_lat.to_f,
-        lng: target.geo_lng.to_f,
-        name: target.name,
-        address: target.address,
-        description: target.description # добавим для красоты
-      }
-    end.compact
-
-    Rails.logger.debug "MAP DATA DEBUG: #{@map_data.inspect}"
-
-    @user_liked = result[:user_liked]
-    @user_bookmarked = result[:user_bookmarked]
+    @route_items = result[:map_items]
+    puts "DEBUG: Мы нашли #{@route_items&.count} точек для карты"
+    @user_liked = result[:current_user_liked]
+    @user_bookmarked = result[:current_user_bookmarked]
     @like = result[:like]
     @bookmark = result[:bookmark]
     @related_routes = result[:related_routes]
@@ -133,8 +119,6 @@ end
 
   private
 
-  # Метод оставлен на случай, если он используется в других частях или хелперах, 
-  # но для основных действий теперь используются данные из Operations.
   def set_user_interaction_data
     return unless current_user && @route
     @current_user_liked = current_user.liked?(@route)

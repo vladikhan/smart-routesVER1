@@ -62,7 +62,6 @@ class NotificationManager {
 
 			const data = await response.json()
 
-			// Debug логирование (можно удалить потом)
 			console.log('✅ Notifications fetched:', data)
 
 			this.updateBadge(data.count)

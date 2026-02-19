@@ -312,8 +312,8 @@
 }
 
 .btn-save {
-	background: rgba(255, 255, 255, 0.25);
 	color: white;
+	background: #2296f3;
 	backdrop-filter: blur(20px);
 	border: 2px solid rgba(255, 255, 255, 0.4);
 	height: 60px;
@@ -322,7 +322,7 @@
 	font-weight: 700;
 
 	&:hover {
-		background: rgba(255, 255, 255, 0.35);
+		background: #64b5f7;
 	border: 2px solid rgba(255, 255, 255, 0.9);
 
 
@@ -331,8 +331,10 @@
 	&.active {
 		background: #4caf50;
 	color: white;
-	border: none;
+	border: 2px solid rgba(255, 255, 255, 0.4)
 	}
+
+	    
 }
 
 .btn-share {
@@ -558,7 +560,6 @@
 
 		.venue-number {
 			transform: scale(1.15) rotate(360deg);
-			box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 		}
 	}
 };
@@ -1096,7 +1097,7 @@
 .review-card:hover .review-content {
 	background: white;
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-	border-left-color: #0d41e1;
+	border-left-color: #6366f1;
 }
 
 .review-footer {

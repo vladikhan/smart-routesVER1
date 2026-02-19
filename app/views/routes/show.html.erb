@@ -4,12 +4,7 @@
 
 <%= render 'pages/header' %>
 
-<% if alert %>
-  <div class="flash-message flash-alert">
-    <i class="fas fa-exclamation-circle"></i>
-    <%= alert %>
-  </div>
-<% end %>
+
 
 
 <!-- Hero Section -->
@@ -473,77 +468,125 @@
 
 
 <script>
-// 1. Берем данные. Используем || [] на случай, если данных нет вообще.
-const rawData = <%= raw (@route_items || []).to_json %>;
+// 1. Берем данные из Ruby (уже есть в твоем коде)
 
-// Превращаем данные в формат, который понимает Google (унифицируем ключи)
-const routeItems = rawData.map(item => ({
-  // Проверяем все возможные варианты имен колонок
-  lat: parseFloat(item.lat || item.geo_lat || item.latitude),
-  lng: parseFloat(item.lng || item.geo_lng || item.longitude),
-  name: item.name || item.venue_name || "Point",
-  address: item.address || item.venue_address || ""
-})).filter(item => !isNaN(item.lat) && !isNaN(item.lng)); // Убираем пустые точки
-
-window.initMap = function() {
-  const mapElement = document.getElementById("map");
-  if (!mapElement) return;
-
-  console.log("Отрисовка точек:", routeItems);
-
-  const bounds = new google.maps.LatLngBounds();
-  const map = new google.maps.Map(mapElement, {
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: true,
-  });
-
-  // Если точек нет — центрируем на Киото, чтобы не видеть океан
-  if (routeItems.length === 0) {
-    map.setCenter({ lat: 35.0116, lng: 135.7681 });
-    map.setZoom(12);
-    return;
-  }
-
-  const markers = routeItems.map((item, index) => {
-    const position = { lat: item.lat, lng: item.lng };
-    bounds.extend(position);
-
-    const marker = new google.maps.Marker({
-      position,
-      map,
-      label: { text: `${index + 1}`, color: "white", fontWeight: "bold" },
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: "#667eea",
-        fillOpacity: 1,
-        strokeColor: "white",
-        strokeWeight: 2,
-        scale: 18
+const rubyData = <%= raw @route.route_items.reload.map { |item| 
+      {
+        latitude:  item.latitude.to_f,
+        longitude: item.longitude.to_f,
+        name:      item.venue_name || "Point",
+        address:   item.venue_address || ""
       }
-    });
+    }.to_json %>;
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `<div style="padding:5px; color: #333;"><strong>${item.name}</strong><br><small>${item.address}</small></div>`
-    });
+    console.log("DEBUG: rubyData из базы:", rubyData);
 
-    marker.addListener("click", () => infoWindow.open(map, marker));
-    return marker;
-  });
+console.log("DEBUG: Что внутри rubyData[0]?", rubyData[0]);
 
-  if (routeItems.length > 1) {
-    new google.maps.Polyline({
-      path: routeItems.map(i => ({ lat: i.lat, lng: i.lng })),
-      map,
-      strokeColor: "#667eea",
-      strokeWeight: 4
-    });
-    map.fitBounds(bounds);
-  } else {
-    map.setCenter({ lat: routeItems[0].lat, lng: routeItems[0].lng });
-    map.setZoom(15);
-  }
-};
+// 2. Исправленный маппинг (используем точные имена latitude/longitude)
+const routeItems = rubyData.map(item => {
+  const latVal = parseFloat(item.latitude); // Берем именно latitude
+  const lngVal = parseFloat(item.longitude); // Берем именно longitude
+  
+  return {
+    lat: latVal,
+    lng: lngVal,
+    name: item.name || "Point",
+    address: item.address || ""
+  };
+}).filter(item => !isNaN(item.lat) && item.lat !== 0);
+
+console.log("DEBUG: После маппинга routeItems:", routeItems);
+(function() {
+    // 1. Берем чистые данные из Ruby
+    const rawData = <%= raw (@route.route_items.reload.map { |item| 
+      {
+        lat: item.latitude.to_f,
+        lng: item.longitude.to_f,
+        name: item.venue_name || "Point",
+        address: item.venue_address || ""
+      }
+    }).to_json %>;
+
+    console.log("1. Данные из Ruby (raw):", rawData);
+
+    // 2. Создаем массив для Google Maps
+    const routeItems = rawData.filter(item => item.lat !== 0 && item.lat !== null);
+    
+    console.log("2. Итоговые точки для карты:", routeItems);
+
+    // 3. Функция инициализации
+    window.initMap = function() {
+      const mapElement = document.getElementById("map");
+      if (!mapElement) return;
+
+      if (routeItems.length === 0) {
+        console.error("ОШИБКА: Нет данных для отрисовки!");
+        return;
+      }
+
+      const map = new google.maps.Map(mapElement, {
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: true,
+      });
+
+      const bounds = new google.maps.LatLngBounds();
+
+      routeItems.forEach((item, index) => {
+        const position = { lat: item.lat, lng: item.lng };
+        
+        new google.maps.Marker({
+          position: position,
+          map: map,
+          label: (index + 1).toString(),
+          title: item.name
+        });
+        
+        bounds.extend(position);
+      });
+
+      if (routeItems.length > 1) {
+        new google.maps.Polyline({
+          path: routeItems.map(i => ({ lat: i.lat, lng: i.lng })),
+          map: map,
+          strokeColor: "#667eea",
+          strokeWeight: 4
+        });
+        map.fitBounds(bounds);
+      } else {
+        map.setCenter(routeItems[0]);
+        map.setZoom(15);
+      }
+    };
+  })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Хендлер для Turbo (Rails 7+)
 document.addEventListener("turbo:load", () => {
@@ -552,9 +595,37 @@ document.addEventListener("turbo:load", () => {
   }
 });
 
-// Функции шаринга и редактирования (оставляем без изменений)
-function shareRoute() { /* твой код */ }
-function toggleEditReview(id) { /* твой код */ }
+function shareRoute() {
+  const url = window.location.href;
+  const btn = document.querySelector('.btn-share span');
+  const originalText = btn.innerText;
+
+  if (navigator.share) {
+    navigator.share({ title: 'SmartRoutes', url: url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      btn.innerText = 'コピー完了！';
+      setTimeout(() => {
+        btn.innerText = originalText;
+      }, 2000);
+    });
+  }
+}
+function toggleEditReview(reviewId) {
+      if (!reviewId) return;
+      const displayDiv = document.getElementById('review-display-' + reviewId);
+      const editDiv = document.getElementById('review-edit-' + reviewId);
+
+      if (displayDiv && editDiv) {
+        if (editDiv.style.display === 'none') {
+          displayDiv.style.display = 'none';
+          editDiv.style.display = 'block';
+        } else {
+          displayDiv.style.display = 'block';
+          editDiv.style.display = 'none';
+        }
+      }
+    }
 </script>
 
 

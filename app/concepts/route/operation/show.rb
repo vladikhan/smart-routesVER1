@@ -7,8 +7,7 @@ module Route::Operation
     step :map_items!
 
     def model!(ctx, params:, **)
-     # Мы загружаем Маршрут + Точки + Заведения одним SQL запросом
-      ctx[:model] = Route.includes(route_items: :venue).find_by(id: params[:id])
+      ctx[:model] = Route.includes(route_items: :item).find_by(id: params[:id])
     end
 
     def increment_views!(ctx, model:, **)
@@ -38,22 +37,16 @@ module Route::Operation
     end
 
     def map_items!(ctx, model:, **)
-  ctx[:map_items] = model.route_items.ordered.map do |ri|
-    # Пытаемся взять привязанный объект (например, Venue), если он есть
-    linked_item = ri.item 
+      ctx[:map_items] = model.route_items.ordered.map do |ri|
+      linked_item = ri.item 
 
-    {
-      # Если есть linked_item, берем имя у него. Если нет — берем venue_name из route_item
-      name:    linked_item&.respond_to?(:name) ? linked_item.name : ri.venue_name,
-      
-      # Координаты берем из новых колонок geo_lat/lng, которые мы только что наполнили
-      lat:     ri.latitude.to_f,
-      lng:     ri.longitude.to_f,
-      
-      # Адрес аналогично: из объекта или из колонки
-      address: linked_item&.respond_to?(:address) ? linked_item.address : ri.venue_address
-    }
-  end
-end
+      {
+        name:    ri.venue_name,
+        lat:     ri.latitude.to_f, 
+        lng:     ri.longitude.to_f,
+        address: ri.venue_address
+        }
+      end
     end
+  end
 end

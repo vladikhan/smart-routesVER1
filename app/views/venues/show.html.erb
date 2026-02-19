@@ -107,24 +107,42 @@
     <!-- Header -->
     
     <div class="card-header-with-action"
-          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h2 style="margin:0;">
-          <i class="fas fa-images"></i>
-          写真ギャラリー
-        </h2>
 
-        <%= form_with(model: @venue, local: true, class: "upload-form") do |f| %>
-          <label class="btn-upload-photos"
-                style="cursor:pointer; background:#3b82f6; color:white; padding:5px 12px; border-radius:6px; font-size: 0.9rem;">
-            <i class="fas fa-plus"></i> 追加
-            <%= f.file_field :photos,
-                  multiple: true,
-                  accept: 'image/*',
-                  onchange: "this.form.submit()",
-                  style: "display:none;" %>
-          </label>
-        <% end %>
-      </div>
+style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+
+<h2 style="margin:0;">
+
+<i class="fas fa-images"></i>
+
+写真ギャラリー
+
+</h2>
+
+
+
+<%= form_with(model: @venue, local: true, class: "upload-form") do |f| %>
+
+<label class="btn-upload-photos"
+
+style="cursor:pointer; background:#3b82f6; color:white; padding:5px 12px; border-radius:6px; font-size: 0.9rem;">
+
+<i class="fas fa-plus"></i> 追加
+
+<%= f.file_field :photos,
+
+multiple: true,
+
+accept: 'image/*',
+
+onchange: "this.form.submit()",
+
+style: "display:none;" %>
+
+</label>
+
+<% end %>
+
+</div>
 
   <!-- Body -->
     <div class="card-body">
@@ -314,16 +332,24 @@
             id="review-<%= review.id %>">
 
           <div class="d-flex gap-3">
+            
             <!-- Avatar -->
-            <div class="author-avatar-large flex-shrink-0"
-                style="width:40px; height:40px; font-size:16px;">
-              <% if review.user.avatar.present? %>
-                <%= image_tag review.user.avatar.thumb.url,
-                      class: 'w-100 h-100 rounded-circle object-fit-cover' %>
-              <% else %>
-                <%= review.user.username.first.upcase %>
-              <% end %>
-            </div>
+            <%= link_to user_path(review.user), 
+      class: "text-decoration-none shadow-sm rounded-circle d-block position-relative", 
+      style: "z-index: 2;", 
+      onclick: "event.stopPropagation();" do %>
+  <div class="author-avatar-large flex-shrink-0 d-flex align-items-center justify-content-center"
+       style="width:40px; height:40px; font-size:16px; background-color: #f0f2f5; color: #65676b;">
+    <% if review.user.avatar.present? %>
+      <%= image_tag review.user.avatar.thumb.url,
+            class: 'w-100 h-100 rounded-circle object-fit-cover' %>
+    <% else %>
+      <span class="fw-bold text-decoration-none" style="color: inherit;">
+        <%= review.user.username.first.upcase %>
+      </span>
+    <% end %>
+  </div>
+<% end %>
 
             
 
@@ -381,20 +407,21 @@
                 <% parent_resource = @route || @venue %>
 
                 <div id="review-edit-<%= review.id %>" style="display:none;" class="mt-2">
-                  <%= form_with(model: [parent_resource, review], local: true) do |f| %>
-                    <%= f.text_area :text, class: "form-control mb-2", rows: 3 %>
+                 <%= form_with(model: [parent_resource, review], local: true) do |f| %>
+                  <%= f.text_area :text, class: "form-control mb-2", rows: 3 %>
 
-                    <div class="d-flex gap-2 justify-content-end">
-                      <%= f.submit '更新する',
-                            class: 'btn btn-primary btn-sm rounded-pill px-3' %>
+                  <div class="d-flex gap-2 justify-content-end">
+                    <%= f.button type: :submit, class: 'btn-update-review rounded-pill' do %>
+                      更新する
+                    <% end %>
 
-                      <button type="button"
-                              class="btn btn-outline-secondary btn-sm rounded-pill px-3"
-                              onclick="toggleEditReview(<%= review.id %>)">
-                        キャンセル
-                      </button>
-                    </div>
-                  <% end %>
+                    <button type="button"
+                            class="btn-cancel-review rounded-pill"
+                            onclick="toggleEditReview(<%= review.id %>)">
+                      キャンセル
+                    </button>
+                  </div>
+                <% end %>
                 </div>
               <% end %>
 

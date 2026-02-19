@@ -38,7 +38,7 @@ class DmMessagesController < ApplicationController
   if result.success?
     @message = result[:model]
     respond_to do |format|
-      format.html { redirect_to dm_room_path(@dm_room), notice: 'Message sent' }
+      format.html { redirect_to dm_room_path(@dm_room) }
       format.js   { head :ok }  
       format.turbo_stream { head :ok }
       format.json {

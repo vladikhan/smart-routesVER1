@@ -102,15 +102,15 @@
       <% other = @active_room.other_user(current_user) %>
       <div class="dm-chat-header">
         <div class="header-user-info">
-<%# !!!!!!!!!!! %>
+
           <%= link_to user_path(other), class: "chat-avatar-link" do %>
   <div class="chat-avatar-wrapper">
     <% if other.avatar.present? %>
       <%# Для CarrierWave обязательно добавляем .url %>
       <%= image_tag other.avatar.url, class: "chat-avatar", alt: other.username %>
     <% elsif other.image_url.present? %>
-      <%# Это твои ссылки из консоли или плейсхолдеры %>
-      <%= image_tag other.image_url, class: "chat-avatar", alt: other.username %>
+      
+      <%= image_tag other.image_url, class: "chat-avatar",  alt: other.username %>
     <% else %>
       <%# Заглушка с первой буквой %>
       <div class="chat-avatar chat-avatar-placeholder">

@@ -122,16 +122,16 @@
                 <div class="spot-number"><%= index + 1 %></div>
                 
                 <input type="text" 
-                       class="place-autocomplete form-control" 
+                       class="form-input" 
+                       style="width: 96%"
                        value="<%= item.venue_name %>" 
                        placeholder="場所を検索...">
 
                 <%# Скрытые поля для передачи данных в контроллер %>
                 <input type="hidden" name="route[route_items_attributes][<%= index %>][id]" value="<%= item.id %>">
                 <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_name]" class="input-name" value="<%= item.venue_name %>">
-                <%# ВАЖНО: используем geo_lat/lng из базы %>
-                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_lat]" class="input-lat" value="<%= item.geo_lat %>">
-                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_lng]" class="input-lng" value="<%= item.geo_lng %>">
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_lat]" class="input-lat" value="<%= item.latitude %>">
+                <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_lng]" class="input-lng" value="<%= item.longitude %>">
                 <input type="hidden" name="route[route_items_attributes][<%= index %>][venue_address]" class="input-address" value="<%= item.venue_address %>">
                 <input type="hidden" name="route[route_items_attributes][<%= index %>][position]" value="<%= index %>">
 
@@ -161,18 +161,18 @@
         </template>
 
         <div class="form-actions" style="margin-top: 30px;">
-          <%= link_to 'キャンセル', @route, class: 'btn btn-cancel' %>
-          <%= f.submit '変更を保存', class: 'btn btn-save' %>
+          <%= link_to 'キャンセル', @route, class: 'btn btn-cancel-review rounded-pill', style: 'padding: 10px' %>
+          <%= f.submit '変更を保存', class: 'btn btn-update-review rounded-pill', style: 'padding: 10px' %>
         </div>
-      <% end %> <%# Конец формы %>
+      <% end %>
 
       <div class="danger-zone">
         <h3>⚠️ 危険な操作</h3>
         <p>このルートを削除すると、すべてのデータが完全に削除されます。</p>
-        <%= button_to 'Удалить', route_path(@route), 
+        <%= button_to '削除', route_path(@route), 
               method: :delete, 
               form: { data: { turbo_confirm: 'Вы уверены?' } },
-              class: 'btn btn-danger' %>
+              class: 'btn btn-danger', style: 'padding: 13px; margin-top: 15px;';  %>
       </div>
     </div>
 
@@ -226,7 +226,7 @@
     if (path.length > 1) {
       polyline = new google.maps.Polyline({
         path: path,
-        strokeColor: '#0288d1',
+        strokeColor: '#667eea',
         strokeWeight: 4,
         map: map
       });
@@ -288,10 +288,8 @@
       };
     }
 
-    // Загрузка самого API Google
     if (typeof google === 'undefined') {
       const script = document.createElement('script');
-      // Добавляем loading=async как просит Google
       script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=initMap&libraries=places&language=ja&loading=async`;
       script.async = true;
       script.defer = true;
@@ -301,7 +299,6 @@
     }
   }
 
-  // Поддержка всех вариантов загрузки Rails
   document.addEventListener('DOMContentLoaded', setupEventListeners);
   document.addEventListener('turbolinks:load', setupEventListeners);
   document.addEventListener('turbo:load', setupEventListeners);

@@ -45,7 +45,8 @@
       <% notifications_of_day.each do |notification| %>
         <%= link_to mark_as_read_notification_path(notification), 
                     class: "notification-card #{notification.is_read ? 'read' : 'unread'}",
-                    data: { notification_id: notification.id } do %>
+                    data: { notification_id: notification.id,
+                            turbo_method: :patch } do %>
           <div class="notification-icon-large">
             <%= notification.icon %>
           </div>

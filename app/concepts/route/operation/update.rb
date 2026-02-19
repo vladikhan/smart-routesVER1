@@ -36,7 +36,8 @@ module Route::Operation
     def model!(ctx, params:, **)
       ctx[:model] = ::Route.find(params[:id])
     rescue ActiveRecord::RecordNotFound
-      ctx[:error] = "Маршрут не найден"
+      ctx[:error] = "ルートが見つかりません
+"
       false
     end
 
@@ -52,7 +53,9 @@ module Route::Operation
 def process_route_items!(ctx, params:, model:, **)
   route_data = params[:route] || {}
   items_data = route_data[:route_items_attributes] || {}
-  items_array = items_data.is_a?(Hash) ? items_data.values : items_data
+  items_array = params[:route_items] || params.dig(:route, :route_items_attributes) || []
+  
+  items_array = items_array.values if items_array.is_a?(Hash)
 
   # Удаляем старые
   model.route_items.destroy_all
@@ -60,12 +63,12 @@ def process_route_items!(ctx, params:, model:, **)
   items_array.each_with_index do |item_params, index|
       next if item_params["venue_name"].blank?
 
-      # Создаем через create!, чтобы если упадет - мы увидели ошибку в логах сразу
       model.route_items.create!(
         venue_name:    item_params["venue_name"],
         venue_address: item_params["venue_address"],
-        geo_lat:       item_params["venue_lat"].to_f,
-        geo_lng:       item_params["venue_lng"].to_f,
+        latitude:       item_params["venue_lat"].to_f,
+        longitude:       item_params["venue_lng"].to_f,
+        item_type:      "Venue",
         position:      index
       )
     end

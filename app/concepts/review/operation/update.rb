@@ -9,10 +9,7 @@ module Review::Operation
 
     def log_errors!(options, **)
       if options['contract.default']
-        puts "Contract Errors: #{options['contract.default'].errors.full_messages}"
       end
-      puts "Model Errors: #{options['model'].errors.full_messages}"
-      puts "Params: #{options['params'].inspect}"
     end
   end
 end

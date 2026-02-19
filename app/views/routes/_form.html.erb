@@ -138,14 +138,14 @@
     <%=
       f.submit(
         @route.new_record? ? 'ルートを作成' : '変更を保存',
-        class: 'btn btn-primary btn-lg px-5 shadow-sm'
+        class: 'btn btn-primary '
       )
     %>
     <%=
       link_to(
         'キャンセル',
         @route.new_record? ? routes_path : @route,
-        class: 'btn btn-outline-secondary btn-lg px-4'
+        class: 'btn btn-outline-secondary '
       )
     %>
   </div>

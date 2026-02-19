@@ -127,9 +127,7 @@ end
 
         room = DmRoom.last
 
-        if room.nil?
-          puts "FAILED TO CREATE ROOM!"
-        end
+        
 
         expect(room.sender_id).to eq(user.id)
         expect(room.receiver_id).to eq(other_user.id)

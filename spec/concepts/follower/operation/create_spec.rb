@@ -118,7 +118,7 @@ RSpec.describe Follower::Operation::Create do
           current_user: active_user
         )
         
-        puts  result['contract.default'].errors.messages if result.failure?
+        
 
         expect(result).to be_failure
         expect(result['contract.default'].errors[:following_id])

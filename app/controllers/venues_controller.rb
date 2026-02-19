@@ -6,6 +6,13 @@ class VenuesController < ApplicationController
 
   def show
     result = Venue::Operation::Show.call(params: params, current_user: current_user)
+
+    if result.success?
+      @venue = result[:model]
+      @routes = result[:public_routes]
+      @featured_route = result[:featured_route]
+      @route_items = result[:route_items]
+    end
     
     if result.failure?
       return redirect_to venues_path, alert: "店舗が見つかりませんでした"
@@ -20,14 +27,16 @@ class VenuesController < ApplicationController
   end
 
   def update
-    # Важно: передаем params.to_unsafe_h только если используем Contract!
-    result = Venue::Operation::Update.call(params: params.to_unsafe_h, id: params[:id])
+    result = Venue::Operation::Update.call(params: params.to_unsafe_h,                           id: params[:id],
+                                           current_user: current_user      
+    )
 
     if result.success?
       redirect_to venue_path(result[:model]), notice: '情報を更新しました'
+    elsif result[:"result.policy.default"]&.failure?
+      redirect_to root_path, alert: '他の人の店舗は編集できません'
     else
       @venue = result[:model]
-      # Вместо ручного вывода ошибок, лучше использовать @form во вьюхе
       @form = result['contract.default']
       flash.now[:alert] = "入力内容にエラーがあります"
       render :edit, status: :unprocessable_entity

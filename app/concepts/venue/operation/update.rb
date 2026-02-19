@@ -12,10 +12,4 @@ class Venue::Operation::Update < Trailblazer::Operation
   model.photos.attach(photos) if photos.any?
   true
   end
-
-  # def persist!(options, model:, params:, **)
-  #   model.photos.attach(params[:venue][:photos]) if params[:venue][:photos].present?
-  #   options['contract.default'].save
-  # end
-  # true
 end

@@ -268,10 +268,7 @@ RSpec.describe 'Follows', type: :request do
       
       # expect(Follower.where(follower: user, following: other_user).exists?).to be true
 
-      if response.status == 302
-        puts "!!!REDIRECTED TO #{response.location}!!!" 
-      end
-
+     
 
       delete unfollow_user_path(other_user), 
           params: { user_id: other_user.id, id: other_user.id },

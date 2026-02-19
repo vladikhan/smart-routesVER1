@@ -1,33 +1,30 @@
 class RouteItem < ApplicationRecord
   belongs_to :route
   belongs_to :item, polymorphic: true, optional: true
-  # Эта ассоциация уже создает метод venue_id и venue
-  belongs_to :venue, optional: true 
+  # belongs_to :venue, optional: true 
 
   validates :route, presence: true
   validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }
   
-  validates :geo_lat, numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
-  validates :geo_lng, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }, allow_nil: true
-
-
-  attr_accessor :geo_lat, :geo_lng
+  validates :latitude, numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
+  validates :longitude, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }, allow_nil: true
 
   scope :ordered, -> { order(:position) }
 
-  # Проксируем методы к полиморфному item
-  delegate :name, :address, :latitude, :longitude, to: :item, allow_nil: true
-
-  def actual_venue
-    item if item_type == 'Venue'
-  end
+  # def actual_venue
+  # #   item if item_type == 'Venue'
+  # end
 
   def venue?
     item_type == 'Venue'
   end
 
+  def item_type
+    value = read_attribute(:item_type)
+    value.present? ? value.classify : value
+  end
+
   def display_name
-    # Используем безопасную навигацию &.
-    (venue? ? item.name : name) || "Location #{position + 1}"
+    venue_address.presence || item&.try(:address)
   end
 end

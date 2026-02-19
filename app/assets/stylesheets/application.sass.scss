@@ -43,7 +43,7 @@ body {
   margin: 0;
   overflow-y: scroll;
   /* Всегда резервирует место под скроллбар */
-  display: flex;
+  // display: flex;
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
@@ -317,7 +317,8 @@ footer {
 }
 
 .mark-all-read {
-  color: #0288d1;
+  color: white;
+  background: #06b6d4;
   text-decoration: none;
   font-size: 14px;
   font-weight: 700;
@@ -327,8 +328,10 @@ footer {
 }
 
 .mark-all-read:hover {
-  background: #e3f2fd;
-  color: #01579b;
+  background-color: #64b5f7;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+  color: white;
 }
 
 .notifications-list {
@@ -696,67 +699,43 @@ footer {
 
 /* === buttons===*/
 
-/* Базовый стиль для кнопок-пунктов в выпадающем меню */
 button.dropdown-item {
   width: auto;
-  /* Ширина по контенту */
   min-width: 120px;
-  /* Минимальная ширина, чтобы кнопка не была слишком узкой */
   margin: 4px auto;
-  /* Центрируем саму кнопку в контейнере */
   padding: 6px 12px;
-  /* Уменьшенные отступы */
-
   justify-content: center;
-  /* Текст и иконка строго по центру */
   align-items: center;
   gap: 8px;
-  /* Компактное расстояние между иконкой и текстом */
-
   background: linear-gradient(135deg, #f0f7ff 0%, #e7f3ff 100%);
   border: none;
   border-radius: 10px;
-  /* Округлые края (pill-shape) для маленьких кнопок выглядят лучше */
-
   color: #0d6efd;
   font-size: 13px;
-  /* Уменьшенный шрифт */
   font-weight: 600;
-  /* Чуть жирнее, чтобы читалось лучше при малом размере */
   white-space: nowrap;
-  /* Запрещаем перенос текста */
-
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
-/* Эффект при наведении на кнопку "Редактировать" */
 button.dropdown-item:hover {
   background: #6366f1;
+  transform: translateY(-2px);
   color: white;
-  /* Текст становится синим */
-  transform: translateX(4px);
-  /* Легкий сдвиг вправо для динамики */
 }
 
-/* Стиль для иконки внутри кнопки */
 button.dropdown-item i {
   font-size: 0.95rem;
   width: 18px;
-  /* Фиксированная ширина иконки, чтобы текст не прыгал */
   text-align: center;
   color: #0d6efd;
-  /* Иконка всегда синяя (text-primary) */
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Анимация иконки при наведении */
 button.dropdown-item:hover i {
-  transform: rotate(-10deg) scale(1.1);
-  /* Иконка карандаша немного наклоняется */
+  transform: translateY(-2px);
 }
 
-/* Убираем синюю рамку фокуса (от Bootstrap/браузеров) */
 button.dropdown-item:focus {
   outline: none;
   box-shadow: none;
@@ -765,30 +744,31 @@ button.dropdown-item:focus {
 /* Специальный стиль для кнопки удаления (text-danger) */
 button.dropdown-item.text-danger {
   color: #dc3545;
-  /* Красный цвет текста по умолчанию */
+
   background: linear-gradient(135deg,
       #fff5f5 0%,
       #ffe3e3 100%);
-  /* Нежно-розовый фон */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
 }
 
 /* Иконка в кнопке удаления */
 button.dropdown-item.text-danger i {
   color: #dc3545;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Эффект при наведении на кнопку "Удалить" */
 button.dropdown-item.text-danger:hover {
   background: #dc3545;
   /* Насыщенный красный при наведении */
   color: white !important;
-  transform: translateX(4px);
+  transform: translateY(-2px);
 }
 
-/* Чтобы иконка тоже белела при наведении */
 button.dropdown-item.text-danger:hover i {
   color: white !important;
   animation: shake 0.3s ease-in-out;
+  transform: translateY(-2px);
   /* Маленькая анимация тряски для иконки корзины */
 }
 
@@ -815,6 +795,22 @@ button.dropdown-item.text-danger:hover i {
   }
 }
 
+.btn-danger {
+  color: white;
+  background: #f43f5e;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.btn-danger:hover {
+  color: white;
+  background: #c43838;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(13, 110, 253, 0.35);
+
+}
+
 /* === Update ===*/
 
 /* Основной стиль кнопки обновления */
@@ -837,20 +833,16 @@ button.dropdown-item.text-danger:hover i {
   justify-content: center;
 }
 
-/* Эффект при наведении */
 .btn-update-review:hover {
-  background: #4da6ee;
+  background: #6366f1;
   transform: translateY(-2px);
-  /* Кнопка "всплывает" */
   box-shadow: 0 6px 16px rgba(13, 110, 253, 0.35);
-  /* Тень становится глубже */
   color: white;
 }
 
 /* Эффект при нажатии */
 .btn-update-review:active {
   transform: translateY(0);
-  /* Кнопка опускается обратно */
   box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
 }
 
@@ -1178,9 +1170,11 @@ button.dropdown-item.text-danger:hover i {
 /* Кнопка "Подписаться" и "Редактировать" (Основная) */
 .btn-primary,
 .btn-edit {
-  background-color: #2296f3;
+  background-color: #06b6d4;
   color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  height: auto;
 }
 
 .btn-primary:hover,
@@ -1204,10 +1198,10 @@ button.dropdown-item.text-danger:hover i {
   transform: translateY(-1px);
 }
 
-/* Кнопка "Отписаться" (Вторичная) */
 .btn-outline-secondary {
   background-color: #3ccddd;
   color: white;
+  width: 100%;
 }
 
 .btn-outline-secondary:hover {

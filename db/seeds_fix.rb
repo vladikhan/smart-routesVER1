@@ -11,4 +11,3 @@ content.gsub!(/venues\.sample\.city/, 'venues.sample.district.city')
 # Write back
 File.write('db/seeds.rb', content)
 
-puts "✓ Fixed venue.city references"

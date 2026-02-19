@@ -56,6 +56,18 @@
 
     <!-- =========== EDIT FORM =========== -->
     <div class="edit-container">
+      <% if @form && @form.errors.any? %>
+      <div class="error-messages" style="color: red; margin-bottom: 20px; border: 1px solid red; padding: 10px;">
+        <h2>入力内容をご確認ください:</h2>
+        <ul>
+          <% @form.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+
       <!-- Flash Notification -->
       <div id="upload-notification" class="notification hidden">
         
@@ -161,7 +173,7 @@
         <!-- Buttons -->
         <div class="action-buttons">
           <%= link_to 'キャンセル', user_path(@user), class: 'btn btn-cancel' %>
-          <%= f.submit '保存', id: 'save-btn', class: 'btn btn-save' %>
+          <%= f.submit '保存', id: 'save-btn', class: 'btn btn-save-profile' %>
         </div>
       <% end %>
     </div>

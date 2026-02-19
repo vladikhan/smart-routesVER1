@@ -97,9 +97,9 @@
             </div>
 
             <div class="route-venues-preview">
-              <% route.route_items.limit(4).each do |item| %>
+              <% route.route_items.limit(4).each_with_index do |item, index| %>
                 <span class="venue-preview-tag">
-                  <%= item.venue&.name || item.venue_name || '場所' %>
+                  <%= item.try(:display_name) || "場所 #{index + 1}" %>
                 </span>
               <% end %>
               <% if route.route_items.count > 4 %>

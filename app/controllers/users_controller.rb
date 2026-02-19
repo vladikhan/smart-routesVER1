@@ -30,31 +30,23 @@ class UsersController < ApplicationController
   end
 
   def edit
-    # Используем форму (Contract) для редактирования
     result = User::Operation::Update.call(params: { id: params[:id] }, current_user: current_user)
     @user = result[:model]
     @form = result['contract.default']
   end
 
   def update
-  # В Trailblazer мы передаем параметры в Операцию. 
-  # Она сама найдет юзера по params[:id] и проверит права через current_user.
-  result = User::Operation::Update.call(params: params.to_unsafe_h, current_user: current_user)
+    result = User::Operation::Update.call(params: params.to_unsafe_h, current_user: current_user)
 
-  if result.success?
-    # Если операция прошла успешно, редиректим на профиль
-    redirect_to user_path(result[:model]), notice: "プロフィールを更新しました"
-  else
-    # Если валидация внутри Trailblazer Contract провалилась:
-    @user = result[:model]
-    @form = result['contract.default'] # Объект формы с ошибками для вьюхи
-    
-    # Выведем ошибки в консоль, чтобы мы видели, почему Trailblazer сделал Rollback
-    puts "TRAILBLAZER ERRORS: #{@form.errors.full_messages}"
-    
-    render :edit, status: :unprocessable_entity
+    if result.success?
+      redirect_to user_path(result[:model]), notice: "プロフィールを更新しました"
+    else
+      @user = result[:model]
+      @form = result['contract.default']
+
+      render :edit, status: :unprocessable_entity
+    end
   end
-end
 
   def comments
     # Логика для отдельной вкладки комментариев

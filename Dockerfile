@@ -1,6 +1,9 @@
 FROM ruby:3.1.6-slim AS base
 
 # Устанавливаем только необходимые системные зависимости
+RUN apt-get update -qq && apt-get install -y imagemagick
+
+
 RUN apt-get update -qq && apt-get install -y \
     build-essential \
     libpq-dev \

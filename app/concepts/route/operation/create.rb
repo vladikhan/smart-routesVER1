@@ -26,17 +26,24 @@ class Route::Operation::Create < Trailblazer::Operation
   end
 
 def process_google_items(options, params:, model:, **)
-  items = params[:route_items] || (params[:route] && params[:route][:route_items_attributes]) || (params[:route] && params[:route][:route_items])
+  items = params[:route_items] || 
+          params.dig(:route, :route_items_attributes) ||
+          params.dig(:route, :route_items)
+          
   return true if items.blank?
 
-  items.each_with_index do |item, index|
-    # Пропускаем, если название места пустое
-    next if item['venue_name'].blank?
+  items_array = items.is_a?(Hash) ? items.values : items
+
+  items_array.each_with_index do |item_data, index|
+    next if item_data['venue_name'].blank?
 
     model.route_items.build(
-      venue_name:       item['venue_name'],
-      venue_address:    item['venue_address'],
-      duration_minutes: item['duration_minutes'],
+      venue_name:    item_data["venue_name"],
+      venue_address: item_data["venue_address"],
+      latitude:      item_data["venue_lat"].to_f, 
+      longitude:     item_data["venue_lng"].to_f,
+      item_type:     "Venue",
+      duration_minutes: item_data['duration_minutes'],
       order_index:      index,
       position:         index + 1,
       item_type:        "Venue"

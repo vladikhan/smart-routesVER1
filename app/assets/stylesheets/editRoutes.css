@@ -68,6 +68,7 @@ body {
 	font-size: 15px;
 	transition: var(--transition);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	color: #3d2755;
 }
 
 .form-input:focus,
@@ -132,13 +133,9 @@ body {
 	transition: var(--transition);
 }
 
-/* .btn-save {
-	background: var(--primary);
-	color: white;
-} */
 
 .btn-save:hover {
-	background: var(--primary-dark);
+	background: #2296f3;
 	box-shadow: var(--shadow-hover);
 	transform: translateY(-2px);
 }
@@ -149,7 +146,7 @@ body {
 }
 
 .btn-cancel:hover {
-	background: #d5d7db;
+	background: #d6dbd5;
 	transform: translateY(-2px);
 }
 
@@ -209,12 +206,12 @@ body {
 
 .spot-number {
 	position: absolute;
-	top: 18px;
-	left: 18px;
-	width: 42px;
-	height: 42px;
+	top: 15px;
+	left: 15px;
+	width: 25px;
+	height: 25px;
 	border-radius: 50%;
-	background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+	background: var(--primary);
 	color: white;
 	display: flex;
 	align-items: center;
@@ -227,8 +224,8 @@ body {
 
 .remove-spot {
 	position: absolute;
-	top: 18px;
-	right: 18px;
+	top: 31px;
+	right: 10px;
 	background: var(--danger);
 	color: white;
 	border: none;
