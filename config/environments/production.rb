@@ -6,14 +6,16 @@ Rails.application.configure do
   config.eager_load = true
 
   # --- СЕКЦИЯ HOSTS (ВАЖНО ДЛЯ HEALTH CHECK) ---
-  # Разрешаем IP-адреса
+
   config.hosts << /^\d+\.\d+\.\d+\.\d+$/ 
-  # Разрешаем твой домен
+ 
   config.hosts << 'smartroutes.learning.datora.org'
-  # Фикс для AWS Health Check: разрешаем внутренние запросы ALB
+  config.hosts << "0.0.0.0"                        
+  config.hosts << "127.0.0.1"                      
+  config.hosts << "smartroutes.learning.datora.org" 
+  config.hosts << /.*\.amazonaws\.com/
   config.hosts << /.*\.internal/
   config.hosts << /.*\.compute\.internal/
-  # Временная мера для отладки (разрешить всё), если Health Check всё еще падает:
   # config.hosts.clear
   # config.hosts << /.*/ 
   # ----------------------------------------------
