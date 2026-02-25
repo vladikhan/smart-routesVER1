@@ -3,34 +3,33 @@ require 'active_support/core_ext/integer/time'
 Rails.application.configure do
   config.action_controller.default_protect_from_forgery = false
   config.force_ssl = false
-
   config.eager_load = true
 
+  # --- СЕКЦИЯ HOSTS (ВАЖНО ДЛЯ HEALTH CHECK) ---
+  # Разрешаем IP-адреса
+  config.hosts << /^\d+\.\d+\.\d+\.\d+$/ 
+  # Разрешаем твой домен
   config.hosts << 'smartroutes.learning.datora.org'
-  config.hosts << "10.1.23.250"
-  config.hosts << '52.195.115.255'
-  config.hosts << 'localhost'
-  config.hosts << '127.0.0.1'
-  config.hosts << '.datora.org'
-  config.hosts << /.*\.amazonaws\.com/
-  config.hosts << /.*\.compute\.amazonaws\.com/
+  # Фикс для AWS Health Check: разрешаем внутренние запросы ALB
+  config.hosts << /.*\.internal/
+  config.hosts << /.*\.compute\.internal/
+  # Временная мера для отладки (разрешить всё), если Health Check всё еще падает:
+  # config.hosts.clear
+  # config.hosts << /.*/ 
+  # ----------------------------------------------
+
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
-
   config.public_file_server.enabled = true
-
   config.assets.compile = false
-
   config.active_storage.service = :amazon
-
   config.log_level = :info
-
-  # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]
 
   config.ssl_options = { hsts: false }
   config.action_mailer.perform_caching = false
 
+  # --- НАСТРОЙКИ ПОЧТЫ ---
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
@@ -49,13 +48,9 @@ Rails.application.configure do
   }
 
   config.i18n.fallbacks = true
-
   config.active_support.deprecation = :notify
-
   config.active_support.disallowed_deprecation = :log
-
   config.active_support.disallowed_deprecation_warnings = []
-
   config.log_formatter = ::Logger::Formatter.new
 
   if ENV['RAILS_LOG_TO_STDOUT'].present?
