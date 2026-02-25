@@ -7,17 +7,17 @@ Rails.application.configure do
 
   # --- СЕКЦИЯ HOSTS (ВАЖНО ДЛЯ HEALTH CHECK) ---
 
-  config.hosts << /^\d+\.\d+\.\d+\.\d+$/ 
+  # config.hosts << /^\d+\.\d+\.\d+\.\d+$/ 
  
-  config.hosts << 'smartroutes.learning.datora.org'
-  config.hosts << "0.0.0.0"                        
-  config.hosts << "127.0.0.1"                      
-  config.hosts << "smartroutes.learning.datora.org" 
-  config.hosts << /.*\.amazonaws\.com/
-  config.hosts << /.*\.internal/
-  config.hosts << /.*\.compute\.internal/
-  # config.hosts.clear
-  # config.hosts << /.*/ 
+  # config.hosts << 'smartroutes.learning.datora.org'
+  # config.hosts << "0.0.0.0"                        
+  # config.hosts << "127.0.0.1"                      
+  # config.hosts << "smartroutes.learning.datora.org" 
+  # config.hosts << /.*\.amazonaws\.com/
+  # config.hosts << /.*\.internal/
+  # config.hosts << /.*\.compute\.internal/
+   config.hosts.clear
+   config.hosts << /.*/ 
   # ----------------------------------------------
 
   config.consider_all_requests_local       = false
