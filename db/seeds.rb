@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'faker'
 
 if Rails.env.development?
@@ -23,36 +22,48 @@ puts "シードデータの作成中..."
 #=========================== 1. Users ==============================
 puts "ユーザーを作成中。。。"
 
-# Создание Администратора: используем new, чтобы избежать колбэка
-admin = User.new(
-  username: 'admin',
-  email: 'admin@smartroutes.com',
-  password: 'password',
-  password_confirmation: 'password',
-  is_admin: true,
-  bio: "SmartRoutesの管理者です。",
-  location: 'Kyoto, Japan',
-  email_verified: true
-)
-admin.skip_confirmation! # <-- Пропускаем отправку письма
-admin.save!              # <-- Сохраняем без ошибок
+# 1. Работаем с админом
+# Ищем любого юзера, который может быть админом (по email или username)
+admin = User.find_by(email: 'admin@example.com') || User.find_by(username: 'admin')
 
-# Создание 30 обычных пользователей: то же исправление
-30.times do |i|
-  user = User.new(
-    username: "user#{i + 1}",
-    email: "user#{i + 1}@example.com",
+if admin.nil?
+  admin = User.new(
+    email: 'admin@example.com',
+    username: 'admin',
     password: 'password123',
     password_confirmation: 'password123',
-    bio: Faker::Lorem.sentence,
-    location: ['Nara', 'Osaka', 'Kyoto'].sample,
-    budget_min: [1000, 2000, 3000, 5000].sample,
-    budget_max: [5000, 10000, 15000, 20000].sample,
+    location: 'Kyoto, Japan',
     email_verified: true
   )
-  user.skip_confirmation! # <-- Пропускаем отправку письма
-  user.save!              # <-- Сохраняем без ошибок
+  admin.skip_confirmation!
+  admin.save!
+  puts "✅ Новый админ создан"
+else
+  puts "ℹ️ Админ уже существует (ID: #{admin.id}), используем его"
 end
+
+# 2. Работаем с обычными пользователями
+30.times do |i|
+  u_email = "user#{i + 1}@example.com"
+  u_name = "user#{i + 1}"
+  
+  # Ищем существующего
+  existing_user = User.find_by(email: u_email) || User.find_by(username: u_name)
+  
+  if existing_user.nil?
+    user = User.new(
+      username: u_name,
+      email: u_email,
+      password: 'password123',
+      password_confirmation: 'password123',
+      email_verified: true
+    )
+    user.skip_confirmation!
+    user.save!
+    print "."
+  end
+end
+puts "\n✅ Пользователи готовы (существующие пропущены)"
 
 puts "#{User.count}人のユーザーを作成しました。"
 
@@ -63,7 +74,7 @@ nil
 puts  "都市とエリアを作成中..."
 
 #京都
-kyoto = City.create!(
+kyoto = City.find_or_create_by!(
   name: '京都',
   name_en: 'Kyoto',
   description: '千年の都、日本の伝統文化の中心地'
@@ -80,11 +91,13 @@ kyoto_districts_data = [
 ]
 
 kyoto_districts = kyoto_districts_data.map do |data|
-  kyoto.districts.create!(data)
+  kyoto.districts.find_or_create_by!(name: data[:name]) do |d|
+     d.description = data[:description]
+  end
 end
 
 #大阪
-osaka = City.create!(
+osaka = City.find_or_create_by!(
   name: '大阪',
   name_en: 'Osaka',
   description: '日本第二の都市、食い倒れの街'
@@ -102,7 +115,7 @@ osaka_districts_data = [
 ]
 
 osaka_districts = osaka_districts_data.map do |data|
-  osaka.districts.create!(data)
+  osaka.districts.find_or_create_by!(data)
 end
 
 puts "#{City.count}都市と#{District.count}エリアを作成しました。" 
@@ -120,7 +133,7 @@ tags_data = %w[
 ]
 
 tags = tags_data.map do |tag_name|
-  Tag.create!(parameter: tag_name)
+  Tag.find_or_create_by!(parameter: tag_name)
 end
 
 puts "#{Tag.count}個のタグを作成しました"
@@ -583,22 +596,26 @@ routes = routes_data.map.with_index do |data, idx|
     is_public: true
   )
 
-  # создаём RouteItems
-  venues_to_add.each_with_index do |venue_data, idx|
-  venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
-  next unless venue
+    # создаём RouteItems
+    venues_to_add.each_with_index do |venue_data, idx|
+    venue = venue_data.is_a?(Venue) ? venue_data : Venue.find_by(name: venue_data[:name])
+    next unless venue
 
-  puts "venue attributes keys: #{venue.attributes.keys}"
+    puts "venue attributes keys: #{venue.attributes.keys}"
 
-  RouteItem.create!(
-    route: route,
-    item_id: venue.id,                # ← ПОЛИМОРФНЫЙ
-    item_type: "Venue",  
-    position: idx + 1,             # ← ВАЛИДНЫЙ ТИП
-    order_index: idx + 1,
-    notes: "おすすめポイント: #{venue.description[0..50]}"
-  )
-end
+    RouteItem.create!(
+      route: route,
+      item_id: venue.id,                
+      item_type: "Venue",  
+      position: idx + 1,             
+      order_index: idx + 1,
+      notes: "おすすめポイント: #{venue.description[0..50]}",
+      latitude: venue.latitude,
+      longitude: venue.longitude,
+      venue_name: venue.name,
+      venue_address: venue.address
+    )
+  end
 
   # создаём теги
   tag_names.each do |tag_name|
@@ -679,7 +696,7 @@ end
 
 Review.limit(50).each do |review|
   users.sample(rand(1..6)).each do |user|
-    Like.create!(user: user, likeable: review)
+    Like.find_or_create_by!(user: user, likeable: review)
   end
 end
 

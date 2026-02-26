@@ -16,7 +16,6 @@ class RoutesController < ApplicationController
   if result.success?
     @route = result[:model]
     @route_items = result[:map_items]
-    puts "DEBUG: Мы нашли #{@route_items&.count} точек для карты"
     @user_liked = result[:current_user_liked]
     @user_bookmarked = result[:current_user_bookmarked]
     @like = result[:like]
@@ -80,7 +79,25 @@ end
       current_user: current_user,
       id: params[:id]
     )
+def update
+    result = Route::Operation::Update.call(
+        params: params.to_unsafe_h,
+        current_user: current_user,
+        id: params[:id]
+    )
 
+    if result.success?
+      redirect_to route_path(result[:model]), notice: 'ルートを更新しました'
+    elsif result['result.policy.default']&.failure?
+      redirect_to routes_path, alert: '他の人のルートは編集できません'
+    else
+      @route = result[:model]
+      @cities = City.order(:name)
+      @venues = Venue.order(:name) if defined?(Venue)
+      flash.now[:alert] = result['contract.default']&.errors&.full_messages&.join(', ') || '更新に失敗しました'
+      render :edit, status: :unprocessable_entity
+    end
+  end
 
     if result.success?
       redirect_to route_path(result[:model]), notice: 'ルートを更新しました'

@@ -12,6 +12,8 @@ gem 'rails', '~> 6.1.7', '>= 6.1.7.6'
 # gem 'turbolinks', '~> 5'
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # gem 'webpacker', '~> 5.0'
+gem 'faker', '~> 3.2'
+
 
 # --- Redis & Sidekiq (Для очередей и кэша) ---
 gem 'redis', '~> 4.0'
@@ -67,7 +69,6 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'database_cleaner-active_record'
   gem 'factory_bot_rails', '~> 6.2'
-  gem 'faker', '~> 3.2'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'rails-controller-testing'

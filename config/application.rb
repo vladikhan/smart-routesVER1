@@ -7,18 +7,26 @@ Bundler.require(*Rails.groups)
 
 module Myapp
   class Application < Rails::Application
-    config.hosts.clear
 
-    config.load_defaults 6.1
 
-    config.active_storage.replace_on_assign_to_many = false
+        config.time_zone = 'Tokyo'
 
-    config.autoload_paths << Rails.root.join('app', 'concepts')
+        config.active_record.default_timezone = :local
+    
+        config.load_defaults 6.1
+    
+        config.active_storage.replace_on_assign_to_many = false
+    
+        config.autoload_paths << Rails.root.join('app', 'concepts')
+    
+        # Set default locale to Japanese
+        config.i18n.default_locale = :ja
+    
+        # Optional: fallback to English if translation is missing
+        config.i18n.fallbacks = [:en]
 
-    # Set default locale to Japanese
-    config.i18n.default_locale = :ja
+        config.middleware.delete ActionDispatch::HostAuthorization
 
-    # Optional: fallback to English if translation is missing
-    config.i18n.fallbacks = [:en]
-  end
-end
+      end
+    end
+

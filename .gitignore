@@ -25,6 +25,7 @@
 !/storage/.keep
 /public/assets
 .byebug_history
+/public/uploads/*
 
 # --- FRONTEND ---
 /public/packs

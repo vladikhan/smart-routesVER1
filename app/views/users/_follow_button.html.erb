@@ -3,15 +3,15 @@
     <%# Только залогиненный пользователь может видеть кнопки фолловинга %>
     <% if current_user.following?(user) %>
        <%= form_with url: unfollow_user_path(user), method: :delete do %>
-         <button type="submit" class="btn btn-outline-secondary mb-3">フォロー解除</button>
+         <button type="submit" class="btn btn-outline-secondary mb-3" style="margin-bottom: 15px">フォロー解除</button>
        <% end %>
     <% else %>
        <%= form_with url: follow_user_path(user), method: :post do %>
-         <button type="submit" class="btn btn-primary mb-3">フォローする</button>
+         <button type="submit" style=" margin-bottom: 15px;" class="btn btn-primary mb-3">フォローする</button>
        <% end %>
     <% end %>
   <% else %>
-    <%# Если пользователь гость, можно либо ничего не показывать, либо отправить на логин %>
+    
     <%= link_to 'ログイン', new_user_session_path, class: "btn btn-primary mb-3" %>
   <% end %>
 </div>

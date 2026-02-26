@@ -11,7 +11,6 @@
   </head>
 
   <body>
-    <%# Header %>
     <%= render 'pages/header' %>
     <%= render 'pages/hero_banner' %>
 
@@ -29,21 +28,6 @@
           <%= f.hidden_field :difficulty, value: params[:difficulty] %>
           <%= f.hidden_field :duration, value: params[:duration] %>
           <%= f.hidden_field :cost, value: params[:cost] %>
-
-          <%=
-            f.select :sort,
-                     options_for_select(
-                       [
-                         %w[人気順 popular],
-                         %w[新着順 recent],
-                         %w[評価順 rating],
-                       ],
-                       params[:sort],
-                     ),
-                     {},
-                     class: 'sort-dropdown',
-                     onchange: 'this.form.submit()'
-          %>
         <% end %>
       </div>
 
@@ -63,6 +47,8 @@
                 </div>
               </div>
 
+              <% if false %>
+              <%# temporarily not used %>
               <div class="route-stats">
                 <div class="route-stat">👁️ <%= route.view_count || 0 %></div>
                 <div class="route-stat">❤️ <%= route.likes_count || 0 %></div>
@@ -70,6 +56,7 @@
                   ⭐ <%= route.average_rating || 4.5 %>
                 </div>
               </div>
+              <% end %>
             </div>
 
             <p class="route-description">
@@ -109,32 +96,7 @@
               <% end %>
             </div>
 
-            <div class="route-footer">
-              <div class="route-actions">
-                <button
-                  class="route-action-btn"
-                  onclick="event.stopPropagation()"
-                >
-                  いいね!
-                </button>
-                <button
-                  class="route-action-btn"
-                  onclick="event.stopPropagation()"
-                >
-                  保存
-                </button>
-                <button
-                  class="route-action-btn"
-                  onclick="event.stopPropagation()"
-                >
-                  共有
-                </button>
-              </div>
-
-              <%=
-                link_to '詳細を見る', route_path(route), class: 'view-route-btn'
-              %>
-            </div>
+            
           </div>
         <% end %>
       </div>

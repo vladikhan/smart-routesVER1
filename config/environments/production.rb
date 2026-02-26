@@ -14,7 +14,7 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
   config.public_file_server.enabled = true
-  config.assets.compile = false # Ассеты должны быть скомпилированы при сборке Docker
+  config.assets.compile = false
   
   # --- STORAGE & LOGS ---
   config.active_storage.service = :amazon
@@ -34,11 +34,11 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   config.action_mailer.smtp_settings = {
-    address:              ENV['SMTP_ADDRESS'],     # 'smtp.gmail.com'
-    port:                 ENV['SMTP_PORT'],        # 587
-    domain:               ENV['SMTP_DOMAIN'],      # 'smartroutes.learning.datora.org'
-    user_name:            ENV['SMTP_USERNAME'],    # Твой Gmail
-    password:             ENV['SMTP_PASSWORD'],    # Твой App Password
+    address:              ENV['SMTP_ADDRESS'],     
+    port:                 ENV['SMTP_PORT'],       
+    domain:               ENV['SMTP_DOMAIN'],     
+    user_name:            ENV['SMTP_USERNAME'],   
+    password:             ENV['SMTP_PASSWORD'],    
     authentication:       'plain',
     enable_starttls_auto: true
   }

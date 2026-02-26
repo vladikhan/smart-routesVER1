@@ -5,16 +5,19 @@
    <!-- Hero Section -->
 <div class="venue-detail-header">
   <div style="max-width: 1200px; width: 100%; position: relative; z-index: 2;">
-    <div class="venue-header-meta">
-      <div class="venue-meta-item">
-        <i class="fas fa-utensils"></i>
-        <span><%= @venue.cuisine_type %></span>
+    <%# temporarily not used %>
+    <% if false %>
+      <div class="venue-header-meta">
+        <div class="venue-meta-item">
+          <i class="fas fa-utensils"></i>
+          <span><%= @venue.cuisine_type %></span>
+        </div>
+        <div class="venue-meta-item">
+          <i class="fas fa-yen-sign"></i>
+          <span><%= @venue.price_range %></span>
+        </div>
       </div>
-      <div class="venue-meta-item">
-        <i class="fas fa-yen-sign"></i>
-        <span><%= @venue.price_range %></span>
-      </div>
-    </div>
+    <% end %>
 
     <h1><%= @venue.name %></h1>
 

@@ -5,7 +5,7 @@ class EmailVerificationsController < ApplicationController
     if params[:confirmation_token].present?
       @user = User.find_by!(confirmation_token: params[:confirmation_token])
     else
-      redirect_to new_user_session_path, alert: "メールアドレス確認メールを送信しました"
+      redirect_to new_user_session_path, notice: "メールアドレス確認メールを送信しました"
     end
   end
 

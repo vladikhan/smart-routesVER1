@@ -24,7 +24,7 @@
   .verification-title {
     font-size: 24px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #64748b;
     margin: 0 0 8px 0;
   }
 
@@ -40,11 +40,11 @@
     border-radius: 10px;
     margin-bottom: 24px;
     text-align: center;
+    color: #0288d1;
   }
 
   .email-address {
     display: block;
-    color: #1e293b;
     font-weight: 600;
     font-size: 16px;
     margin-bottom: 4px;
@@ -95,24 +95,20 @@
   }
 </style>
 
-<%# Рендерим хедер один раз %>
 <%= render 'pages/header' %>
 
 <div class="verification-container">
-  <%# 1. ЗАГОЛОВОК %>
   <div class="verification-header">
     <span class="verification-icon">📧</span>
     <h1 class="verification-title">メール確認</h1>
     <p class="verification-subtitle">送信された6桁の確認コードを入力してください</p>
   </div>
 
-  <%# 2. ИНФО О EMAIL %>
   <div class="email-box">
     <span class="email-address"><%= @user.email %></span>
     <span class="email-label">こちらのアドレスにコードを送信しました</span>
   </div>
 
-  <%# 3. ФОРМА ВВОДА КОДА (ГЛАВНОЕ ДЕЙСТВИЕ) %>
   <%= form_with url: verify_email_verification_path, method: :post, local: true do |f| %>
     <%= hidden_field_tag :confirmation_token, params[:confirmation_token] %>
     
@@ -120,7 +116,8 @@
       <%= text_field_tag :verification_code, nil, 
             placeholder: "000000", 
             class: "email-box", 
-            style: "width: 100%; font-size: 32px; letter-spacing: 8px; text-align: center; border: 2px solid #0288d1; background: #fff;",
+            style: "width: 100%; color: #0288d1;
+                    font-size: 32px; letter-spacing: 8px; text-align: center; border: 2px solid #0288d1; background: #fff;",
             required: true,
             maxlength: 6 %>
     </div>

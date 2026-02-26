@@ -1012,6 +1012,13 @@ button.dropdown-item.text-danger:hover i {
   }
 }
 
+.stat-card.no-hover {
+  cursor: default;
+  transform: none;
+  background-color: white;
+  box-shadow: none;
+}
+
 .stat-icon {
   font-size: 30px;
 }
@@ -1172,14 +1179,16 @@ button.dropdown-item.text-danger:hover i {
 .btn-edit {
   background-color: #06b6d4;
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
   height: auto;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  text-align: center;
 }
 
 .btn-primary:hover,
 .btn-edit:hover {
-  background-color: #64b5f7;
+  background-color: #3bc4d3;
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
   color: white;
@@ -1199,15 +1208,21 @@ button.dropdown-item.text-danger:hover i {
 }
 
 .btn-outline-secondary {
-  background-color: #3ccddd;
+  background-color: #c43838;
+  ;
   color: white;
   width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  height: auto;
+
 }
 
 .btn-outline-secondary:hover {
-  background-color: #3bc4d3;
+  background-color: #f43f5e;
   color: white;
   transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+
 }
 
 /* Эффект нажатия (Active) */

@@ -6,7 +6,7 @@
 <% end %>
 
 <% if @user.errors.any? %>
-  <div class="error-messages" style="color: red; margin-bottom: 20px;">
+  <div class="error-messages" style="color: red; margin-bottom: 15px;">
     <h2>入力内容 на проверку:</h2>
     <ul>
       <% @user.errors.full_messages.each do |message| %>
@@ -57,7 +57,7 @@
     <!-- =========== EDIT FORM =========== -->
     <div class="edit-container">
       <% if @form && @form.errors.any? %>
-      <div class="error-messages" style="color: red; margin-bottom: 20px; border: 1px solid red; padding: 10px;">
+      <div class="error-messages" style="color: red; margin-bottom: 15px; border: 1px solid red; padding: 10px;">
         <h2>入力内容をご確認ください:</h2>
         <ul>
           <% @form.errors.full_messages.each do |message| %>

@@ -53,6 +53,34 @@
     <% end %>
   </div>
 
+  <div class="related-routes-section">
+    <h3>
+      <i class="fas fa-route"></i>
+      関連するルート
+    </h3>
+
+    <% if @related_routes.present? && @related_routes.any? %>
+      <div class="related-routes-list">
+        <% @related_routes.limit(5).each do |route| %>
+          <%= link_to route_path(route), class: "related-route-item" do %>
+            <div class="related-route-icon">
+              <i class="fas fa-map-marked-alt"></i>
+            </div>
+            <div class="related-route-info">
+              <h4><%= route.name %></h4>
+              <p><%= truncate(route.description, length: 80) %></p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="no-related-routes-message">
+        <i class="fas fa-route"></i>
+        <p>関連するルートがありません</p>
+      </div>
+    <% end %>
+  </div>
+
   <!-- Nearby Venues -->
   <% if @nearby_venues.present? && @nearby_venues.any? %>
     <div class="venue-info-card">

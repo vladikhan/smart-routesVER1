@@ -315,7 +315,6 @@
 	color: white;
 	background: #2296f3;
 	backdrop-filter: blur(20px);
-	border: 2px solid rgba(255, 255, 255, 0.4);
 	height: 60px;
 	padding: 16px 32px;
 	border-radius: 50px;
@@ -348,15 +347,7 @@
 	}
 }
 
-.btn-edit {
-	background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-	color: white;
-	border: none;
 
-	&:hover {
-		background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-	}
-}
 
 /* Container for mini cards */
 .routes-section {
@@ -382,9 +373,8 @@
 /* Hover Effect */
 .route-mini-card:hover {
   background: #ffffff;
-  border-color: #007bff; /* Цвет бренда */
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
-  transform: translateX(5px); /* Японский стиль: смещение вправо вместо увеличения */
+  transform: translateX(5px); 
 }
 
 /* Header & Icon */
@@ -819,9 +809,14 @@
 	cursor: pointer;
 }
 
+.avatar-link {
+  text-decoration: none; 
+}
+
 .author-avatar-large:hover {
-	transform: scale(1.1) rotate(5deg);
+	transform: scale(1.05) rotate(2deg);
 	box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+	/* transform: translateY(-2px); */
 }
 
 .author-avatar-large img {
