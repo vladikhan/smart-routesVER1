@@ -3,7 +3,7 @@
 .profile-header {
 	background: linear-gradient(135deg, #d8f7e7 0%, #338aed 100%);
 	color: white;
-	padding: 50px 20px;
+	padding: 110px 20px;
 }
 
 .profile-header-content {
@@ -66,11 +66,18 @@
 	color:white;
 }
 
+.stat-number-index {
+	font-size: 24px;
+	font-weight: 700;
+	display: block;
+	color:#6366f1;
+}
+
 .stat-label {
 	font-size: 14px;
 	opacity: 0.9;
 	display: block;
-	color: #3d2755;
+	color: white;
 }
 
 /* Profile Actions */
@@ -236,15 +243,43 @@
 	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
+/* Базовый стиль для блока с картинкой/фоном */
+.route-card-image, .venue-card-image {
+  width: 100%;
+  height: 180px;
+  position: relative; /* Чтобы контент внутри не улетал */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: white;
+  overflow: hidden; /* Чтобы картинка не выходила за края */
+}
+
 .route-card-image {
-	width: 100%;
-	height: 180px;
-	background: linear-gradient(135deg, #64b5f7, #0288d1);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 48px;
-	color: white;
+  background: linear-gradient(135deg, #64b5f7, #06b6d4);
+}
+
+.venue-card-image {
+  background: linear-gradient(135deg, #9683EC, #6366f1);
+}
+
+/* ДОБАВЬ ЭТО: Если внутри блока есть картинка <img>, она должна растягиваться правильно */
+.route-card-image img, .venue-card-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Картинка заполнит блок без искажений */
+  z-index: 1;
+}
+
+/* Если поверх картинки есть текст (как на скрине "京都"), он должен быть выше картинки */
+.route-card-image span, .venue-card-image span {
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Чтобы текст лучше читался на фото */
 }
 
 .route-card-content {
@@ -623,9 +658,7 @@
 		font-size: 20px;
 	}
 
-	.stat-number {
-		font-size: 20px;
-	}
+	
 
 	.profile-stats {
 		gap: 20px;

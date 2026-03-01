@@ -1,77 +1,64 @@
-<%= stylesheet_link_tag 'activities', media: 'all' %>
+<%= stylesheet_link_tag "activities", "data-turbo-track": "reload" %>
 
 <div class="activity-timeline-container">
-  <div class="user-stats-row mb-4">
-    <div class="stat">
-      <span class="stat-number"><%= @user.routes.count %></span>
-      <span class="stat-label">ルート</span>
-    </div>
-    <div class="stat">
-      <span class="stat-number"><%= @user.followers.count %></span>
-      <span class="stat-label">フォロワー</span>
-    </div>
-  </div>
 
   <% if activities.any? %>
-    <div class="activity-timeline">
-      <% activities.group_by { |a| a[:created_at].to_date }.each do |date, daily_activities| %>
-        <div class="date-divider">
-          <span class="date-text">
-            <% if date == Date.today %>
-              今日
-            <% elsif date == Date.yesterday %>
-              昨日
-            <% else %>
-              <%= date.strftime('%Y年%m月%d日') %>
-            <% end %>
-          </span>
+    <div class="timeline-body">
+      <%# Группировка по дате — это хорошо, оставляем %>
+      <% activities.group_by { |a| a.created_at.to_date }.each do |date, daily_activities| %>
+        
+        <div class="timeline-date-header">
+          <i class="far fa-calendar-alt"></i> <%= date_label(date) %>
         </div>
 
         <% daily_activities.each do |activity| %>
-          <div class="activity-item">
-            <div class="activity-icon"><%= activity[:icon] %></div>
-            <div class="activity-content">
-              <div class="activity-text"><%= activity[:text] %></div>
-              <div class="activity-time">
-                <%= time_ago_in_words(activity[:created_at]) %>前
-              </div>
-
-              <% if activity[:obj] %>
-                <% case activity[:type] %>
-                <% when 'route' %>
-                  <%= link_to route_path(activity[:obj]), class: "activity-preview" do %>
-                    <div class="preview-content">
-                      <strong><%= activity[:obj].name %></strong>
-                      <p>
-                        <%= truncate(activity[:obj].description, length: 60) %>
-                      </p>
-                    </div>
-                  <% end %>
-                <% when 'like', 'comment' %>
-                  <%= link_to route_path(activity[:obj]), class: "activity-preview" do %>
-                    <div class="preview-content">
-                      <strong><%= activity[:obj].name %></strong>
-                    </div>
-                  <% end %>
+          <%# Определяем пользователя активности заранее %>
+          <% activity_user = activity.respond_to?(:owner) ? activity.owner : (activity.respond_to?(:user) ? activity.user : nil) %>
+          
+          <div class="activity-card shadow-sm mb-3">
+            <div class="activity-avatar">
+              <% if activity_user %>
+                <%= link_to user_path(activity_user) do %>
+                  <%= user_avatar(activity_user, size: 45) %>
                 <% end %>
+              <% else %>
+                <div class="default-icon">👤</div>
+              <% end %>
+            </div>
+
+            <div class="activity-content">
+              <div class="activity-header">
+                <span class="activity-text">
+                  <%= render_activity_text(activity) %>
+                </span>
+              </div>
+              
+              <div class="activity-meta">
+                <small class="text-muted">
+                  <i class="far fa-clock"></i> <%= time_ago_in_words(activity.created_at) %>前
+                </small>
+              </div>
+              
+              <%# Превью объекта (Маршрута, Отзыва и т.д.) %>
+              <% if activity.trackable.present? %>
+                <div class="activity-sub-card mt-2 p-2 border rounded bg-light">
+                  <% if activity.trackable.respond_to?(:name) %>
+                    <%= link_to activity.trackable.name, activity.trackable %>
+                  <% elsif activity.trackable.respond_to?(:title) %>
+                    <%= link_to activity.trackable.title, activity.trackable %>
+                  <% end %>
+                </div>
               <% end %>
             </div>
           </div>
         <% end %>
+
       <% end %>
     </div>
-
-    <div class="mt-4">
-      <%=
-        if activities.respond_to?(:total_pages)
-          paginate activities, param_name: :activity_page
-        end
-      %>
-    </div>
   <% else %>
-    <div class="empty-state">
-      <div class="empty-state-icon">📊</div>
-      <p class="empty-state-text">まだアクティビティがありません</p>
+    <div class="empty-state text-center py-5 shadow-sm rounded">
+      <div class="empty-icon" style="font-size: 3rem;">📭</div>
+      <p class="text-muted mt-2">アクティビティはまだありません</p>
     </div>
   <% end %>
 </div>

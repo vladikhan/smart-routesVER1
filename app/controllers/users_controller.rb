@@ -13,7 +13,6 @@ class UsersController < ApplicationController
   end
 
   def show
-    # Операция Show уже внутри себя делает: set_user, base_routes_scope и prepare_activities
     result = User::Operation::Show.call(params: params, current_user: current_user)
     
     if result.failure?
@@ -23,10 +22,23 @@ class UsersController < ApplicationController
     @user = result[:model]
     @routes = result[:routes]
     @saved_routes = result[:saved_routes]
-    @activities = result[:activities]
+    @activities = Activity.where(user_id: @user.id)
+                      .includes(:user, :trackable)
+                      .order(created_at: :desc)
+                      .page(params[:activity_page])
+    
+  
+  
     
     # Отзывы подгружаем отдельно с пагинацией
-    @reviews = @user.reviews.includes(:reviewable).recent.page(params[:review_page]).per(10)
+    @reviews = @user.reviews
+                    .includes(:user, reviewable: [:city])
+                    .recent
+                    .page(params[:review_page])
+                    .per(10)
+
+   
+    
   end
 
   def edit
@@ -118,15 +130,17 @@ end
 
   private
 
-  def set_user
-    @user = User.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    redirect_to users_path, alert: 'ユーザーが見つかりませんでした'
-  end
-
-  def user_params
-  params.require(:user).permit(:username, :birthday, :location, :gender, :bio, :avatar, :remove_avatar)
+  # Должно быть так:
+def user_params
+  params.require(:user).permit(:username, :bio, :location, :avatar, :remove_avatar) 
 end
+
+def set_user
+    @user = User.find(params[:id])
+  end
+  
+
+
 
   def authorize_user!
     user_to_check = @user || User.find_by(id: params[:id])

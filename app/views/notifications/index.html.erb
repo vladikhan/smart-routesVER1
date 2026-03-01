@@ -14,15 +14,14 @@
     </h1>
 
     <% if @notifications.where(is_read: false).any? %>
-      <%# Исправлено: вызываем JS функцию напрямую через onclick %>
       <button
-  type="button"
-  class="mark-all-read"
-  data-url="<%= mark_all_as_read_notifications_path %>"
-  onclick="console.log('Клик сработал!'); alert('URL: ' + this.dataset.url); markAllNotificationsAsRead(this.dataset.url)"
->
-  すべて既読にする
-</button>
+        type="button"
+        class="mark-all-read"
+        data-url="<%= mark_all_as_read_notifications_path %>"
+        onclick="console.log('Клик сработал!'); alert('URL: ' + this.dataset.url); markAllNotificationsAsRead(this.dataset.url)"
+      >
+        すべて既読にする
+      </button>
     <% end %>
   </div>
 
@@ -43,50 +42,36 @@
       </div>
 
       <% notifications_of_day.each do |notification| %>
-        <%= link_to mark_as_read_notification_path(notification), 
+        <%= button_to mark_as_read_notification_path(notification), 
+                    method: :patch,
                     class: "notification-card #{notification.is_read ? 'read' : 'unread'}",
-                    data: { notification_id: notification.id,
-                            turbo_method: :patch } do %>
-          <div class="notification-icon-large">
-            <%= notification.icon %>
-          </div>
+                    style: "background: none; border: none; padding: 0; width: 100%; text-align: left;",
+                    data: { notification_id: notification.id } do %>
+          
+          <div class="notification-item-layout" style="display: flex; align-items: center; padding: 10px;">
+            <div class="notification-actor-avatar" style="margin-right: 12px;">
+              <%= user_avatar(notification.actor, size: 32, css_class: "avatar-small") %>
+            </div>
 
-          <div class="notification-body">
-            <% if notification.actor.present? %>
-              <div class="notification-actor-avatar">
-                <% if notification.actor.avatar.present? %>
-                  <%=
-                    image_tag notification.actor.avatar.url,
-                              class: 'avatar-small'
-                  %>
-                <% else %>
-                  <div class="avatar-placeholder-small">
-                    <%= notification.actor.username[0].upcase %>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-
-            <div class="notification-text-content">
-              <div class="notification-message">
-                <%= notification.message %>
-              </div>
-              <div class="notification-time">
-                <%= time_ago_in_words(notification.created_at) %>前
+            <div class="notification-body">
+              <div class="notification-text-content">
+                <div class="notification-message">
+                  <%= notification.message %>
+                </div>
+                <div class="notification-time" style="font-size: 0.8em; color: #666;">
+                  <%= time_ago_in_words(notification.created_at) %>前
+                </div>
               </div>
             </div>
+
+            <% unless notification.is_read %>
+              <div class="notification-unread-dot" style="margin-left: auto; width: 10px; height: 10px; background: #007bff; border-radius: 50%;"></div>
+            <% end %>
           </div>
+        <% end %> <%# Закрывает button_to %>
+      <% end %> <%# Закрывает notifications_of_day.each %>
+    <% end %> <%# Закрывает group_by.each %>
 
-          <% unless notification.is_read %>
-            <div class="notification-unread-dot"></div>
-          <% end %>
-        <% end %>
-      <% end %>
-    <% end %>
-
-    <div class="pagination-wrapper mt-4">
-      <%= paginate @notifications %>
-    </div>
   <% else %>
     <div class="empty-state">
       <div class="empty-icon">🔔</div>
@@ -120,8 +105,7 @@
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')
-              .content,
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
             Accept: "application/json",
           },
         }
@@ -130,19 +114,14 @@
       const data = await response.json();
 
       if (data.success) {
-        // Мгновенно обновляем UI карточки
-        const card = document.querySelector(
-          `[data-notification-id="${notificationId}"]`
-        );
+        const card = document.querySelector(`[data-notification-id="${notificationId}"]`);
         if (card) {
           card.classList.remove("unread");
           card.classList.add("read");
-          // Удаляем точку уведомления, если она есть
           const dot = card.querySelector(".notification-unread-dot");
           if (dot) dot.remove();
         }
 
-        // Переходим по адресу уведомления (на маршрут, лайк и т.д.)
         if (data.redirect_url) {
           setTimeout(() => {
             window.location.href = data.redirect_url;
@@ -158,19 +137,25 @@
    * Отметить ВСЕ уведомления как прочитанные
    */
   window.markAllNotificationsAsRead = async function (url) { 
-  if (!url) return; // Предохранитель
-  if (!confirm("すべての通知を既読にしますか？")) return;
+    if (!url) return; 
+    if (!confirm("すべての通知を既読にしますка？")) return;
 
-  try {
-    const response = await fetch(url, { // Используем полученный url
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        "Accept": "application/json",
-      },
-    });
-    // ... остальной твой код с data.success
-  } catch (e) { console.error(e) }
-}
+    try {
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+          "Accept": "application/json",
+        },
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        window.location.reload(); // Перезагружаем, чтобы обновить все статусы
+      }
+    } catch (e) { 
+      console.error(e); 
+    }
+  }
 </script>

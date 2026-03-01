@@ -1,4 +1,6 @@
-
+body {
+  padding: 80px 0;
+}
 
 /* Premium Chat Container */
 .dm-chat-container {
@@ -193,12 +195,12 @@
   background: rgba(102, 126, 234, 0.03);
 }
 
-.chat-avatar-wrapper {
+/* .chat-avatar-wrapper {
   position: relative;
   flex-shrink: 0;
-}
+} */
 
-.chat-avatar,
+/* .chat-avatar,
 .user-avatar,
 .message-avatar {
   width: 52px;
@@ -219,7 +221,7 @@
   font-size: 20px;
   font-weight: 800;
   transform: translateY(-2px);
-}
+} */
 
 .message-avatar {
   width: 32px;
@@ -254,7 +256,7 @@
 .chat-name {
   font-weight: 700;
   font-size: 15px;
-  color: #64748B;
+  color: #667eea;
 }
 
 .chat-time {
@@ -338,6 +340,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: -11px;
 }
 
 .user-name-link {
@@ -349,7 +352,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 800;
-  color: #2c3e50;
+  color: #667eea;
   transition: color 0.3s ease;
 }
 

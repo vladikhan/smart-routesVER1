@@ -1,5 +1,12 @@
 class Route < ApplicationRecord
   belongs_to :user
+
+  after_create_commit do
+    broadcast_replace_to "user_stats_#{user.id}", 
+                         target: "routes_count_#{user.id}", 
+                         html: user.routes.count
+  end
+  
   belongs_to :city, optional: true
 
   has_many :route_items, dependent: :destroy
@@ -50,6 +57,8 @@ class Route < ApplicationRecord
   def increment_view_count!
     increment!(:view_count)
   end
+
+
 
   def liked_by?(user)
     return false unless user

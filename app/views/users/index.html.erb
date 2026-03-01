@@ -8,7 +8,7 @@
 <% end %>
 
     <!-- Hero Banner -->
-    <section class="hero-banner" style="padding: 60px 20px;">
+    <section class="hero-banner" style="padding: 150px 20px;">
       <h1 class="hero-title">ユーザー一覧</h1>
       <p class="hero-subtitle">Smart Routesのメンバーを探す</p>
       <div class="search-box-container">
@@ -32,33 +32,37 @@
         </h2>
       </div>
 
-      <div class="users-grid">
-        <% @users.each do |user| %>
-          <%= link_to user_path(user), class: "user-card" do %>
-            <%=
-              image_tag user.avatar_url,
-                        class: 'user-avatar',
-                        alt: user.username
-            %>
+        <div class="users-grid">
+          <% @users.each do |user| %>
+            <%= link_to user_path(user), class: "user-card" do %>
+              <%=
+                image_tag user.display_avatar,
+                          class: 'user-avatar',
+                          alt: user.username,
+                          loading: 'lazy'
+              %>
 
-            <h3 class="user-name">@<%= user.username %></h3>
+              <h3 class="user-name">@<%= user.username %></h3>
 
-            <p class="user-bio">
-              <%= user.bio || 'まだ自己紹介がありません' %>
-            </p>
+              <p class="user-bio">
+                <%= user.bio || 'まだ自己紹介がありません' %>
+              </p>
 
-            <div class="user-stats">
-              <div class="user-stat">
-                <div class="stat-number"><%= user.routes.count %></div>
-                <div class="stat-label">ルート</div>
+              <%= turbo_stream_from "user_stats_#{user.id}" %>
+              <div class="user-stats">
+                <div class="user-stat">
+                  <div class="stat-number-index" id="routes_count_<%= user.id %>"><%= user.routes.count %>
+                  </div>
+                  
+                  <div class="stat-label-user">ルート</div>
+                </div>
+                <div class="user-stat">
+                  <div class="stat-number-index"><%= user.reviews.count %></div>
+                  <div class="stat-label-user">レビュー</div>
+                </div>
               </div>
-              <div class="user-stat">
-                <div class="stat-number"><%= user.reviews.count %></div>
-                <div class="stat-label">レビュー</div>
-              </div>
-            </div>
+            <% end %>
           <% end %>
-        <% end %>
       </div>
 
       <!-- Pagination -->

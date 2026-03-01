@@ -13,12 +13,11 @@
   <%= render 'pages/header' %>
   
 
-  <%# --- СЕКЦИЯ ХЕДЕРА С ФОЛЛОУИНГОМ --- %>
   <section class="profile-header" 
            data-controller="follow" 
            data-follow-user-id-value="<%= @user.id %>">
     <div class="profile-header-content">
-      <%= image_tag @user.avatar_url, class: "profile-avatar-large", alt: @user.username %>
+      <%= image_tag @user.display_avatar, class: "profile-avatar-large", alt: @user.username %>
 
       <div class="profile-info">
         <h1>@<%= @user.username %></h1>
@@ -34,9 +33,9 @@
             <span class="stat-label">フォロー</span>
           </div>
           <div class="stat-box">
-            <%# Добавили target для мгновенного обновления цифры %>
-            <span class="stat-number" data-follow-target="count"><%= @user.followers.count %></span>
-            <span data-follow-target="count"><%= @user.followers.count %></span> フォロワー
+            <span class="stat-number"><%= @user.followers.count %></span>
+            <span class="stat-label">フォロワー</span>
+            
           </div>
         </div>
 
@@ -72,22 +71,31 @@
     </section>
 
     <main class="profile-content">
-      <div class="tab-content active" id="routes-tab" data-profile-tabs-target="content">
-         <%= render partial: 'routes/route_card', collection: @routes, as: :route %>
-      </div>
-<div class="tab-content" id="saved-tab" data-profile-tabs-target="content" style="display: none;">
-  <div class="bookmarks-container">
-    <%# Получаем все закладки пользователя (и маршруты, и заведения) %>
-    <% all_saved_items = @user.bookmarks.includes(:item).order(created_at: :desc) %>
+  <%# 1. Сначала определяем, находимся ли мы на странице пагинации активностей %>
+  <% is_activity = params[:activity_page].present? %>
 
-    <% if all_saved_items.any? %>
+  <%# 2. Таб МАРШРУТЫ: скрываем его, если мы пагинируем активности %>
+  <div class="tab-content <%= 'active' unless is_activity %>" 
+       id="routes-tab" 
+       data-profile-tabs-target="content"
+       style="<%= is_activity ? 'display: none;' : 'display: block;' %>">
+     <%= render partial: 'routes/route_card', collection: @routes, as: :route %>
+  </div>
+
+  <%# 3. Таб СОХРАНЕННОЕ %>
+  <div class="tab-content" id="saved-tab" data-profile-tabs-target="content" style="display: none;">
+  <div class="bookmarks-container">
+    <% if @saved_routes.any? %>
       <div class="row row-cols-1 row-cols-md-2 g-3">
-        <% all_saved_items.each do |bookmark| %>
-          <div class="col">
+        <% @saved_routes.each do |bookmark| %>
+          <div class="col d-flex"> <%# d-flex поможет выровнять высоту карточек %>
             <% if bookmark.item.is_a?(Route) %>
               <%= render 'routes/route_card', route: bookmark.item %>
             <% elsif bookmark.item.is_a?(Venue) %>
-              <%= render 'venues/venue_card', venue: bookmark.item %>
+              <%# Оборачиваем Venue в специальный класс, если его стили ломаются %>
+              <div class="venue-card-wrapper w-100">
+                <%= render 'venues/venue_card', venue: bookmark.item %>
+              </div>
             <% end %>
           </div>
         <% end %>
@@ -97,15 +105,22 @@
     <% end %>
   </div>
 </div>
-         <%= render partial: 'routes/route_card', collection: @saved_routes, as: :route %>
-      </div>
-      <div class="tab-content" id="reviews-tab" data-profile-tabs-target="content" style="display: none;">
-         <%= render partial: 'reviews/review', collection: @reviews, as: :review %>
-      </div>
-      <div class="tab-content" id="activity-tab" data-profile-tabs-target="content" style="display: none;">
-         <%= render 'notifications/activity_list', activities: @activities %>
-    </main>
+
+  <%# 4. Таб ОТЗЫВЫ %>
+  <div class="tab-content" id="reviews-tab" data-profile-tabs-target="content" style="display: none;">
+     <%= render partial: 'reviews/review', collection: @reviews, as: :review %>
   </div>
+
+  <%# 5. Таб АКТИВНОСТИ: показываем его сразу, если есть activity_page %>
+  <div class="tab-content <%= 'active' if is_activity %>" 
+       id="activity-tab" 
+       data-profile-tabs-target="content" 
+       style="<%= is_activity ? 'display: block;' : 'display: none;' %>">
+    
+    <%# В Rails 6 лучше убрать turbo_frame_tag, если ты не настраивал Hotwire отдельно %>
+    <%= render 'notifications/activity_list', activities: @activities %>
+  </div>
+</main>
       </div>
 
   <%= render 'pages/route_make' %>
@@ -115,52 +130,43 @@
   
 
  <script>
-/**
- * Функция инициализации табов.
- * Мы выносим её отдельно, чтобы вызывать и при загрузке, и при смене страницы.
- */
 function initProfileTabs() {
-  console.log("Checking for tabs..."); // Появится в консоли F12
   const tabs = document.querySelectorAll('.tab-btn');
   const contents = document.querySelectorAll('.tab-content');
 
   if (tabs.length === 0) return;
 
-  
-
-  // Заново находим кнопки после клонирования
-  const freshTabs = document.querySelectorAll('.tab-btn');
-
-  freshTabs.forEach(tab => {
-    tab.addEventListener('click', function() {
+  tabs.forEach(tab => {
+    tab.onclick = function() {
       const target = this.getAttribute('data-tab');
-      console.log("Tab clicked: " + target);
 
       // 1. Снимаем активный класс со всех кнопок
-      freshTabs.forEach(t => t.classList.remove('active'));
-      // 2. Скрываем весь контент через стили (надёжнее чем классы)
+      tabs.forEach(t => t.classList.remove('active'));
+      
+      // 2. Скрываем весь контент
       contents.forEach(c => {
         c.classList.remove('active');
         c.style.display = 'none';
       });
 
-      // 3. Активируем нужную кнопку
+      // 3. Активируем нужную кнопку и блок
       this.classList.add('active');
-      // 4. Показываем нужный блок
       const activeBox = document.getElementById(target + '-tab');
       if (activeBox) {
         activeBox.classList.add('active');
         activeBox.style.display = 'block';
       }
-    });
+    };
   });
 }
 
-// Слушаем событие Turbo (обязательно для Rails 7)
-document.addEventListener('turbo:load', initProfileTabs);
+document.addEventListener('turbolinks:load', initProfileTabs);
 
-// На всякий случай для обычных переходов
-document.addEventListener('DOMContentLoaded', initProfileTabs);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initProfileTabs);
+} else {
+  initProfileTabs();
+}
 </script>
 
 

@@ -73,19 +73,16 @@
     <%= yield :extra_css %>
 
     <style>
-  /* Уменьшаем шрифты категорий и отступы */
   .picker {
     --emojis-per-row: 6;
     --emoji-size: 1.5rem;
-    font-size: 0.8rem; /* Уменьшаем общий текст интерфейса */
+    font-size: 0.8rem; 
   }
 
-  /* Если хочешь убрать лишние детали (например, превью внизу) */
   .picmo__preview {
     display: none !important;
   }
   
-  /* Делаем само окно более легким */
   .picmo__picker {
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);

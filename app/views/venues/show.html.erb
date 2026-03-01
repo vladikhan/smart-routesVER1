@@ -268,9 +268,12 @@ style: "display:none;" %>
 
       <div class="d-flex gap-3 align-items-start">
 
-        <div class="author-avatar-large flex-shrink-0 shadow-sm"
-             style="width:45px; height:45px; font-size:18px;">
-          <%= current_user.username&.at(0)&.upcase || "U" %>
+        <div class="author-avatar-large avatar-container shadow-sm"
+            style="width:50px; height:50px; overflow: hidden; border-radius: 50%; background-color: #f8f9fa;">
+          
+          
+          <%= user_avatar(current_user, size: 50) %>
+
         </div>
 
         <div class="flex-grow-1">
@@ -341,23 +344,18 @@ style: "display:none;" %>
       class: "text-decoration-none shadow-sm rounded-circle d-block position-relative", 
       style: "z-index: 2;", 
       onclick: "event.stopPropagation();" do %>
-  <div class="author-avatar-large flex-shrink-0 d-flex align-items-center justify-content-center"
-       style="width:40px; height:40px; font-size:16px; background-color: #f0f2f5; color: #65676b;">
-    <% if review.user.avatar.present? %>
-      <%= image_tag review.user.avatar.thumb.url,
-            class: 'w-100 h-100 rounded-circle object-fit-cover' %>
-    <% else %>
-      <span class="fw-bold text-decoration-none" style="color: inherit;">
-        <%= review.user.username.first.upcase %>
-      </span>
-    <% end %>
-  </div>
+      
+    
+
+    <div class="author-avatar-large avatar-container shadow-sm"
+     style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; background-color: #f0f2f5;">
+  <%= link_to user_path(review.user), title: review.user.username, class: "d-block w-100 h-100" do %>
+    <%= user_avatar(review.user, size: 50, css_class: "avatar-standard") %>
+  <% end %>
+</div>
+
+
 <% end %>
-
-            
-
-
-
 
             <!-- Content -->
             <div class="flex-grow-1">

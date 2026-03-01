@@ -7,7 +7,7 @@
 
 <% if @user.errors.any? %>
   <div class="error-messages" style="color: red; margin-bottom: 15px;">
-    <h2>入力内容 на проверку:</h2>
+    <h2>入力内容 for check:</h2>
     <ul>
       <% @user.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -22,11 +22,9 @@
     <!-- =========== PROFILE HEADER =========== -->
     <section class="profile-header">
       <div class="profile-header-content">
-        <%=
-          image_tag @user.avatar_url,
-                    class: 'profile-avatar-large',
-                    id: 'header-avatar'
-        %>
+        
+
+<%= image_tag @user.display_avatar, id: "img_prev", class: "profile-avatar-large" %>
 
         <div class="profile-info">
           <h1>@<%= @user.username %></h1>
@@ -103,8 +101,7 @@
                 type="button"
                 id="delete-btn"
                 class="btn-delete-photo"
-                onclick="deleteAvatar()"
-              >
+                onclick="deleteAvatar()">
                 写真を削除
               </button>
               <%=

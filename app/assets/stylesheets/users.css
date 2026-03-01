@@ -44,7 +44,7 @@
 	font-size: 18px;
 	font-weight: 700;
 	margin-bottom: 8px;
-	color: #333;
+	color: #6366f1;
 }
 
 .user-bio {
@@ -76,8 +76,40 @@
 	color: #0288d1;
 }
 
-.stat-label {
+.stat-label-user {
 	font-size: 12px;
-	color: #999;
+	color: #64748B;
 	margin-top: 2px;
+}
+
+.review-target-header {
+  /* Чтобы ссылка не "вылетала" за пределы, если нужно ограничить область */
+  position: relative; 
+  transition: transform 0.2s ease;
+  
+  .text-primary {
+    color: #2296f3; 
+    font-size: 0.9rem;
+    letter-spacing: -0.02em;
+		margin-left: 30px;
+    font-size: larger;
+		font-weight: bolder;
+    
+    &:hover {
+      color: #0056b3; 
+      text-decoration: none;
+    }
+  }
+
+  /* Если хочешь, чтобы при наведении на всю карточку текст заголовка чуть подсвечивался */
+  &:hover .text-primary {
+    color: #64b5f7;
+  }
+}
+
+/* Стили для эмодзи или иконки, чтобы они не слипались с текстом */
+.review-target-header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }

@@ -79,40 +79,40 @@ class NotificationPresenter
 
     helpers = Rails.application.routes.url_helpers
 
-    case notifiable_type
+    case @n.notifiable_type
     when 'Route'
-      helpers.route_path(notifiable)
+      helpers.route_path(@n.notifiable)
 
     when 'Venue'
-      helpers.venue_path(notifiable)
+      helpers.venue_path(@n.notifiable)
 
     when 'DmMessage'
-      room_id = notifiable.respond_to?(:dm_room_id) ? notifiable.dm_room_id : nil
+      room_id = @n.notifiable.respond_to?(:dm_room_id) ? @n.notifiable.dm_room_id : nil
       room_id ? helpers.dm_room_path(room_id) : helpers.dm_rooms_path
 
     when 'Comment'
-      target = notifiable.commentable
+      target = @n.notifiable.commentable
       if target.is_a?(Route)
-        helpers.route_path(target, anchor: "comment-#{notifiable.id}")
+        helpers.route_path(target, anchor: "comment-#{@n.notifiable.id}")
       elsif target.is_a?(Venue)
-        helpers.venue_path(target, anchor: "comment-#{notifiable.id}")
+        helpers.venue_path(target, anchor: "comment-#{@n.notifiable.id}")
       else
         helpers.root_path
       end
 
     when 'Review'
-      if notifiable.reviewable
-        helpers.route_path(notifiable.reviewable, anchor: "review-#{notifiable.id}")
+      if @n.notifiable.reviewable
+        helpers.route_path(@n.notifiable.reviewable, anchor: "review-#{@n.notifiable.id}")
       else
         helpers.root_path
       end
 
     when 'Like'
-      target = notifiable.likeable
+      target = @n.notifiable.likeable
       target.is_a?(Route) ? helpers.route_path(target) : helpers.root_path
 
     when 'User'
-      helpers.user_path(notifiable)
+      helpers.user_path(@n.notifiable)
 
     else
       helpers.root_path
@@ -124,22 +124,25 @@ class NotificationPresenter
 
   private
 
+  private
+
   def get_target_name
-    case notifiable
+    case @n.notifiable
     when Route, Venue
-      notifiable.name
+      @n.notifiable.name
     when Comment
-      notifiable.commentable&.name
+      @n.notifiable.commentable&.name
     when Review
-      notifiable.reviewable&.name
+      @n.notifiable.reviewable&.name
     when Like
-      notifiable.likeable&.name
+      @n.notifiable.likeable&.name
     when DmMessage
-      notifiable.dm_room&.other_user(user)&.username
+      @n.notifiable.dm_room&.other_user(@n.user)&.username
     else
       nil
     end
-  rescue StandardError
+  rescue StandardError => e
+    Rails.logger.error "❌ get_target_name error: #{e.message}"
     nil
   end
 end

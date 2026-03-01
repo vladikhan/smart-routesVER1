@@ -15,12 +15,8 @@
       <div class="user-info">
         <%= link_to user_path(@route.user), class: "avatar-link" do %>
           <div class="user-avatar">
-            <% if @route.user.avatar.present? %>
-              <%= image_tag @route.user.avatar.thumb.url, alt: @route.user.username %>
-            <% else %>
-              <%= @route.user.username[0].upcase %>
-            <% end%>
-          </div>
+          <%= user_avatar(@route.user, size: 40) %>
+        </div>
         <% end %>
         <div class="user-name-date">
           <strong>@<%= @route.user.username %></strong>
@@ -210,20 +206,30 @@
   </div>
 
   <div class="counter-badge shadow-sm">
-    <span class="count-num"><%= @route.reviews.count %></span>
+    <span class="count-num"><%= @reviews.count %></span>
     <span class="count-label">件</span>
   </div>
 </div>
 
   <!-- Review Form for logged in users -->
   <% if user_signed_in? %>
-  <%# !!!!!!!! %>
   <div class="review-form-card mb-4 p-4 bg-white rounded-4 shadow-sm border">
     <%= form_with(model: [@route, @route.reviews.build], local: true, class: 'review-form') do |f| %>
       <div class="d-flex gap-3 align-items-start">
-        <div class="chat-avatar chat-avatar-placeholder">
-          <%= current_user.username&.at(0)&.upcase || "U" %>
-        </div>
+        <div class="author-avatar-large avatar-container shadow-sm" 
+     style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; background-color: #f0f2f5;">
+  
+  <% if current_user.avatar.present? %>
+    <%= image_tag current_user.avatar.thumb.url, 
+          class: 'w-100 h-100 object-fit-cover' %>
+  <% else %>
+    <%# Dicebear аватар для чата %>
+    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=<%= current_user.username || 'user' %>" 
+         alt="<%= current_user.username %>" 
+         class="w-100 h-100">
+  <% end %>
+  
+</div>
 
         <div class="flex-grow-1">
           <div class="rating-select mb-2 d-flex align-items-center gap-2">
@@ -258,9 +264,6 @@
       </div>
     <% end %>
   </div>
-  <%# !!!!!!! %>
-
-
 
   <% else %>
     <div class="text-center py-4 mb-4 bg-light rounded-3 border">
@@ -273,31 +276,37 @@
 
   <!-- Reviews List -->
   <div class="reviews-list">
-        <% if @reviews&.any? %>
-      <% @reviews.order(created_at: :desc).each_with_index do |review, index| %>
-        <%# Добавляем border-bottom всем, кроме последнего элемента %>
-        <div class="review-item py-3 <%= 'border-bottom' unless index == @reviews.count - 1 %>" id="review-<%= review.id %>">
-          <div class="d-flex gap-3">
-<%# !!!!!! %>
-            <%= link_to user_path(review.user), class: "chat-avatar-link flex-shrink-0" do %>
-  <div class="chat-avatar-wrapper shadow-sm" style="width:52px; height:52px;">
+      <% if @reviews&.any? %>
+    <% @reviews.each_with_index do |review, index| %>
+      <div class="review-item py-3 <%= 'border-bottom' unless index == @reviews.count - 1 %>" id="review-<%= review.id %>">
+        <div class="d-flex gap-3">
+          <%= link_to user_path(review.user), class: "chat-avatar-link flex-shrink-0" do %>
+    <div class="chat-avatar-wrapper shadow-sm" style="width:52px; height:52px;">
+      <% if review.user.avatar.present? %>
+        <%= image_tag review.user.avatar.thumb.url, 
+                      class: "chat-avatar", 
+                      alt: review.user.username, 
+                      style: "width:52px; height:52px; object-fit: cover;" %>
+      <% elsif review.user.image_url.present? %>
+        <%= image_tag review.user.image_url, 
+                      class: "chat-avatar", 
+                      alt: review.user.username, 
+                      style: "width:52px; height:52px; object-fit: cover;" %>
+      <% else %>
+        <div class="author-avatar-large avatar-container shadow-sm" 
+      style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; background-color: #f0f2f5;">
+    
     <% if review.user.avatar.present? %>
-      <%# Используем .thumb.url для быстрой загрузки в списке %>
+      <%# Настоящий аватар из Active Storage %>
       <%= image_tag review.user.avatar.thumb.url, 
-                    class: "chat-avatar", 
-                    alt: review.user.username, 
-                    style: "width:52px; height:52px; object-fit: cover;" %>
-    <% elsif review.user.image_url.present? %>
-      <%= image_tag review.user.image_url, 
-                    class: "chat-avatar", 
-                    alt: review.user.username, 
-                    style: "width:52px; height:52px; object-fit: cover;" %>
+            class: 'w-100 h-100 object-fit-cover' %>
     <% else %>
-      <%# Заглушка, если аватара нет %>
-      <div class="chat-avatar chat-avatar-placeholder" 
-           >
-        <%= review.user.username&.at(0)&.upcase || "U" %>
-      </div>
+      <%# Генерация Dicebear на лету %>
+      <img src="https://api.dicebear.com/7.x/identicon/svg?seed=<%= review.user.username || 'user' %>" 
+          alt="<%= review.user.username %>" 
+          class="w-100 h-100">
+    <% end %>
+  </div>
     <% end %>
 
     <%# Индикатор онлайна автора отзыва %>
@@ -306,9 +315,8 @@
     <% end %>
   </div>
 <% end %>
-<%# !!!!!! %>
           <div class="flex-grow-1">
-            <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="d-flex justify-content-between align-items-center w-100">
               <div>
                 <div class="fw-semibold"><%= review.user.username %></div>
                 <div class="text-muted small">
@@ -382,13 +390,21 @@
       <!-- Author Card -->
       <div class="content-card author-card">
         <%= link_to user_path(@route.user), class: "avatar-link" do %>
-          <div class="author-avatar-large chat-avatar chat-avatar-placeholder">
-            <% if @route.user.avatar.present? %>
-              <%= image_tag @route.user.avatar.thumb.url, alt: @route.user.username %>
-            <% else %>
-              <%= @route.user.username[0].upcase %>
-            <% end %>
-          </div>
+          <div class="author-avatar-large chat-avatar d-flex align-items-center justify-content-center shadow-sm"
+     style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%; background-color: #f8f9fa;">
+  
+  <% if @route.user.avatar.present? %>
+    <%# Настоящее фото из Active Storage %>
+    <%= image_tag @route.user.avatar.thumb.url, 
+          alt: @route.user.username,
+          class: 'w-100 h-100 object-fit-cover' %>
+  <% else %>
+    <%# Уникальный Dicebear аватар по имени автора %>
+    <img src="https://api.dicebear.com/7.x/identicon/svg?seed=<%= @route.user.username || 'author' %>" 
+         alt="<%= @route.user.username %>" 
+         class="w-100 h-100">
+  <% end %>
+</div>
         <% end %>
 
 
@@ -447,7 +463,7 @@
                 <div class="route-mini-card-meta">
                   <div class="route-mini-card-meta-item">
                     <i class="fas fa-map-marker-alt"></i>
-                    <%= route.route_items.count %>場所
+                    <%= route.route_items.size %>場所
                   </div>
                   <div class="route-mini-card-meta-item">
                     <i class="fas fa-heart"></i>
@@ -475,7 +491,7 @@
 <script>
 // 1. Берем данные из Ruby (уже есть в твоем коде)
 
-const rubyData = <%= raw @route.route_items.reload.map { |item| 
+const rubyData = <%= raw @route.route_items.map { |item| 
       {
         latitude:  item.latitude.to_f,
         longitude: item.longitude.to_f,
@@ -484,9 +500,7 @@ const rubyData = <%= raw @route.route_items.reload.map { |item|
       }
     }.to_json %>;
 
-    console.log("DEBUG: rubyData из базы:", rubyData);
 
-console.log("DEBUG: Что внутри rubyData[0]?", rubyData[0]);
 
 // 2. Исправленный маппинг (используем точные имена latitude/longitude)
 const routeItems = rubyData.map(item => {
@@ -504,7 +518,7 @@ const routeItems = rubyData.map(item => {
 console.log("DEBUG: После маппинга routeItems:", routeItems);
 (function() {
     // 1. Берем чистые данные из Ruby
-    const rawData = <%= raw (@route.route_items.reload.map { |item| 
+    const rawData = <%= raw (@route.route_items.map { |item| 
       {
         lat: item.latitude.to_f,
         lng: item.longitude.to_f,

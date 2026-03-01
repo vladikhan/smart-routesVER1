@@ -32,25 +32,25 @@ class Notification < ApplicationRecord
   end
 
   def target_url
-  return "#" if notifiable.blank?
-  
   helpers = Rails.application.routes.url_helpers
   
   case notification_type
   when 'new_message'
-    msg = DmMessage.find_by(id: notifiable_id)
-    msg ? helpers.dm_room_path(msg.dm_room_id) : "#"
+    # Используем &. (safe navigation), чтобы не упасть, если notifiable пропал
+    room_id = notifiable&.dm_room_id
+    room_id ? helpers.dm_room_path(room_id) : helpers.dm_rooms_path
   when 'follow'
     helpers.user_path(actor_id)
   when 'like', 'new_route'
-    helpers.route_path(notifiable_id)
+    # Если маршрут удалили, отправляем на главную
+    notifiable.present? ? helpers.route_path(notifiable_id) : helpers.routes_path
   else
     helpers.root_path
   end
-  rescue => e
-    Rails.logger.error "Notification target_url error: #{e.message}"
-    "#"
-  end
+rescue => e
+  Rails.logger.error "Notification target_url error: #{e.message}"
+  "/"
+end
 
   def self.mark_all_as_read_for(user)
   user.notifications.where(is_read: false).update_all(is_read: true, read_at: Time.current)

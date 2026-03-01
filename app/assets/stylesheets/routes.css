@@ -296,7 +296,7 @@
 	    height: 60px;
 
 	&:hover {
-		background: rgba(255, 255, 255, 0.35);
+		background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
 		border-color: rgba(255, 255, 255, 0.6);
 	}
 
@@ -313,12 +313,13 @@
 
 .btn-save {
 	color: white;
-	background: #2296f3;
+	background: rgba(255, 255, 255, 0.25);
 	backdrop-filter: blur(20px);
 	height: 60px;
 	padding: 16px 32px;
 	border-radius: 50px;
 	font-weight: 700;
+	border: 2px solid rgba(255, 255, 255, 0.4);
 
 	&:hover {
 		background: #64b5f7;
@@ -328,7 +329,7 @@
 	}
 	
 	&.active {
-		background: #4caf50;
+		background: #64b5f7;
 	color: white;
 	border: 2px solid rgba(255, 255, 255, 0.4)
 	}
@@ -341,6 +342,7 @@
 	color: white;
 	backdrop-filter: blur(20px);
 	height: 60px;
+	border: 2px solid rgba(255, 255, 255, 0.4);
 
 	&:hover {
 		background: rgba(255, 255, 255, 0.35);
@@ -542,7 +544,7 @@
 		transform: translateX(12px);
 		background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
 		box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
-		border-left-color: #0d41e1;
+		border-left-color: #6366f1;
 
 		&::before {
 			width: 100%;
@@ -835,6 +837,7 @@
 	font-weight: 800;
 	color: #2c3e50;
 	margin-bottom: 8px;
+  margin-top: 30px;
 }
 
 .author-username {
@@ -1036,7 +1039,7 @@
 
 .review-author-name {
 	font-weight: 800;
-	color: #2c3e50;
+	color: #3d2755;
 	font-size: 16px;
 	transition: color 0.3s ease;
 }
@@ -1046,11 +1049,7 @@
 	color: #667eea;
 }
 
-.review-author-username {
-	font-size: 13px;
-	color: #999;
-	font-weight: 600;
-}
+
 
 .review-rating {
 	display: flex;
@@ -1252,7 +1251,7 @@
 	left: 0;
 	right: 0;
 	height: 3px;
-	background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
+	background: linear-gradient(90deg, #07c8f9 0%, #64b5f7 100%);
 	border-radius: 3px 3px 0 0;
 }
 

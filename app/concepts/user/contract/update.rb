@@ -4,7 +4,8 @@ module User::Contract
     property :bio
     property :avatar
     property :location
-
+    property :remove_avatar
+    
     validates :username, presence: true
     validates :bio, length: { maximum: 500 }
   end

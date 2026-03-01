@@ -13,6 +13,8 @@
 	margin-bottom: 2rem;
 	padding-bottom: 1rem;
 	border-bottom: 2px solid #e2e8f0;
+  margin-top: 100px;
+
 }
 
 .page-title {
@@ -85,7 +87,7 @@
 		border-color: #e2e8f0;
 
 		&::before {
-			background: linear-gradient(90deg, #07c8f9 0%, #0d41e1 100%);
+			background: #6366f1;
 		}
 	}
 

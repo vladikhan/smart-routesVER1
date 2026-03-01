@@ -42,9 +42,11 @@
 /* Hero Banner */
 .hero-banner {
 	background: linear-gradient(135deg, #4dc9e6 0%, #fefbf6 100%);
-	padding: 60px 20px;
+	padding: 150px 0;
 	color: white;
 	text-align: center;
+	margin-top: 0 !important;    
+	overflow: hidden;
 }
 
 .hero-title {

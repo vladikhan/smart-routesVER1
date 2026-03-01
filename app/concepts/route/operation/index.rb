@@ -8,7 +8,7 @@ module Route::Operation
       
       ctx[:model] = ::Route.public_routes
                            .with_attached_images
-                           .includes(:user, :city)
+                           .includes(:user, :city, :route_items)
                            .recent
     end
 

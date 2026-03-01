@@ -2,23 +2,30 @@ class NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @notifications = current_user.notifications
-                                 .includes(:actor, :notifiable)
-                                 .recent
+    # 1. Сначала фильтруем (Scope logic)
+    base_notifications = current_user.notifications.includes(:actor, :notifiable).recent
 
     @notifications = case params[:filter]
-                     when 'messages'     then @notifications.message_notifications
-                     when 'interactions' then @notifications.interaction_notifications
-                     when 'follows'      then @notifications.follow_notifications
-                     else @notifications 
+                     when 'messages'     then base_notifications.message_notifications
+                     when 'interactions' then base_notifications.interaction_notifications
+                     when 'follows'      then base_notifications.follow_notifications
+                     else base_notifications 
                      end
 
-    @notifications = @notifications.page(params[:page]).per(20)
+    # 2. Берем только последние 50. Пагинация больше не нужна, если мы чистим базу.
+    @notifications = @notifications.limit(50)
 
-    @unread_count = @notifications.where(is_read: false).count
+    # 3. Считаем непрочитанные ДО того, как пометим их прочитанными
+    @unread_count = @notifications.select { |n| !n.is_read }.size
+
+    # 4. Помечаем только ТЕ, что сейчас на экране, как прочитанные
+    unread_ids = @notifications.reject(&:is_read).map(&:id)
+    if unread_ids.any?
+      current_user.notifications.where(id: unread_ids)
+                  .update_all(is_read: true, read_at: Time.current)
+    end
   end
 
-  # Этот метод должен быть один!
   def unread_count
     render json: { 
       count: current_user.notifications.where(is_read: false).count, 

@@ -106,13 +106,22 @@ end
   end
 
   # === Helpers ===
-  def avatar_url
-    avatar.present? ? avatar.url : '/images/default_avatar.png'
-  end
-
   def admin?
     respond_to?(:is_admin) && is_admin
   end
 
-  
+  # === Default Avatar ===
+  def avatar_url
+    avatar.present? ? avatar.url : nil 
+  end
+
+  # === Default Avatar ===
+def display_avatar
+  if avatar.present? && avatar.file.present? && avatar.file.exists?
+    avatar.url
+  else
+    seed = username.presence || id
+    "https://api.dicebear.com/7.x/identicon/svg?seed=#{seed}&backgroundColor=ffffff"
+  end
+end
 end

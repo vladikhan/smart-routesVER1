@@ -40,14 +40,13 @@
 
     <div class="auth-links">
       <% if user_signed_in? %>
-        <%= render 'pages/notification_bell' %>
+       
+        <%# Bell in header %>
+        <%#= render 'pages/notification_bell' %>
+
 
         <%= link_to user_path(current_user), class: "page-nav-icon", title: "マイページ" do %>
-          <% if current_user.avatar.present? %>
-            <%= image_tag current_user.avatar.thumb.url %>
-          <% else %>
-            👤
-          <% end %>
+          <%= image_tag current_user.display_avatar, class: "rounded-circle", size: "40x40" %>
         <% end %>
 
         <%= link_to 'ログアウト', logout_confirm_path, class: 'login-btn' %>

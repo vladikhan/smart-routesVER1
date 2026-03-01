@@ -107,13 +107,13 @@ Rails.application.routes.draw do
   end
 
   # Notification routes
-  resources :notifications, only: %i[index show] do
+  resources :notifications, only: %i[index] do
     collection do
       get :unread_count
       patch :mark_all_as_read
     end
     member do
-      get :mark_as_read
+      patch :mark_as_read
     end
   end
 end

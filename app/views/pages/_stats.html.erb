@@ -4,25 +4,25 @@
     <%= link_to routes_path, class: "stat-card" do %>
       <div class="stat-icon">🗺️</div>
       <div class="stat-number"><%= @routes_count %></div>
-      <div class="stat-label">ルート</div>
+      <div class="stat-label-home">ルート</div>
     <% end %>
 
     <%= link_to venues_path, class: "stat-card" do %>
       <div class="stat-icon">📍</div>
       <div class="stat-number"><%= @venues_count %></div>
-      <div class="stat-label">場所</div>
+      <div class="stat-label-home">場所</div>
     <% end %>
 
     <%= link_to users_path, class: "stat-card" do %>
       <div class="stat-icon">👥</div>
       <div class="stat-number"><%= @users_count %></div>
-      <div class="stat-label">ユーザー</div>
+      <div class="stat-label-home">ユーザー</div>
     <% end %>
 
     <div class="stat-card no-hover">
       <div class="stat-icon">⭐</div>
       <div class="stat-number"><%= @reviews_count %></div>
-      <div class="stat-label">レビュー</div>
+      <div class="stat-label-home">レビュー</div>
     </div>
   </div>
 </div>

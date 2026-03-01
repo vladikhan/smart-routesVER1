@@ -1,4 +1,6 @@
 <%= stylesheet_link_tag 'dmRooms', media: 'all' %>
+<%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
 <%= render 'pages/header'%>
 
 <div class="dm-chat-container">
@@ -41,25 +43,18 @@
            data-filter="<%= is_unread ? 'unread' : 'all' %>">
         
         <%= link_to user_path(other), class: "chat-avatar-link" do %>
-  <div class="chat-avatar-wrapper">
-    <% if other.avatar.present? %>
-      <%# Для CarrierWave обязательно добавляем .url %>
-      <%= image_tag other.avatar.url, class: "chat-avatar", alt: other.username %>
-    <% elsif other.image_url.present? %>
-      <%# Это твои ссылки из консоли или плейсхолдеры %>
-      <%= image_tag other.image_url, class: "chat-avatar", alt: other.username %>
-    <% else %>
-      <%# Заглушка с первой буквой %>
-      <div class="chat-avatar chat-avatar-placeholder">
-        <%= other.username[0].upcase if other.username.present? %>
-      </div>
-    <% end %>
+          <div class="author-avatar-large avatar-container shadow-sm chat-avatar-wrapper" 
+              style="position: relative; margin-right: 12px; width: 50px; height: 50px; flex-shrink: 0;">
+            
+            <%# Вызываем аватар именно в размере 50 %>
+            <%= user_avatar(other, size: 50, css_class: "chat-avatar rounded-circle") %>
 
-    <% if other.respond_to?(:online?) && other.online? %>
-      <span class="online-indicator"></span>
-    <% end %>
-  </div>
-<% end %>
+            <%# Индикатор онлайна %>
+            <% if other.respond_to?(:online?) && other.online? %>
+              <span class="online-indicator"></span>
+            <% end %>
+          </div>
+        <% end %> 
 
         <%= link_to dm_room_path(room), class: "chat-info-clickable-area" do %>
           <div class="chat-info">
@@ -103,27 +98,19 @@
       <div class="dm-chat-header">
         <div class="header-user-info">
 
-          <%= link_to user_path(other), class: "chat-avatar-link" do %>
-  <div class="chat-avatar-wrapper">
-    <% if other.avatar.present? %>
-      <%# Для CarrierWave обязательно добавляем .url %>
-      <%= image_tag other.avatar.url, class: "chat-avatar", alt: other.username %>
-    <% elsif other.image_url.present? %>
-      
-      <%= image_tag other.image_url, class: "chat-avatar",  alt: other.username %>
-    <% else %>
-      <%# Заглушка с первой буквой %>
-      <div class="chat-avatar chat-avatar-placeholder">
-        <%= other.username[0].upcase if other.username.present? %>
-      </div>
-    <% end %>
+          <%= link_to user_path(other), class: "chat-avatar-link d-block", style: "text-decoration: none;" do %>
+        <div class="author-avatar-large avatar-container shadow-sm chat-avatar-wrapper" 
+            style="position: relative; margin-right: 12px; width: 50px; height: 50px; flex-shrink: 0; background-color: #f0f2f5; border-radius: 50%; overflow: hidden;">
+          
+          <%# Хелпер сам создаст правильный img с нужным размером %>
+          <%= user_avatar(other, size: 50, css_class: "chat-avatar rounded-circle object-fit-cover") %>
 
-    <% if other.respond_to?(:online?) && other.online? %>
-      <span class="online-indicator"></span>
-    <% end %>
-  </div>
-<% end %>
-<%# !!!!!!!! %>
+          <%# Добавляем индикатор онлайна, если нужно %>
+          <% if other.respond_to?(:online?) && other.online? %>
+            <span class="online-indicator" style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background-color: #2ecc71; border: 2px solid white; border-radius: 50%; z-index: 2;"></span>
+          <% end %>
+        </div>
+      <% end %>
 
           <h5 class="user-name"><%= other.username %></h5>
         </div>

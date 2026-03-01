@@ -4,7 +4,7 @@ class RoutesController < ApplicationController
   def index
     result = Route::Operation::Index.call(params: params)
     
-    @routes = result[:routes] || result[:model] # Поддержка обоих ключей для надежности
+    @routes = result[:routes] || result[:model] 
     @featured_routes = result[:featured_routes]
     @cities = City.all
   end
@@ -22,6 +22,7 @@ class RoutesController < ApplicationController
     @bookmark = result[:bookmark]
     @related_routes = result[:related_routes]
     @reviews = @route.reviews.includes(:user) if @route.respond_to?(:reviews)
+    @reviews = @route.reviews.includes(:user).order(created_at: :desc)
   else
     redirect_to routes_path, alert: "Route not found"
   end
