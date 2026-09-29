@@ -16,7 +16,7 @@ class RouteItem < ApplicationRecord
   # end
 
   def venue?
-    item_type == 'Venue'
+    read_attribute(:item_type).to_s.classify == 'Venue'
   end
 
   def item_type

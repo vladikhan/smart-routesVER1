@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_02_19_020719) do
+ActiveRecord::Schema.define(version: 2026_09_27_152220) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -158,6 +158,11 @@ ActiveRecord::Schema.define(version: 2026_02_19_020719) do
     t.index ["follower_id", "following_id"], name: "index_followers_on_follower_id_and_following_id", unique: true
     t.index ["follower_id"], name: "index_followers_on_follower_id"
     t.index ["following_id"], name: "index_followers_on_following_id"
+  end
+
+  create_table "jwt_denylists", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "likes", force: :cascade do |t|
@@ -378,9 +383,11 @@ ActiveRecord::Schema.define(version: 2026_02_19_020719) do
     t.string "gender"
     t.integer "followers_count", default: 0, null: false
     t.integer "following_count", default: 0, null: false
+    t.string "jti", default: "", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["is_admin"], name: "index_users_on_is_admin"
+    t.index ["jti"], name: "index_users_on_jti"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
     t.index ["verification_code"], name: "index_users_on_verification_code"

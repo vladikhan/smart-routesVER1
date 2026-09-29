@@ -62,6 +62,7 @@ gem 'validates_timeliness', '~> 6.0'
 gem 'valid_email2'
 
 gem 'turbo-rails'
+gem 'devise-jwt'
 
 # --- Группа разработки и тестов ---
 group :development, :test do

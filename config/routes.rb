@@ -36,7 +36,7 @@ Rails.application.routes.draw do
   get 'logout_confirm', to: 'pages#logout_confirm'
 
   # Users
-  # resources :users, only: %i[index show edit update] do
+  # resources :users only: %i[index show edit update] do
   #   resource :follow, only: %i[create destroy], controller: 'follows'
   # end
 
@@ -48,11 +48,11 @@ Rails.application.routes.draw do
     end
   end
 
-  
+
   # Email verification
   get 'email_verification', to: 'email_verifications#new'
   post 'email_verification', to: 'email_verifications#verify'
-  post 'email_verification/resend', to: 'email_verifications#resend', as: 'email_verification_resend'
+  post 'email_verification/resend', to: 'email_verification#resend', as: 'email_verification_resend'
 
   resource :email_verification, only: [:new, :show] do
     collection do
@@ -116,4 +116,20 @@ Rails.application.routes.draw do
       patch :mark_as_read
     end
   end
+
+  namespace :api do
+    namespace :v1 do
+      resources :venues, only: %i[index show]
+      resources :routes, only: %i[index show]
+      resources :cities, only: %i[index show]
+
+      devise_for :users, path: '', controllers: {
+        sessions: 'api/v1/sessions'
+      }, path_names: {
+        sign_in: 'login',
+        sign_out: 'logout'
+      }
+    end
+  end
+
 end

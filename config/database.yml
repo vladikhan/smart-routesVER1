@@ -2,20 +2,19 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: postgres
-  password: password
-  host: db # имя сервиса из docker-compose.yml
+  host: localhost
+  port: 5432
 
 development:
   <<: *default
-  database: smartroutes_development
-
+  database: smart_routes_dev
 test:
   <<: *default
-  database: smartroutes_test
+  host: localhost   # или 127.0.0.1
+  port: 5432  
+  database: smart_routes_test
 
 production:
-  production:
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>

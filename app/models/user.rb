@@ -1,7 +1,8 @@
 class User < ApplicationRecord
   # === Devise & Auth ===
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable, :confirmable
+         :recoverable, :rememberable, :validatable, :confirmable,
+         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
   mount_uploader :avatar, AvatarUploader
 
@@ -53,17 +54,17 @@ class User < ApplicationRecord
   end
 
   def send_verification_code
-  generate_verification_code
-  UserMailer.verification_code_email(self).deliver_now
+    generate_verification_code
+    UserMailer.verification_code_email(self).deliver_now
   end
 
   # === Messages and Notifications ===
-def unread_notifications_count
-  # Rails кэширует простые count запросы, но можно добавить явный кэш
-  Rails.cache.fetch("user_#{id}_unread_notifications", expires_in: 1.minute) do
-    notifications.unread.count
+  def unread_notifications_count
+    # Rails кэширует простые count запросы, но можно добавить явный кэш
+    Rails.cache.fetch("user_#{id}_unread_notifications", expires_in: 1.minute) do
+      notifications.unread.count
+    end
   end
-end
 
   def unread_messages_count
     (sent_dm_rooms.sum(:unread_count_sender) || 0) + (received_dm_rooms.sum(:unread_count_receiver) || 0)
@@ -112,16 +113,16 @@ end
 
   # === Default Avatar ===
   def avatar_url
-    avatar.present? ? avatar.url : nil 
+    avatar.present? ? avatar.url : nil
   end
 
   # === Default Avatar ===
-def display_avatar
-  if avatar.present? && avatar.file.present? && avatar.file.exists?
-    avatar.url
-  else
-    seed = username.presence || id
-    "https://api.dicebear.com/7.x/identicon/svg?seed=#{seed}&backgroundColor=ffffff"
+  def display_avatar
+    if avatar.present? && avatar.file.present? && avatar.file.exists?
+      avatar.url
+    else
+      seed = username.presence || id
+      "https://api.dicebear.com/7.x/identicon/svg?seed=#{seed}&backgroundColor=ffffff"
+    end
   end
-end
 end

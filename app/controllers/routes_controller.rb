@@ -35,13 +35,6 @@ end
     @venues = Venue.all
   end
 
-  def route_params
-  params.require(:route).permit(
-    :name, :description, :is_public,
-    route_items_attributes: [:id, :venue_name, :venue_address, :geo_lat, :geo_lng, :_destroy]
-  )
-end
-
   def create
     result = Route::Operation::Create.call(
       params: params.to_unsafe_h,
@@ -80,25 +73,6 @@ end
       current_user: current_user,
       id: params[:id]
     )
-def update
-    result = Route::Operation::Update.call(
-        params: params.to_unsafe_h,
-        current_user: current_user,
-        id: params[:id]
-    )
-
-    if result.success?
-      redirect_to route_path(result[:model]), notice: 'ルートを更新しました'
-    elsif result['result.policy.default']&.failure?
-      redirect_to routes_path, alert: '他の人のルートは編集できません'
-    else
-      @route = result[:model]
-      @cities = City.order(:name)
-      @venues = Venue.order(:name) if defined?(Venue)
-      flash.now[:alert] = result['contract.default']&.errors&.full_messages&.join(', ') || '更新に失敗しました'
-      render :edit, status: :unprocessable_entity
-    end
-  end
 
     if result.success?
       redirect_to route_path(result[:model]), notice: 'ルートを更新しました'
@@ -127,15 +101,15 @@ def update
   
 end
 
-  def route_params
-  params.require(:route).permit(
-    :name, :description, :city_id, :estimated_duration, :estimated_cost, :difficulty_level,
-    tag_ids: [],
-    route_items_attributes: [:id, :venue_name, :venue_address, :geo_lat, :geo_lng, :duration_minutes, :_destroy]
-  )
-end
-
   private
+
+  def route_params
+    params.require(:route).permit(
+      :name, :description, :city_id, :estimated_duration, :estimated_cost, :difficulty_level,
+      tag_ids: [],
+      route_items_attributes: [:id, :venue_name, :venue_address, :geo_lat, :geo_lng, :duration_minutes, :_destroy]
+    )
+  end
 
   def set_user_interaction_data
     return unless current_user && @route
