@@ -1,41 +1,129 @@
- Smart Routes
-Travel route sharing platform for Osaka, Kyoto, and Nara. 大阪・京都・奈良向け旅行ルート共有プラットフォーム
+# Smart Routes 🗺️
+**Travel route sharing platform for Osaka, Kyoto, and Nara**
+大阪・京都・奈良向け旅行ルート共有プラットフォーム
 
- Overview / 概要
-Smart Routes is a platform to create, share, and search for travel routes that combine sightseeing spots with local gourmet experiences. Smart Routesは、観光地とローカルグルメを組み合わせた旅行ルートを作成・共有・検索できるプラットフォームです。
+## Overview / 概要
 
- Key Features / 主な機能
-AI Route Generation: Create routes based on city, preferences, and budget. (AIによるルート生成：都市・好み・予算を考慮)
+Smart Routes lets travelers create, share, and discover routes combining sightseeing spots with local food experiences across Kansai region.
+観光地とローカルグルメを組み合わせた旅行ルートを作成・共有・検索できるプラットフォームです。
 
-Verified Routes: User-created and community-verified travel plans. (ユーザー作成＆検証済みルート)
+> 🚧 Currently migrating from Rails monolith → Rails API + Next.js frontend
 
-Interactive Maps: Navigation powered by Google Maps API. (Google Maps API連動ナビゲーション)
+---
 
-Social Features: Follow, save, and messaging functionality. (フォロー・保存・メッセージ機能)
+## Architecture / アーキテクチャ
 
- Tech Stack / 技術スタック
-Backend: Ruby on Rails (Trailblazer), PostgreSQL, Redis
+smart-routes-frontend/ # Next.js 16 (App Router, TypeScript, Tailwind v4)
+smartRoutesReact/ # Rails 6.1 Pure API (Trailblazer, PostgreSQL, Redis)
 
-Infrastructure: Docker, AWS (EC2, RDS, S3, Route53)
 
-CI/CD: Docker-based deployment
+**Frontend** → SSR/SEO-optimized pages, JWT auth via httpOnly cookies
+**Backend** → JSON API, Trailblazer operations, Devise JWT
 
-How to Run with Docker / Dockerでの起動方法
-1. Prerequisites / 前提条件
-Docker & Docker Compose installed.
+---
 
-2. Setup Environment / 環境設定
-Create a .env file in the root directory and add your keys (Refer to .env.example): ルートディレクトリに.envファイルを作成し、キーを追加してください（.env.exampleを参照）:
+## Key Features / 主な機能
 
-Bash
+- 🤖 **AI Route Generation** — routes based on city, preferences, and budget
+- ✅ **Verified Routes** — community-created and verified travel plans
+- 🗺️ **Interactive Maps** — Google Maps API navigation
+- 👥 **Social Features** — follow, bookmark, messaging, reviews
 
-GOOGLE_MAPS_API_KEY=your_api_key_here
-DATABASE_URL=postgres://postgres:password@db:5432/smart_routes_dev
-3. Build and Start / ビルドと起動
-Bash
+---
 
+## Tech Stack / 技術スタック
+
+| Layer | Tech |
+|---|---|
+| Frontend | Next.js 16, TypeScript, Tailwind CSS v4 |
+| Backend | Ruby on Rails 6.1, Trailblazer 2.x |
+| Database | PostgreSQL 15 |
+| Cache/Jobs | Redis 7, Sidekiq |
+| Auth | Devise + JWT |
+| Maps | Google Maps API |
+| Infrastructure | Docker, AWS (EC2, RDS, S3, Route53) |
+| CI/CD | Docker-based deployment |
+
+---
+
+## Getting Started / 起動方法
+
+### Prerequisites
+- Docker & Docker Compose
+- Ruby 3.1.4 (rbenv)
+- Node.js 18+
+
+### 1. Environment setup
+
+```bash
+cp .env.example .env
+# Fill in your keys:
+# GOOGLE_MAPS_API_KEY=
+# SECRET_KEY_BASE=
+# DEVISE_JWT_SECRET_KEY=
+```
+
+### 2. Run with Docker (recommended)
+
+```bash
 docker-compose up --build
-The app will be available at http://localhost:3000.
+```
 
-Deployment / デプロイ
-The project is deployed using a custom shell script that manages Docker containers on the server. 本プロジェクトは、サーバー上のDockerコンテナを管理するカスタムシェルスクリプトを使用してデプロイされています。
+- Rails API → http://localhost:3000
+- Next.js frontend → http://localhost:3001
+
+### 3. Run locally (development)
+
+```bash
+# Terminal 1 — Backend
+docker-compose up -d db redis
+cd smartRoutesReact
+DISABLE_SPRING=1 REDIS_URL=redis://localhost:6379/0 rails server -p 3000
+
+# Terminal 2 — Frontend
+cd smart-routes-frontend
+npm run dev  # runs on port 3001
+```
+
+### 4. Database setup
+
+```bash
+cd smartRoutesReact
+DISABLE_SPRING=1 rails db:migrate
+REDIS_URL=redis://localhost:6379/0 DISABLE_SPRING=1 rails db:seed
+```
+
+---
+
+## API Endpoints / APIエンドポイント
+
+| Method | Path | Description |
+|---|---|---|
+| GET | /api/v1/venues | List venues |
+| GET | /api/v1/venues/:id | Venue detail |
+| GET | /api/v1/routes | List routes |
+| GET | /api/v1/cities | List cities |
+| POST | /api/v1/login | JWT login |
+| DELETE | /api/v1/logout | JWT logout |
+
+---
+
+## Deployment / デプロイ
+
+Deployed via custom shell script managing Docker containers on AWS EC2.
+AWS EC2上のDockerコンテナをカスタムシェルスクリプトで管理してデプロイしています。
+
+```bash
+./deploy.sh
+```
+
+---
+
+## Project Status / 進捗
+
+- [x] Rails API namespace + venues endpoint
+- [x] Next.js SSR frontend with venues page
+- [ ] JWT authentication
+- [ ] Routes pages
+- [ ] Google Maps integration
+- [ ] AI route generation
